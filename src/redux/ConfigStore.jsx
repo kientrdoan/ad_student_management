@@ -3,6 +3,8 @@ import { thunk } from 'redux-thunk';
 import { UserReducer } from './reducers/UserRedeucer';
 import { DepartmentReducer } from './reducers/Department';
 import { MajorReducer } from './reducers/MajorReducer';
+import { ClassReducer } from './reducers/ClassReducer';
+import { StudentReducer } from './reducers/StudentReducer';
 const dummyReducer = (state = {}, ) => state;
 
 const rootReducer = combineReducers({
@@ -10,6 +12,8 @@ const rootReducer = combineReducers({
   UserReducer,
   DepartmentReducer,
   MajorReducer,
+  ClassReducer,
+  StudentReducer,
   dummy: dummyReducer
 })
 

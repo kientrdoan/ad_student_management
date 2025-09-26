@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Input, Space, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAction } from "../redux/actions/DepartmentsAction";
+import { editDepartmentAction, getAllAction } from "../redux/actions/DepartmentsAction";
 import { addDepartmentAction } from "../redux/actions/DepartmentsAction";
 
 export default function Department() {
@@ -38,8 +38,16 @@ export default function Department() {
     try {
       const values = await form.validateFields();
       if (editingRecord) {
-        // TODO: gọi API update
-        console.log("Edit department:", { ...editingRecord, ...values });
+        let newValues = { ...editingRecord, ...values }
+        console.log("Edit department:", newValues);
+        const res = await dispatch(editDepartmentAction(newValues));
+        console.log("res edit", res);
+        if (res.success) {
+          message.success("Edit department successfully!");
+          dispatch(getAllAction());
+        } else {
+          message.error("Failed to edit department!");
+        }
       } else {
         // Gọi API add
         const res = await dispatch(addDepartmentAction(values));

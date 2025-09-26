@@ -1,17 +1,18 @@
 /* eslint-disable no-unused-vars */
 
-import { departmentService } from "../../../service/DepartmentService";
-import { GET_ALL } from "../types/DepartmentType";
+import { classService } from "../../../service/ClassService";
+import { GET_ALL_CLASS } from "../types/ClassType";
 
 
-export const getAllAction = () => {
+
+export const getAllClassAction = () => {
   return async (dispatch) => {
     try {
-      const result = await departmentService.getAll();
+      const result = await classService.getAll();
       if (result.status === 200) {
         dispatch({
-          type: GET_ALL,
-          departments: result.data.data,
+          type: GET_ALL_CLASS,
+          classes: result.data.data,
         });
         return { success: true, data: result.data.data };
       }
@@ -22,10 +23,10 @@ export const getAllAction = () => {
   };
 };
 
-export const addDepartmentAction = (payload) => {
+export const addClassAction = (payload) => {
   return async (dispatch) => {
     try {
-      const result = await departmentService.addDepartment(payload);
+      const result = await classService.addStudent(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };
@@ -38,11 +39,11 @@ export const addDepartmentAction = (payload) => {
 };
 
 
-export const editDepartmentAction = (payload) => {
+export const editClassAction = (payload) => {
   return async (dispatch) => {
     try {
-      const result = await departmentService.editDepartment(payload);
-      console.log("result", result);
+      const result = await classService.editStudent(payload);
+      console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };
       }

@@ -14,7 +14,7 @@ export class DepartmentService extends BaseService {
   }
 
   editDepartment = (payload) => {
-    return this.put(`/admins/departments/${payload.id}`, payload)
+    return this.put(`/admins/departments/`, payload)
   }
 }
 

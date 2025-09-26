@@ -2,10 +2,12 @@ import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import HomeTemplate from "./my_templates/HomeTemplate";
-import Student from "./pages/student";
 import { TOKEN } from "../utils/Config";
 import Department from "./pages/Department";
 import Major from "./pages/Major";
+import Student from "./pages/Student";
+import Class from "./pages/Class";
+import StudentDetail from "./pages/StudentDetail";
 
 function App() {
   const ProtectedRoute = () => {
@@ -20,8 +22,10 @@ function App() {
           <Route path="/" element={<HomeTemplate />}>
             <Route index element={<Home />} />
             <Route path="students" element={<Student />} />
+            <Route path="students/detail" element={<StudentDetail />} />
             <Route path="departments" element={<Department />} />
             <Route path="majors" element={<Major />} />
+            <Route path="class" element={<Class />} />
           </Route>
         </Route>
 

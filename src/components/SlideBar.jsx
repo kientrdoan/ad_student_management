@@ -5,9 +5,9 @@ const menuItems = [
   { name: "Dashboard", path: "/" },
   { name: "Departments", path: "/departments" },
   { name: "Majors", path: "/majors" },
+  { name: "Class", path: "/class" },
   { name: "Students", path: "/students" },
   { name: "Teachers", path: "/teachers" },
-  { name: "Class", path: "/class" },
 ];
 
 export default function SlideBar() {
