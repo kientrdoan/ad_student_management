@@ -1,0 +1,1 @@
+export const GET_ALL_MAJOR = 'GET_ALL_MAJOR';

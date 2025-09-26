@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 
 import { loginAction } from "../redux/actions/UserAction";
+import { TOKEN } from "../../utils/Config";
 
 export default function Login(props) {
   const dispatch = useDispatch();
@@ -29,6 +30,18 @@ export default function Login(props) {
 
         if (result?.success) {
           messageApi.success("Đăng nhập thành công!");
+          console.log("result", result);
+
+          const accessToken = result.data?.access;
+          // const refreshToken = result.data?.refresh;
+
+          if (accessToken) {
+            localStorage.setItem(TOKEN, accessToken);
+          }
+          // if (refreshToken) {
+          //   localStorage.setItem("refresh_token", refreshToken);
+          // }
+
           navigate("/");
         } else {
           messageApi.error("Tài khoản hoặc mật khẩu không đúng!");
@@ -42,7 +55,7 @@ export default function Login(props) {
   return (
     <>
       {contextHolder}
-      <div className="flex justify-center items-center content-center h-screen">
+      <div className='flex justify-center items-center content-center h-screen'>
         <form
           onSubmit={formik.handleSubmit}
           className='lg:w-1/2 xl:max-w-screen-sm'
