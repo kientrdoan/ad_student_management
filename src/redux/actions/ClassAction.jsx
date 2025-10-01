@@ -8,7 +8,7 @@ import { GET_ALL_CLASS } from "../types/ClassType";
 export const getAllClassAction = () => {
   return async (dispatch) => {
     try {
-      const result = await classService.getAll();
+      const result = await classService.getAllClass();
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_CLASS,
@@ -26,7 +26,7 @@ export const getAllClassAction = () => {
 export const addClassAction = (payload) => {
   return async (dispatch) => {
     try {
-      const result = await classService.addStudent(payload);
+      const result = await classService.addClass(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };
@@ -42,7 +42,7 @@ export const addClassAction = (payload) => {
 export const editClassAction = (payload) => {
   return async (dispatch) => {
     try {
-      const result = await classService.editStudent(payload);
+      const result = await classService.editClass(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };

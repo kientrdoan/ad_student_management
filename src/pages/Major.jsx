@@ -4,7 +4,7 @@ import {
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAction } from "../redux/actions/DepartmentsAction";
-import { addMajorAction, getAllMajorAction } from "../redux/actions/MajorAction";
+import { addMajorAction, editMajorAction, getAllMajorAction } from "../redux/actions/MajorAction";
 
 export default function Major() {
   const dispatch = useDispatch();
@@ -45,6 +45,13 @@ export default function Major() {
       if (editingRecord) {
         // TODO: Update major
         console.log("Update major:", { ...editingRecord, ...values });
+        const res = await dispatch(editMajorAction({ ...editingRecord, ...values }));
+        if (res.success) {
+          message.success("edit major successfully!");
+          dispatch(getAllMajorAction());
+        } else {
+          message.error("Failed to edit major!");
+        }
       } else {
         console.log("Add major:", values);
         const res = await dispatch(addMajorAction(values));

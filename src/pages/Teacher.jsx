@@ -2,43 +2,43 @@
 import React, { useEffect } from "react";
 import { Table, Button, Space, Popconfirm, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllStudentAction, deleteStudentAction } from "../redux/actions/StudentAction";
-import { getAllClassAction } from "../redux/actions/ClassAction";
+import {  deleteTeacherAction, getAllTeacherAction } from "../redux/actions/TeacherAction";
 import { Link } from "react-router-dom";
 
-export default function Student() {
+export default function Teacher() {
   const dispatch = useDispatch();
-  const students = useSelector((state) => state.StudentReducer.students);
+  const teachers = useSelector((state) => state.TeacherReducer.teachers);
+    // 👉 dữ liệu đang edit
+
 
   useEffect(() => {
-    dispatch(getAllStudentAction());
-    dispatch(getAllClassAction());
+    dispatch(getAllTeacherAction());
   }, [dispatch]);
 
   const handleDelete = async (id) => {
-    const res = await dispatch(deleteStudentAction(id));
+    const res = await dispatch(deleteTeacherAction(id));
     if (res.success) {
       message.success("Xoá student thành công!");
-      dispatch(getAllStudentAction()); // reload danh sách
+      dispatch(getAllTeacherAction()); // reload danh sách
     } else {
       message.error("Xoá thất bại!");
     }
   };
 
+
+
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
-    { title: "Student Code", dataIndex: "student_code", key: "student_code" },
     { title: "Last Name", render: (_, r) => r.user?.last_name || "N/A" },
     { title: "First Name", render: (_, r) => r.user?.first_name || "N/A" },
-    { title: "Class", dataIndex: "classes", key: "classes" },
     { title: "Email", render: (_, r) => r.user?.email || "N/A" },
     { title: "Phone", render: (_, r) => r.user?.phone || "N/A" },
     {
       title: "Action",
       render: (_, record) => (
         <Space>
-          <Link to={`/students/detail/${record.id}`}>Edit</Link>
-          <Popconfirm
+          <Link to={`/teachers/detail/${record.id}`}>Edit </Link>
+           <Popconfirm
             title="Bạn có chắc muốn xoá student này?"
             okText="OK"
             cancelText="Hủy"
@@ -56,16 +56,17 @@ export default function Student() {
   return (
     <div style={{ padding: 24 }}>
       <Space style={{ marginBottom: 16 }}>
-        <Link to="/students/detail">Add Student</Link>
+        <Link to="/teachers/detail">Add Teacher</Link>
       </Space>
 
       <Table
         bordered
         columns={columns}
-        dataSource={students}
+        dataSource={teachers}
         rowKey={(record) => record.id}
         pagination={{ pageSize: 10 }}
       />
+
     </div>
   );
 }

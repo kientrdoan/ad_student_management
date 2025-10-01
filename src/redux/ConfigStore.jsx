@@ -5,6 +5,7 @@ import { DepartmentReducer } from './reducers/Department';
 import { MajorReducer } from './reducers/MajorReducer';
 import { ClassReducer } from './reducers/ClassReducer';
 import { StudentReducer } from './reducers/StudentReducer';
+import { TeacherReducer } from './reducers/TeacherReducer';
 const dummyReducer = (state = {}, ) => state;
 
 const rootReducer = combineReducers({
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   MajorReducer,
   ClassReducer,
   StudentReducer,
+  TeacherReducer,
   dummy: dummyReducer
 })
 

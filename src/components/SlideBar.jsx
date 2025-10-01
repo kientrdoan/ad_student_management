@@ -8,6 +8,8 @@ const menuItems = [
   { name: "Class", path: "/class" },
   { name: "Students", path: "/students" },
   { name: "Teachers", path: "/teachers" },
+  { name: "courses", path: "/courses" },
+  { name: "semester", path: "/semester" },
 ];
 
 export default function SlideBar() {

@@ -5,16 +5,16 @@ export class ClassService extends BaseService {
     super();
   }
 
-  getAll = () => {
+  getAllClass = () => {
     return this.get_token("/admins/classes/");
   };
 
-  addStudent = (payload) => {
+  addClass = (payload) => {
     return this.post_token(`/admins/classes/`, payload)
   }
 
-  editStudent = (payload) => {
-    return this.put(`/admins/classes/${payload.id}`, payload)
+  editClass = (payload) => {
+    return this.put(`/admins/classes/`, payload)
   }
 }
 

@@ -14,7 +14,7 @@ export class MajorService extends BaseService {
   }
 
   editMajor = (payload) => {
-    return this.put(`/admins/majors/${payload.id}`, payload)
+    return this.put(`/admins/majors/`, payload)
   }
 }
 

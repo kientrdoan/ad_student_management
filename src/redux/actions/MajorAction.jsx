@@ -41,7 +41,7 @@ export const addMajorAction = (payload) => {
 export const editMajorAction = (payload) => {
   return async (dispatch) => {
     try {
-      const result = await majorService.addDepartment(payload);
+      const result = await majorService.editMajor(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };
