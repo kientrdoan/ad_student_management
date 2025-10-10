@@ -1,41 +1,30 @@
-import React, { useEffect } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  Card,
-  Space,
-  DatePicker,
-  message,
-} from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import dayjs from "dayjs";
+"use client"
 
-import {
-  addTeacherAction,
-  editTeacherAction,
-  getTeacherAction,
-} from "../redux/actions/TeacherAction";
-import { getAllAction } from "../redux/actions/DepartmentsAction";
+import { useEffect } from "react"
+import { Form, Input, Button, Select, Card, Space, DatePicker, message, Row, Col } from "antd"
+import { UserOutlined, ArrowLeftOutlined } from "@ant-design/icons"
+import { useDispatch, useSelector } from "react-redux"
+import { useParams, useNavigate } from "react-router-dom"
+import dayjs from "dayjs"
+
+import { addTeacherAction, editTeacherAction, getTeacherAction } from "../redux/actions/TeacherAction"
+import { getAllAction } from "../redux/actions/DepartmentsAction"
 
 export default function TeacherDetail() {
-  const [form] = Form.useForm();
-  const dispatch = useDispatch();
-  const departments = useSelector(
-    (state) => state.DepartmentReducer.departments
-  );
+  const [form] = Form.useForm()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const departments = useSelector((state) => state.DepartmentReducer.departments)
 
-  const [messageApi, contextHolder] = message.useMessage();
-  const { id } = useParams();
+  const [messageApi, contextHolder] = message.useMessage()
+  const { id } = useParams()
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getAllAction());
+      await dispatch(getAllAction())
 
       if (id) {
-        const res = await dispatch(getTeacherAction(id));
+        const res = await dispatch(getTeacherAction(id))
         if (res.success) {
           form.setFieldsValue({
             instructor_code: res.data.instructor_code,
@@ -48,20 +37,17 @@ export default function TeacherDetail() {
             phone: res.data.user?.phone,
             address: res.data.user?.address,
             identity_number: res.data.user?.identity_number,
-            date_of_birth: res.data.user?.date_of_birth
-              ? dayjs(res.data.user.date_of_birth)
-              : null,
+            date_of_birth: res.data.user?.date_of_birth ? dayjs(res.data.user.date_of_birth) : null,
             gender: res.data.user?.gender === "M" ? "Nam" : "Nữ",
-            url: res.data.user?.url,
-          });
+          })
         } else {
-          messageApi.error("Không tìm thấy teacher!");
+          messageApi.error("Không tìm thấy teacher!")
         }
       }
-    };
+    }
 
-    fetchData();
-  }, [dispatch, id, form, messageApi]);
+    fetchData()
+  }, [dispatch, id, form, messageApi])
 
   const handleSubmit = async (values) => {
     const payload = {
@@ -76,166 +62,184 @@ export default function TeacherDetail() {
         phone: values.phone,
         address: values.address,
         identity_number: values.identity_number,
-        date_of_birth: values.date_of_birth
-          ? values.date_of_birth.format("YYYY-MM-DD")
-          : null,
+        date_of_birth: values.date_of_birth ? values.date_of_birth.format("YYYY-MM-DD") : null,
         gender: values.gender === "Nam" ? "M" : "F",
-        url: values.url,
-        password: "12345", // có thể fix cứng hoặc backend set
+        password: "12345",
         role: "TEACHER",
         is_active: true,
       },
-    };
+    }
 
     if (id) {
-      const res = await dispatch(editTeacherAction(id, payload));
+      const res = await dispatch(editTeacherAction(id, payload))
       if (res.success) {
-        messageApi.success("Cập nhật teacher thành công!");
+        messageApi.success("Cập nhật teacher thành công!")
+        setTimeout(() => navigate("/teachers"), 1000)
       } else {
-        messageApi.error("Thao tác thất bại!");
+        messageApi.error("Thao tác thất bại!")
       }
     } else {
-      const res = await dispatch(addTeacherAction(payload));
+      const res = await dispatch(addTeacherAction(payload))
       if (res.success) {
-        messageApi.success("Thêm teacher thành công!");
+        messageApi.success("Thêm teacher thành công!")
+        setTimeout(() => navigate("/teachers"), 1000)
       } else {
-        messageApi.error("Thao tác thất bại!");
+        messageApi.error("Thao tác thất bại!")
       }
     }
-  };
+  }
 
   return (
     <>
       {contextHolder}
-      <Card
-        title={id ? "Cập nhật Teacher" : "Thêm Teacher"}
-        style={{ maxWidth: 800, margin: "0 auto", marginTop: 24 }}
-      >
-        <Form form={form} layout='vertical' onFinish={handleSubmit}>
-          {/* Teacher Info */}
-          <Space size='middle' style={{ width: "100%", display: "flex" }}>
-            <Form.Item
-              label='Instructor Code'
-              name='instructor_code'
-              style={{ flex: 1 }}
-              rules={[
-                { required: true, message: "Vui lòng nhập mã giảng viên!" },
-              ]}
-            >
-              <Input placeholder='VD: T20' />
-            </Form.Item>
-
-            <Form.Item label='Degree' name='degree' style={{ flex: 1 }}>
-              <Input placeholder='VD: Master, PhD' />
-            </Form.Item>
-
-            <Form.Item label='Title' name='title' style={{ flex: 1 }}>
-              <Input placeholder='VD: Professor, Lecturer' />
-            </Form.Item>
-          </Space>
-
-          <Form.Item
-            label='Department'
-            name='department'
-            rules={[{ required: true, message: "Vui lòng chọn khoa!" }]}
-          >
-            <Select placeholder='Chọn khoa'>
-              {departments?.map((d) => (
-                <Select.Option key={d.id} value={d.id}>
-                  {d.name || d.id}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          {/* User Info */}
-          <h3 style={{ marginTop: 24, marginBottom: 12 }}>Thông tin cá nhân</h3>
-          <Space size='middle' style={{ width: "100%" }}>
-            <Form.Item
-              label='First Name'
-              name='first_name'
-              style={{ flex: 1 }}
-              rules={[{ required: true, message: "Vui lòng nhập First Name!" }]}
-            >
-              <Input placeholder='Nhập First Name' />
-            </Form.Item>
-
-            <Form.Item
-              label='Last Name'
-              name='last_name'
-              style={{ flex: 1 }}
-              rules={[{ required: true, message: "Vui lòng nhập Last Name!" }]}
-            >
-              <Input placeholder='Nhập Last Name' />
-            </Form.Item>
-
-            <Form.Item
-              label='Identity Number'
-              name='identity_number'
-              style={{ flex: 1 }}
-            >
-              <Input placeholder='CMND/CCCD' />
-            </Form.Item>
-
-            <Form.Item
-              label='Date of Birth'
-              name='date_of_birth'
-              style={{ flex: 1 }}
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-          </Space>
-
-          <Space size='middle' style={{ width: "100%" }}>
-            <Form.Item
-              label='Email'
-              name='email'
-              style={{ flex: 1 }}
-              rules={[
-                { required: true, message: "Vui lòng nhập email!" },
-                { type: "email", message: "Email không hợp lệ!" },
-              ]}
-            >
-              <Input placeholder='Nhập Email' />
-            </Form.Item>
-
-            <Form.Item
-              label='Phone'
-              name='phone'
-              style={{ flex: 1 }}
-              rules={[
-                { required: true, message: "Vui lòng nhập số điện thoại!" },
-              ]}
-            >
-              <Input placeholder='Nhập Phone' />
-            </Form.Item>
-
-            <Form.Item label='Gender' name='gender' style={{ flex: 1 }}>
-              <Select placeholder='Chọn giới tính'>
-                <Select.Option value='male'>Nam</Select.Option>
-                <Select.Option value='female'>Nữ</Select.Option>
-                <Select.Option value='other'>Khác</Select.Option>
-              </Select>
-            </Form.Item>
-          </Space>
-
-          <Form.Item label='Address' name='address'>
-            <Input placeholder='Nhập địa chỉ' />
-          </Form.Item>
-
-          <Space size='middle' style={{ width: "100%" }}>
-            {/* <Form.Item label="Avatar URL" name="url" style={{ flex: 1 }}>
-              <Input placeholder="Nhập URL avatar" />
-            </Form.Item> */}
-          </Space>
-
-          <Form.Item>
-            <Button type='primary' htmlType='submit' block>
-              {id ? "Cập nhật Teacher" : "Lưu Teacher"}
+      <div className="h-full overflow-auto p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/teachers")} className="mb-4">
+              Back to Teachers
             </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <UserOutlined className="text-indigo-600 text-xl" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">{id ? "Edit Teacher" : "Add New Teacher"}</h1>
+                <p className="text-sm text-gray-500">
+                  {id ? "Update teacher information" : "Create a new teacher record"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Card className="shadow-sm border border-gray-200">
+            <Form form={form} layout="vertical" onFinish={handleSubmit}>
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                  Teacher Information
+                </h3>
+                <Row gutter={16}>
+                  <Col span={8}>
+                    <Form.Item
+                      label="Instructor Code"
+                      name="instructor_code"
+                      rules={[{ required: true, message: "Please input instructor code!" }]}
+                    >
+                      <Input placeholder="e.g. T20001" size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item label="Degree" name="degree">
+                      <Input placeholder="e.g. PhD, Master" size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item label="Title" name="title">
+                      <Input placeholder="e.g. Professor" size="large" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Form.Item
+                  label="Department"
+                  name="department"
+                  rules={[{ required: true, message: "Please select department!" }]}
+                >
+                  <Select placeholder="Select department" size="large">
+                    {departments?.map((d) => (
+                      <Select.Option key={d.id} value={d.id}>
+                        {d.name || d.id}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                  Personal Information
+                </h3>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      label="First Name"
+                      name="first_name"
+                      rules={[{ required: true, message: "Please input first name!" }]}
+                    >
+                      <Input placeholder="Enter first name" size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Last Name"
+                      name="last_name"
+                      rules={[{ required: true, message: "Please input last name!" }]}
+                    >
+                      <Input placeholder="Enter last name" size="large" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Email"
+                      name="email"
+                      rules={[
+                        { required: true, message: "Please input email!" },
+                        { type: "email", message: "Invalid email!" },
+                      ]}
+                    >
+                      <Input placeholder="Enter email" size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="Phone" name="phone" rules={[{ required: true, message: "Please input phone!" }]}>
+                      <Input placeholder="Enter phone" size="large" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Row gutter={16}>
+                  <Col span={8}>
+                    <Form.Item label="Identity Number" name="identity_number">
+                      <Input placeholder="ID/Passport" size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item label="Date of Birth" name="date_of_birth">
+                      <DatePicker style={{ width: "100%" }} size="large" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item label="Gender" name="gender">
+                      <Select placeholder="Select gender" size="large">
+                        <Select.Option value="Nam">Male</Select.Option>
+                        <Select.Option value="Nữ">Female</Select.Option>
+                        <Select.Option value="Khác">Other</Select.Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Form.Item label="Address" name="address">
+                  <Input.TextArea rows={2} placeholder="Enter address" />
+                </Form.Item>
+              </div>
+
+              <Form.Item className="mb-0">
+                <Space size="middle">
+                  <Button type="primary" htmlType="submit" size="large">
+                    {id ? "Update Teacher" : "Create Teacher"}
+                  </Button>
+                  <Button size="large" onClick={() => navigate("/teachers")}>
+                    Cancel
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Form>
+          </Card>
+        </div>
+      </div>
     </>
-  );
+  )
 }

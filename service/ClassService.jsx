@@ -13,8 +13,8 @@ export class ClassService extends BaseService {
     return this.post_token(`/admins/classes/`, payload)
   }
 
-  editClass = (payload) => {
-    return this.put(`/admins/classes/`, payload)
+  editClass = (id, payload) => {
+    return this.put(`/admins/classes/${id}`, payload)
   }
 }
 

@@ -39,10 +39,10 @@ export const addClassAction = (payload) => {
 };
 
 
-export const editClassAction = (payload) => {
+export const editClassAction = (id, payload) => {
   return async (dispatch) => {
     try {
-      const result = await classService.editClass(payload);
+      const result = await classService.editClass(id, payload);
       console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };

@@ -1,32 +1,20 @@
-import React from "react";
-import { FiMenu, FiMail } from "react-icons/fi";
+import { FiUser } from "react-icons/fi"
 
 export default function Header() {
   return (
-    <header className="flex items-center justify-between bg-gray-100 px-4 h-14 shadow">
+    <header className="flex items-center justify-between bg-white px-6 h-16 flex-shrink-0 shadow-sm border-b border-gray-200">
+      <div className="flex items-center">
+        <h2 className="text-lg font-semibold text-gray-800">Dashboard</h2>
+      </div>
 
-    <div></div>
-
-      {/* Khu vực bên phải */}
-      <div className="flex items-center space-x-4">
-        {/* Icon thông báo / mail */}
-        {/* <div className="relative">
-          <FiMail size={20} className="text-gray-600 hover:text-gray-800" />
-          <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-            6
-          </span>
-        </div> */}
-
-        {/* Avatar + tên */}
-        <div className="flex items-center space-x-2 cursor-pointer">
-          {/* <img
-            src="https://i.pravatar.cc/40"
-            alt="avatar"
-            className="w-8 h-8 rounded-full object-cover"
-          /> */}
+      <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors">
+          <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center">
+            <FiUser className="text-white text-sm" />
+          </div>
           <span className="text-gray-700 text-sm font-medium">Admin</span>
         </div>
       </div>
     </header>
-  );
+  )
 }
