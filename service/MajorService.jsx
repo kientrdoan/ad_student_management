@@ -13,8 +13,12 @@ export class MajorService extends BaseService {
     return this.post_token(`/admins/majors/`, payload)
   }
 
-  editMajor = (payload) => {
-    return this.put(`/admins/majors/`, payload)
+  editMajor = (id, payload) => {
+    return this.put(`/admins/majors/${id}`, payload)
+  }
+
+  deleteMajor = (id) => {
+    return this.delete(`/admins/majors/${id}`)
   }
 }
 

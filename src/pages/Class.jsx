@@ -13,7 +13,13 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { getAllMajorAction } from "../redux/actions/MajorAction";
-import { addClassAction, editClassAction, getAllClassAction } from "../redux/actions/ClassAction";
+import {
+  addClassAction,
+  editClassAction,
+  getAllClassAction,
+} from "../redux/actions/ClassAction";
+
+import dayjs from "dayjs";
 
 export default function Class() {
   const dispatch = useDispatch();
@@ -60,7 +66,9 @@ export default function Class() {
         res = await dispatch(addClassAction(values));
       }
       if (res?.success) {
-        message.success(`${editingRecord ? "Update" : "Add"} class successfully!`);
+        message.success(
+          `${editingRecord ? "Update" : "Add"} class successfully!`
+        );
         dispatch(getAllClassAction());
         setIsModalVisible(false);
       } else {
@@ -85,13 +93,25 @@ export default function Class() {
     },
     { title: "Start Year", dataIndex: "start_year", key: "start_year" },
     { title: "End Year", dataIndex: "end_year", key: "end_year" },
-    { title: "Created At", dataIndex: "created_at", key: "created_at" },
-    { title: "Updated At", dataIndex: "updated_at", key: "updated_at" },
+    {
+      title: "Created At",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (text) =>
+        text ? dayjs(text).format("DD/MM/YYYY HH:mm:ss") : "N/A",
+    },
+    {
+      title: "Updated At",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      render: (text) =>
+        text ? dayjs(text).format("DD/MM/YYYY HH:mm:ss") : "N/A",
+    },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" onClick={() => showEditModal(record)}>
+        <Button type='link' onClick={() => showEditModal(record)}>
           Edit
         </Button>
       ),
@@ -101,7 +121,7 @@ export default function Class() {
   return (
     <div style={{ padding: 24 }}>
       <Space style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={showAddModal}>
+        <Button type='primary' onClick={showAddModal}>
           Add Class
         </Button>
       </Space>
@@ -119,23 +139,23 @@ export default function Class() {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText="Save"
+        okText='Save'
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout='vertical'>
           <Form.Item
-            label="Class Name"
-            name="name"
+            label='Class Name'
+            name='name'
             rules={[{ required: true, message: "Please input class name!" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label="Major"
-            name="major"
+            label='Major'
+            name='major'
             rules={[{ required: true, message: "Please select major!" }]}
           >
-            <Select placeholder="Select major">
+            <Select placeholder='Select major'>
               {majors?.map((m) => (
                 <Select.Option key={m.id} value={m.id}>
                   {m.name}
@@ -145,19 +165,19 @@ export default function Class() {
           </Form.Item>
 
           <Form.Item
-            label="Start Year"
-            name="start_year"
+            label='Start Year'
+            name='start_year'
             rules={[{ required: true, message: "Please input start year!" }]}
           >
-            <Input type="number" />
+            <Input type='number' />
           </Form.Item>
 
           <Form.Item
-            label="End Year"
-            name="end_year"
+            label='End Year'
+            name='end_year'
             rules={[{ required: true, message: "Please input end year!" }]}
           >
-            <Input type="number" />
+            <Input type='number' />
           </Form.Item>
         </Form>
       </Modal>

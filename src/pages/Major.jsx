@@ -1,15 +1,30 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table, Button, Modal, Form, Input, Select, Space, message,
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  message,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAction } from "../redux/actions/DepartmentsAction";
-import { addMajorAction, editMajorAction, getAllMajorAction } from "../redux/actions/MajorAction";
+import {
+  addMajorAction,
+  editMajorAction,
+  getAllMajorAction,
+} from "../redux/actions/MajorAction";
+
+import dayjs from "dayjs";
 
 export default function Major() {
   const dispatch = useDispatch();
   const majors = useSelector((state) => state.MajorReducer.majors);
-  const departments = useSelector((state) => state.DepartmentReducer.departments);
+  const departments = useSelector(
+    (state) => state.DepartmentReducer.departments
+  );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
@@ -45,7 +60,9 @@ export default function Major() {
       if (editingRecord) {
         // TODO: Update major
         console.log("Update major:", { ...editingRecord, ...values });
-        const res = await dispatch(editMajorAction({ ...editingRecord, ...values }));
+        const res = await dispatch(
+          editMajorAction({ ...editingRecord, ...values })
+        );
         if (res.success) {
           message.success("edit major successfully!");
           dispatch(getAllMajorAction());
@@ -80,13 +97,26 @@ export default function Major() {
         return dept ? dept.name : "N/A";
       },
     },
-    { title: "Created At", dataIndex: "created_at", key: "created_at" },
-    { title: "Updated At", dataIndex: "updated_at", key: "updated_at" },
+    // {
+    //   title: "Created At",
+    //   dataIndex: "created_at",
+    //   key: "created_at",
+    //   render: (text) =>
+    //     text ? dayjs(text).format("DD/MM/YYYY HH:mm:ss") : "N/A",
+    // },
+
+    // {
+    //   title: "Updated At",
+    //   dataIndex: "updated_at",
+    //   key: "updated_at",
+    //   render: (text) =>
+    //     text ? dayjs(text).format("DD/MM/YYYY HH:mm:ss") : "N/A",
+    // },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" onClick={() => showEditModal(record)}>
+        <Button type='link' onClick={() => showEditModal(record)}>
           Edit
         </Button>
       ),
@@ -96,7 +126,7 @@ export default function Major() {
   return (
     <div style={{ padding: 24 }}>
       <Space style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={showAddModal}>
+        <Button type='primary' onClick={showAddModal}>
           Add Major
         </Button>
       </Space>
@@ -114,23 +144,23 @@ export default function Major() {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText="Save"
+        okText='Save'
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout='vertical'>
           <Form.Item
-            label="Name"
-            name="name"
+            label='Name'
+            name='name'
             rules={[{ required: true, message: "Please input name!" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label="Department"
-            name="department"
+            label='Department'
+            name='department'
             rules={[{ required: true, message: "Please select department!" }]}
           >
-            <Select placeholder="Select department">
+            <Select placeholder='Select department'>
               {departments.map((d) => (
                 <Select.Option key={d.id} value={d.id}>
                   {d.name}

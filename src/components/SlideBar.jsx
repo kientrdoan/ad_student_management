@@ -2,14 +2,17 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 const menuItems = [
-  { name: "Dashboard", path: "/" },
+  // { name: "Dashboard", path: "/" },
   { name: "Departments", path: "/departments" },
   { name: "Majors", path: "/majors" },
   { name: "Class", path: "/class" },
+  { name: "Subjects", path: "/subjects" },
+  { name: "Semesters", path: "/semesters" },
+  { name: "Rooms", path: "/rooms" },
+  { name: "Courses", path: "/courses" },
   { name: "Students", path: "/students" },
   { name: "Teachers", path: "/teachers" },
-  { name: "courses", path: "/courses" },
-  { name: "semester", path: "/semester" },
+
 ];
 
 export default function SlideBar() {

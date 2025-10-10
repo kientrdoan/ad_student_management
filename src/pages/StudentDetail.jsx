@@ -1,80 +1,70 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect } from "react";
-import { Form, Input, Button, Select, Card, Space, message } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllClassAction } from "../redux/actions/ClassAction";
 import {
-  addStudentAction,
-  editStudentAction,
-  getStudentAction,
-} from "../redux/actions/StudentAction";
-import { useParams } from "react-router-dom";
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Button,
+  Card,
+  Space,
+  message,
+} from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllMajorAction } from "../redux/actions/MajorAction";
+import {
+  addSubjectAction,
+  editSubjectAction,
+  getSubjectAction,
+} from "../redux/actions/SubjectAction";
+import { useParams, useNavigate } from "react-router-dom";
 
-export default function StudentAdd() {
+export default function SubjectDetail() {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const classes = useSelector((state) => state.ClassReducer.classes);
-
+  const navigate = useNavigate();
+  const majors = useSelector((state) => state.MajorReducer.majors);
   const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getAllClassAction());
+      await dispatch(getAllMajorAction());
 
       if (id) {
-        const res = await dispatch(getStudentAction(id));
-        if (res.success) {
+        const res = await dispatch(getSubjectAction(id));
+        if (res?.data) {
           form.setFieldsValue({
-            student_code: res.data.student_code,
-            classes: res.data.classes,
-            email: res.data.user?.email,
-            first_name: res.data.user?.first_name,
-            last_name: res.data.user?.last_name,
-            phone: res.data.user?.phone,
+            code: res.data.code,
+            name: res.data.name,
+            credit: res.data.credit,
+            description: res.data.description,
+            total_period: res.data.total_period,
+            theory_period: res.data.theory_period,
+            lab_period: res.data.lab_period,
+            major: res.data.major,
           });
         } else {
-          messageApi.error("Không tìm thấy student!");
+          messageApi.error("Không tìm thấy môn học!");
         }
       }
     };
-
     fetchData();
   }, [dispatch, id, form, messageApi]);
 
   const handleSubmit = async (values) => {
-    const payload = {
-      student_code: values.student_code,
-      classes: values.classes,
-      user: {
-        email: values.email,
-        first_name: values.first_name,
-        last_name: values.last_name,
-        phone: values.phone,
-        password: "12345",
-        role: "STUDENT",
-        is_active: true,
-      },
-    };
-
+    let res;
     if (id) {
-      console.log("values", payload)
-      const res = await dispatch(editStudentAction(id, payload));
-      if (res.success) {
-        messageApi.success(
-          id ? "Cập nhật student thành công!" : "Thêm student thành công!"
-        );
-      } else {
-        messageApi.error("Thao tác thất bại!");
-      }
+      res = await dispatch(editSubjectAction({ id, ...values }));
     } else {
-      const res = await dispatch(addStudentAction(payload));
-      if (res.success) {
-        messageApi.success(
-          id ? "Cập nhật student thành công!" : "Thêm student thành công!"
-        );
-      } else {
-        messageApi.error("Thao tác thất bại!");
-      }
+      res = await dispatch(addSubjectAction(values));
+    }
+
+    if (res?.success) {
+      messageApi.success(id ? "Cập nhật môn học thành công!" : "Thêm môn học thành công!");
+      navigate("/subjects");
+    } else {
+      messageApi.error("Thao tác thất bại!");
     }
   };
 
@@ -82,88 +72,110 @@ export default function StudentAdd() {
     <>
       {contextHolder}
       <Card
-        title={id ? "Cập nhật Student" : "Thêm Student"}
+        title={id ? "Cập nhật Môn học" : "Thêm Môn học"}
         style={{ maxWidth: 700, margin: "0 auto", marginTop: 24 }}
       >
         <Form
           form={form}
-          layout='vertical'
+          layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{ is_active: true, role: "STUDENT" }}
+          initialValues={{ credit: 3 }}
         >
+          {/* Hàng 1: Code + Name */}
           <Space
-            size='middle'
+            size="middle"
             style={{ width: "100%", justifyContent: "space-between" }}
           >
             <Form.Item
-              label='First Name'
-              name='first_name'
+              label="Code"
+              name="code"
               style={{ flex: 1 }}
-              rules={[{ required: true, message: "Vui lòng nhập First Name!" }]}
+              rules={[{ required: true, message: "Vui lòng nhập mã môn học!" }]}
             >
-              <Input placeholder='Nhập First Name' />
+              <Input placeholder="VD: CS101" />
             </Form.Item>
 
             <Form.Item
-              label='Last Name'
-              name='last_name'
+              label="Name"
+              name="name"
               style={{ flex: 1 }}
-              rules={[{ required: true, message: "Vui lòng nhập Last Name!" }]}
+              rules={[{ required: true, message: "Vui lòng nhập tên môn học!" }]}
             >
-              <Input placeholder='Nhập Last Name' />
-            </Form.Item>
-
-            <Form.Item
-              label='Phone'
-              name='phone'
-              style={{ flex: 1 }}
-              rules={[{ required: true, message: "Vui lòng nhập phone!" }]}
-            >
-              <Input placeholder='Nhập phone' />
+              <Input placeholder="VD: Introduction to Programming" />
             </Form.Item>
           </Space>
 
-          <Form.Item
-            label='Student Code'
-            name='student_code'
-            rules={[{ required: true, message: "Vui lòng nhập mã sinh viên!" }]}
-          >
-            <Input placeholder='VD: 027' />
-          </Form.Item>
-
-          <Form.Item
-            label='Class'
-            name='classes'
-            rules={[{ required: true, message: "Vui lòng chọn lớp!" }]}
-          >
-            <Select placeholder='Chọn lớp'>
-              {classes?.map((c) => (
-                <Select.Option key={c.id} value={c.id}>
-                  {c.name || c.id}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
+          {/* Hàng 2: Credit + Major */}
           <Space
-            size='middle'
+            size="middle"
             style={{ width: "100%", justifyContent: "space-between" }}
           >
             <Form.Item
-              label='Email'
-              name='email'
-              rules={[
-                { required: true, message: "Vui lòng nhập email!" },
-                { type: "email", message: "Email không hợp lệ!" },
-              ]}
+              label="Credit"
+              name="credit"
+              style={{ flex: 1 }}
+              rules={[{ required: true, message: "Vui lòng nhập số tín chỉ!" }]}
             >
-              <Input placeholder='Nhập Email' />
+              <InputNumber min={1} max={10} style={{ width: "100%" }} />
+            </Form.Item>
+
+            <Form.Item
+              label="Major"
+              name="major"
+              style={{ flex: 1 }}
+              rules={[{ required: true, message: "Vui lòng chọn chuyên ngành!" }]}
+            >
+              <Select placeholder="Chọn chuyên ngành">
+                {majors?.map((m) => (
+                  <Select.Option key={m.id} value={m.id}>
+                    {m.name}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           </Space>
 
-          <Form.Item>
-            <Button type='primary' htmlType='submit' block>
-              {id ? "Cập nhật Student" : "Lưu Student"}
+          {/* Description */}
+          <Form.Item label="Description" name="description">
+            <Input.TextArea rows={3} placeholder="Nhập mô tả môn học..." />
+          </Form.Item>
+
+          {/* Hàng 3: Total Period + Theory Period + Lab Period */}
+          <Space
+            size="middle"
+            style={{ width: "100%", justifyContent: "space-between" }}
+          >
+            <Form.Item
+              label="Total Period"
+              name="total_period"
+              style={{ flex: 1 }}
+              rules={[{ required: true, message: "Vui lòng nhập tổng số tiết!" }]}
+            >
+              <InputNumber min={1} style={{ width: "100%" }} />
+            </Form.Item>
+
+            <Form.Item
+              label="Theory Period"
+              name="theory_period"
+              style={{ flex: 1 }}
+              rules={[{ required: true, message: "Vui lòng nhập số tiết lý thuyết!" }]}
+            >
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+
+            <Form.Item
+              label="Lab Period"
+              name="lab_period"
+              style={{ flex: 1 }}
+              rules={[{ required: true, message: "Vui lòng nhập số tiết thực hành!" }]}
+            >
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+          </Space>
+
+          <Form.Item style={{ marginTop: 24 }}>
+            <Button type="primary" htmlType="submit" block>
+              {id ? "Cập nhật Môn học" : "Lưu Môn học"}
             </Button>
           </Form.Item>
         </Form>

@@ -1,0 +1,29 @@
+import { BaseService } from "./BaseService";
+
+export class SubjectService extends BaseService {
+  constructor() {
+    super();
+  }
+
+  getAllSubject = () => {
+    return this.get_token("/admins/subjects/");
+  };
+
+  getSubject = (id) => {
+    return this.get_token(`/admins/subjects/${id}`);
+  };
+
+  addSubject = (payload) => {
+    return this.post_token(`/admins/subjects/`, payload)
+  }
+
+  editSubject = (id, payload) => {
+    return this.put(`/admins/subjects/${id}`, payload)
+  }
+
+  deleteSubject = (id) => {
+    return this.delete(`/admins/subjects/${id}`)
+  }
+}
+
+export const subjectService = new SubjectService();

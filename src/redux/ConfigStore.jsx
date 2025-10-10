@@ -6,6 +6,10 @@ import { MajorReducer } from './reducers/MajorReducer';
 import { ClassReducer } from './reducers/ClassReducer';
 import { StudentReducer } from './reducers/StudentReducer';
 import { TeacherReducer } from './reducers/TeacherReducer';
+import { SemesterReducer } from './reducers/SemesterReducer';
+import { CourseReducer } from './reducers/CourseReducer';
+import { SubjectReducer } from './reducers/SubjectReducer';
+import { RoomReducer } from './reducers/RoomReducer';
 const dummyReducer = (state = {}, ) => state;
 
 const rootReducer = combineReducers({
@@ -16,6 +20,10 @@ const rootReducer = combineReducers({
   ClassReducer,
   StudentReducer,
   TeacherReducer,
+  SemesterReducer,
+  CourseReducer,
+  SubjectReducer,
+  RoomReducer,
   dummy: dummyReducer
 })
 

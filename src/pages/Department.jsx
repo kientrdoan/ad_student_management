@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, Space, message } from "antd";
+import { Table, Button, Modal, Form, Input, Space, message, Popconfirm } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { editDepartmentAction, getAllAction } from "../redux/actions/DepartmentsAction";
+import {
+  deleteDepartmentAction,
+  editDepartmentAction,
+  getAllAction,
+} from "../redux/actions/DepartmentsAction";
 import { addDepartmentAction } from "../redux/actions/DepartmentsAction";
 
 export default function Department() {
@@ -38,9 +42,9 @@ export default function Department() {
     try {
       const values = await form.validateFields();
       if (editingRecord) {
-        let newValues = { ...editingRecord, ...values }
+        let newValues = { ...editingRecord, ...values };
         console.log("Edit department:", newValues);
-        const res = await dispatch(editDepartmentAction(newValues));
+        const res = await dispatch(editDepartmentAction(editingRecord.id, newValues));
         console.log("res edit", res);
         if (res.success) {
           message.success("Edit department successfully!");
@@ -64,20 +68,55 @@ export default function Department() {
     }
   };
 
+  const handleDelete = async (id) => {
+    const res = await dispatch(deleteDepartmentAction(id));
+    if (res.success) {
+      message.success("Xoá semester thành công!");
+      dispatch(getAllAction());
+    } else {
+      message.error("Xoá thất bại!");
+    }
+  };
+
   // --- Columns ---
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
     { title: "Code", dataIndex: "code", key: "code" },
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Created At", dataIndex: "created_at", key: "created_at" },
-    { title: "Updated At", dataIndex: "updated_at", key: "updated_at" },
+    // {
+    //   title: "Created At",
+    //   dataIndex: "created_at",
+    //   key: "created_at",
+    //   render: (text) =>
+    //     text ? dayjs(text).format("DD/MM/YYYY HH:mm:ss") : "N/A",
+    // },
+    // {
+    //   title: "Updated At",
+    //   dataIndex: "updated_at",
+    //   key: "updated_at",
+    //   render: (text) =>
+    //     text ? dayjs(text).format("DD/MM/YYYY HH:mm:ss") : "N/A",
+    // },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" onClick={() => showEditModal(record)}>
-          Edit
-        </Button>
+        <Space>
+          <Button type='link' onClick={() => showEditModal(record)}>
+            Edit
+          </Button>
+
+          <Popconfirm
+            title='Bạn có chắc muốn xoá student này?'
+            okText='OK'
+            cancelText='Hủy'
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type='link' danger>
+              Delete
+            </Button>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
@@ -85,31 +124,31 @@ export default function Department() {
   return (
     <div style={{ padding: 24 }}>
       <Space style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={showAddModal}>
+        <Button type='primary' onClick={showAddModal}>
           Add Department
         </Button>
       </Space>
 
-      <Table columns={columns} dataSource={departments} rowKey="id" bordered />
+      <Table columns={columns} dataSource={departments} rowKey='id' bordered />
 
       <Modal
         title={editingRecord ? "Edit Department" : "Add Department"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText="Save"
+        okText='Save'
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout='vertical'>
           <Form.Item
-            label="Code"
-            name="code"
+            label='Code'
+            name='code'
             rules={[{ required: true, message: "Please input code!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            label="Name"
-            name="name"
+            label='Name'
+            name='name'
             rules={[{ required: true, message: "Please input name!" }]}
           >
             <Input />
