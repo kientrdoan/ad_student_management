@@ -27,7 +27,7 @@ export default function TeacherDetail() {
         const res = await dispatch(getTeacherAction(id))
         if (res.success) {
           form.setFieldsValue({
-            instructor_code: res.data.instructor_code,
+            teacher_code: res.data.teacher_code,
             degree: res.data.degree,
             title: res.data.title,
             department: res.data.department,
@@ -51,7 +51,7 @@ export default function TeacherDetail() {
 
   const handleSubmit = async (values) => {
     const payload = {
-      instructor_code: values.instructor_code,
+      teacher_code: values.teacher_code,
       degree: values.degree,
       title: values.title,
       department: values.department,
@@ -121,7 +121,7 @@ export default function TeacherDetail() {
                   <Col span={8}>
                     <Form.Item
                       label="Instructor Code"
-                      name="instructor_code"
+                      name="teacher_code"
                       rules={[{ required: true, message: "Please input instructor code!" }]}
                     >
                       <Input placeholder="e.g. T20001" size="large" />
