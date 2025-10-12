@@ -26,7 +26,7 @@ export default function Student() {
     student_code: true,
     last_name: true,
     first_name: true,
-    classes: true,
+    class_student: true,
     email: true,
     phone: true,
     created_at: false,
@@ -54,7 +54,7 @@ export default function Student() {
       student.student_code?.toLowerCase().includes(searchLower) ||
       student.user?.last_name?.toLowerCase().includes(searchLower) ||
       student.user?.first_name?.toLowerCase().includes(searchLower) ||
-      student.classes?.toLowerCase().includes(searchLower) ||
+      student.class_student?.toLowerCase().includes(searchLower) ||
       student.user?.email?.toLowerCase().includes(searchLower) ||
       student.user?.phone?.toLowerCase().includes(searchLower)
     )
@@ -102,9 +102,9 @@ export default function Student() {
         ),
       },
       {
-        key: "classes",
+        key: "class_student",
         label: (
-          <Checkbox checked={visibleColumns.classes} onChange={() => toggleColumn("classes")}>
+          <Checkbox checked={visibleColumns.class_student} onChange={() => toggleColumn("class_student")}>
             Class
           </Checkbox>
         ),
@@ -169,10 +169,10 @@ export default function Student() {
     },
     {
       title: "Class",
-      dataIndex: "classes",
-      key: "classes",
-      visible: visibleColumns.classes,
-      render: (classes) => (classes ? <Tag color="blue">{classes}</Tag> : "N/A"),
+      dataIndex: "class_student",
+      key: "class_student",
+      visible: visibleColumns.class_student,
+      render: (class_student) => (class_student ? <Tag color="blue">{class_student.name}</Tag> : "N/A"),
       width: 100,
     },
     {
