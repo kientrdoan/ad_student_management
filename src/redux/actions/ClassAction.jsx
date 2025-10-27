@@ -53,3 +53,18 @@ export const editClassAction = (id, payload) => {
     }
   };
 };
+
+export const deleteClassAction = (id) => {
+  return async (dispatch) => {
+    try {
+      const result = await classService.deleteClass(id);
+      console.log("result", result);
+      if (result.status === 200) {
+        return { success: true, data: result.data.data };
+      }
+    } catch (error) {
+      console.log("error", error);
+      return { success: false, error };
+    }
+  };
+};

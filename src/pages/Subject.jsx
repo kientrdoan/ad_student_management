@@ -2,11 +2,11 @@
 
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react"
-import { Table, Button, Space, Input, Dropdown, Checkbox, Tag } from "antd"
-import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, BookOutlined } from "@ant-design/icons"
+import { Table, Button, Space, Input, Dropdown, Checkbox, Tag, Popconfirm, message } from "antd"
+import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, BookOutlined, DeleteOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux"
 import { getAllMajorAction } from "../redux/actions/MajorAction"
-import { getAllSubjectAction } from "../redux/actions/SubjectAction"
+import { deleteSubjectAction, getAllSubjectAction } from "../redux/actions/SubjectAction"
 import { Link } from "react-router-dom"
 import dayjs from "dayjs"
 
@@ -50,6 +50,16 @@ export default function Subject() {
       ...prev,
       [columnKey]: !prev[columnKey],
     }))
+  }
+
+  const handleDelete = async (id) => {
+    const res = await dispatch(deleteSubjectAction(id))
+    if (res.success) {
+      message.success("Xoá môn học thành công!")
+      dispatch(getAllSubjectAction())
+    } else {
+      message.error("Xoá thất bại!")
+    }
   }
 
   const columnMenu = {
@@ -124,7 +134,7 @@ export default function Subject() {
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", width: 70, visible: visibleColumns.id },
     {
-      title: "Code",
+      title: "Mã môn",
       dataIndex: "code",
       key: "code",
       visible: visibleColumns.code,
@@ -132,28 +142,28 @@ export default function Subject() {
       width: 120,
     },
     {
-      title: "Name",
+      title: "Tên môn",
       dataIndex: "name",
       key: "name",
       visible: visibleColumns.name,
       width: 250,
     },
     {
-      title: "Credit",
+      title: "Tín chỉ",
       dataIndex: "credit",
       key: "credit",
       visible: visibleColumns.credit,
       width: 80,
     },
     {
-      title: "Total Period",
+      title: "Tổng số tiết",
       dataIndex: "total_period",
       key: "total_period",
       visible: visibleColumns.total_period,
       width: 120,
     },
     {
-      title: "Major",
+      title: "Ngành",
       dataIndex: "major",
       key: "major",
       render: (id) => {
@@ -164,7 +174,7 @@ export default function Subject() {
       width: 180,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -172,7 +182,7 @@ export default function Subject() {
       width: 150,
     },
     {
-      title: "Updated At",
+      title: "Ngày cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -183,11 +193,23 @@ export default function Subject() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Link to={`/subjects/detail/${record.id}`}>
-          <Button type="link" icon={<EditOutlined />} className="text-indigo-600">
+       <Space>
+          <Link to={`/subjects/detail/${record.id}`}>
+            <Button type="link" icon={<EditOutlined />} className="text-indigo-600">
             {/* Edit */}
-          </Button>
-        </Link>
+            </Button>
+          </Link>
+          <Popconfirm
+            title="Bạn có chắc muốn xoá môn học này?"
+            okText="OK"
+            cancelText="Hủy"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              {/* Delete */}
+            </Button>
+          </Popconfirm>
+       </Space>
       ),
       visible: true,
       fixed: "right",
@@ -206,8 +228,8 @@ export default function Subject() {
               <BookOutlined className="text-indigo-600 text-lg" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Subjects</h1>
-              <p className="text-sm text-gray-500">Manage subject information and curriculum</p>
+              <h1 className="text-2xl font-bold text-gray-900">Môn học</h1>
+              <p className="text-sm text-gray-500">Manage subject information</p>
             </div>
           </div>
         </div>
@@ -215,7 +237,7 @@ export default function Subject() {
         <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Link to="/subjects/detail">
             <Button type="primary" icon={<PlusOutlined />} size="large" className="shadow-sm">
-              Add Subject
+              Thêm mới
             </Button>
           </Link>
 

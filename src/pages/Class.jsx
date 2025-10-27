@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Table, Button, Modal, Form, Input, Select, Space, message, Dropdown, Checkbox, Tag } from "antd"
-import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, UsergroupAddOutlined } from "@ant-design/icons"
+import { Table, Button, Modal, Form, Input, Select, Space, message, Dropdown, Checkbox, Tag, Popconfirm } from "antd"
+import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, UsergroupAddOutlined, DeleteOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux"
 import { getAllMajorAction } from "../redux/actions/MajorAction"
-import { addClassAction, editClassAction, getAllClassAction } from "../redux/actions/ClassAction"
+import { addClassAction, deleteClassAction, editClassAction, getAllClassAction } from "../redux/actions/ClassAction"
 import dayjs from "dayjs"
 
 export default function Class() {
@@ -92,6 +92,16 @@ export default function Class() {
     }))
   }
 
+    const handleDelete = async (id) => {
+    const res = await dispatch(deleteClassAction(id))
+    if (res.success) {
+      message.success("Xoá lớp sinh viên thành công!")
+      dispatch(getAllClassAction())
+    } else {
+      message.error("Xoá thất bại!")
+    }
+  }
+
   const columnMenu = {
     items: [
       {
@@ -156,7 +166,7 @@ export default function Class() {
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 70 },
     {
-      title: "Name",
+      title: "Tên lớp",
       dataIndex: "name",
       key: "name",
       visible: visibleColumns.name,
@@ -164,7 +174,7 @@ export default function Class() {
       width: 150,
     },
     {
-      title: "Major",
+      title: "Ngành",
       dataIndex: "major",
       key: "major",
       render: (id) => {
@@ -175,21 +185,21 @@ export default function Class() {
       width: 200,
     },
     {
-      title: "Start Year",
+      title: "Năm bắt đầu",
       dataIndex: "start_year",
       key: "start_year",
       visible: visibleColumns.start_year,
       width: 110,
     },
     {
-      title: "End Year",
+      title: "Năm kết thúc",
       dataIndex: "end_year",
       key: "end_year",
       visible: visibleColumns.end_year,
       width: 110,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (text) => (text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -197,7 +207,7 @@ export default function Class() {
       width: 150,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (text) => (text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -208,9 +218,21 @@ export default function Class() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" icon={<EditOutlined />} onClick={() => showEditModal(record)} className="text-indigo-600">
+        <Space>
+          <Button type="link" icon={<EditOutlined />} onClick={() => showEditModal(record)} className="text-indigo-600">
           {/* Edit */}
         </Button>
+        <Popconfirm
+            title="Bạn có chắc muốn xoá lớp sinh viên này?"
+            okText="OK"
+            cancelText="Hủy"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              {/* Delete */}
+            </Button>
+          </Popconfirm>
+        </Space>
       ),
       visible: true,
       fixed: "right",
@@ -229,7 +251,7 @@ export default function Class() {
               <UsergroupAddOutlined className="text-indigo-600 text-lg" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Classes</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Lớp sinh viên</h1>
               <p className="text-sm text-gray-500">Manage class information and schedules</p>
             </div>
           </div>
@@ -237,7 +259,7 @@ export default function Class() {
 
         <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="shadow-sm">
-            Add Class
+            Thêm mới
           </Button>
 
           <Space size="middle">
@@ -276,18 +298,18 @@ export default function Class() {
       </div>
 
       <Modal
-        title={editingRecord ? "Edit Class" : "Add Class"}
+        title={editingRecord ? "Cập nhật thông tin lớp sinh viên" : "Thêm thông tin lớp sinh viên"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
         okText="Save"
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Class Name" name="name" rules={[{ required: true, message: "Please input class name!" }]}>
+          <Form.Item label="Tên lớp" name="name" rules={[{ required: true, message: "Vui lòng nhập tên lớp!" }]}>
             <Input />
           </Form.Item>
 
-          <Form.Item label="Major" name="major" rules={[{ required: true, message: "Please select major!" }]}>
+          <Form.Item label="Ngành" name="major" rules={[{ required: true, message: "Vui lòng chọn ngành!" }]}>
             <Select placeholder="Select major">
               {majors?.map((m) => (
                 <Select.Option key={m.id} value={m.id}>
@@ -298,14 +320,14 @@ export default function Class() {
           </Form.Item>
 
           <Form.Item
-            label="Start Year"
+            label="Năm bắt đầu"
             name="start_year"
-            rules={[{ required: true, message: "Please input start year!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập nắm bắt đầu!" }]}
           >
             <Input type="number" />
           </Form.Item>
 
-          <Form.Item label="End Year" name="end_year" rules={[{ required: true, message: "Please input end year!" }]}>
+          <Form.Item label="Năm kết thúc" name="end_year" rules={[{ required: true, message: "Vui lòng nhập năm kết thúc!" }]}>
             <Input type="number" />
           </Form.Item>
         </Form>

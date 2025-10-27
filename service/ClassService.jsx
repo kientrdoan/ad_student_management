@@ -16,6 +16,10 @@ export class ClassService extends BaseService {
   editClass = (id, payload) => {
     return this.put(`/admins/classes/${id}`, payload)
   }
+
+  deleteClass = (id) => {
+    return this.delete(`/admins/classes/${id}`)
+  }
 }
 
 export const classService = new ClassService();

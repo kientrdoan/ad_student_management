@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Table, Button, Modal, Form, Input, Space, message, Dropdown, Checkbox, Tag } from "antd"
-import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, HomeOutlined } from "@ant-design/icons"
+import { Table, Button, Modal, Form, Input, Space, message, Dropdown, Checkbox, Tag, Popconfirm } from "antd"
+import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, HomeOutlined, DeleteOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux"
 import dayjs from "dayjs"
-import { addRoomAction, editRoomAction, getAllRoomAction } from "../redux/actions/RoomAction"
+import { addRoomAction, deleteRoomAction, editRoomAction, getAllRoomAction } from "../redux/actions/RoomAction"
 
 export default function Room() {
   const dispatch = useDispatch()
@@ -85,6 +85,16 @@ export default function Room() {
     }))
   }
 
+    const handleDelete = async (id) => {
+    const res = await dispatch(deleteRoomAction(id))
+    if (res.success) {
+      message.success("Xoá phòng thành công!")
+      dispatch(getAllRoomAction())
+    } else {
+      message.error("Xoá thất bại!")
+    }
+  }
+
   const columnMenu = {
     items: [
       {
@@ -141,23 +151,23 @@ export default function Room() {
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 80 },
     {
-      title: "Room code",
+      title: "Mã phòng",
       dataIndex: "room_code",
       key: "room_code",
       visible: visibleColumns.room_code,
       render: (code) => <Tag color="orange">{code}</Tag>,
     },
-    { title: "Building", dataIndex: "building", key: "building", visible: visibleColumns.building },
-    { title: "Max capacity", dataIndex: "max_capacity", key: "max_capacity", visible: visibleColumns.max_capacity },
+    { title: "Toà nhà", dataIndex: "building", key: "building", visible: visibleColumns.building },
+    { title: "Số lượng tối đa", dataIndex: "max_capacity", key: "max_capacity", visible: visibleColumns.max_capacity },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (text) => (text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "N/A"),
       visible: visibleColumns.created_at,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (text) => (text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -167,9 +177,21 @@ export default function Room() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" icon={<EditOutlined />} onClick={() => showEditModal(record)} className="text-indigo-600">
-          {/* Edit */}
-        </Button>
+        <Space>
+          <Button type="link" icon={<EditOutlined />} onClick={() => showEditModal(record)} className="text-indigo-600">
+            {/* Edit */}
+          </Button>
+          <Popconfirm
+            title="Bạn có chắc muốn xoá phòng này này?"
+            okText="OK"
+            cancelText="Hủy"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              {/* Delete */}
+            </Button>
+          </Popconfirm>
+        </Space>
       ),
       visible: true,
       fixed: "right",
@@ -188,7 +210,7 @@ export default function Room() {
               <HomeOutlined className="text-indigo-600 text-lg" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Rooms</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Phòng học</h1>
               <p className="text-sm text-gray-500">Manage classroom and facility information</p>
             </div>
           </div>
@@ -196,7 +218,7 @@ export default function Room() {
 
         <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="shadow-sm">
-            Add Room
+            Thêm mới
           </Button>
 
           <Space size="middle">
@@ -235,7 +257,7 @@ export default function Room() {
       </div>
 
       <Modal
-        title={editingRecord ? "Edit Room" : "Add Room"}
+        title={editingRecord ? "Cập nhật thông tin phòng học" : "Thêm mới phòng học"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
@@ -243,19 +265,19 @@ export default function Room() {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            label="Room code"
+            label="Mã phòng"
             name="room_code"
-            rules={[{ required: true, message: "Please input room code!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập mã phòng!" }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="Building" name="building" rules={[{ required: true, message: "Please input building!" }]}>
+          <Form.Item label="Toà nhà" name="building" rules={[{ required: true, message: "Vui lòng nhập toà nhà!" }]}>
             <Input />
           </Form.Item>
           <Form.Item
-            label="Max Capacity"
+            label="Số lượng tối đa"
             name="max_capacity"
-            rules={[{ required: true, message: "Please input max capacity!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập số lượng tối đa!" }]}
           >
             <Input type="number" min={1} />
           </Form.Item>

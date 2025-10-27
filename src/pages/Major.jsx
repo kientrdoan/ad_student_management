@@ -1,100 +1,147 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Table, Button, Modal, Form, Input, Select, Space, message, Dropdown, Checkbox, Tag } from "antd"
-import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, FundOutlined } from "@ant-design/icons"
-import { useDispatch, useSelector } from "react-redux"
-import { getAllAction } from "../redux/actions/DepartmentsAction"
-import { addMajorAction, editMajorAction, getAllMajorAction } from "../redux/actions/MajorAction"
-import dayjs from "dayjs"
+import { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  message,
+  Dropdown,
+  Checkbox,
+  Tag,
+  Popconfirm,
+} from "antd";
+import {
+  SearchOutlined,
+  SettingOutlined,
+  EditOutlined,
+  PlusOutlined,
+  FundOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllAction } from "../redux/actions/DepartmentsAction";
+import {
+  addMajorAction,
+  deleteMajorAction,
+  editMajorAction,
+  getAllMajorAction,
+} from "../redux/actions/MajorAction";
+import dayjs from "dayjs";
 
 export default function Major() {
-  const dispatch = useDispatch()
-  const majors = useSelector((state) => state.MajorReducer.majors)
-  const departments = useSelector((state) => state.DepartmentReducer.departments)
+  const dispatch = useDispatch();
+  const majors = useSelector((state) => state.MajorReducer.majors);
+  const departments = useSelector(
+    (state) => state.DepartmentReducer.departments
+  );
 
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [editingRecord, setEditingRecord] = useState(null)
-  const [form] = Form.useForm()
-  const [searchText, setSearchText] = useState("")
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState("");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     name: true,
     department: true,
     created_at: true,
     updated_at: true,
-  })
+  });
 
   useEffect(() => {
     const loadData = async () => {
-      await dispatch(getAllAction())
-      await dispatch(getAllMajorAction())
-    }
-    loadData()
-  }, [dispatch])
+      await dispatch(getAllAction());
+      await dispatch(getAllMajorAction());
+    };
+    loadData();
+  }, [dispatch]);
 
   const showAddModal = () => {
-    setEditingRecord(null)
-    form.resetFields()
-    setIsModalVisible(true)
-  }
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
 
   const showEditModal = (record) => {
-    setEditingRecord(record)
+    setEditingRecord(record);
     form.setFieldsValue({
       name: record.name,
       department: record.department,
-    })
-    setIsModalVisible(true)
-  }
+    });
+    setIsModalVisible(true);
+  };
 
   const handleOk = async () => {
     try {
-      const values = await form.validateFields()
+      const values = await form.validateFields();
       if (editingRecord) {
-        console.log("Update major:", { ...editingRecord, ...values })
-        const res = await dispatch(editMajorAction({ ...editingRecord, ...values }))
+        console.log("Update major:", { ...editingRecord, ...values });
+        const res = await dispatch(
+          editMajorAction({ ...editingRecord, ...values })
+        );
         if (res.success) {
-          message.success("edit major successfully!")
-          dispatch(getAllMajorAction())
+          message.success("edit major successfully!");
+          dispatch(getAllMajorAction());
         } else {
-          message.error("Failed to edit major!")
+          message.error("Failed to edit major!");
         }
       } else {
-        console.log("Add major:", values)
-        const res = await dispatch(addMajorAction(values))
+        console.log("Add major:", values);
+        const res = await dispatch(addMajorAction(values));
         if (res.success) {
-          message.success("Add major successfully!")
-          dispatch(getAllMajorAction())
+          message.success("Add major successfully!");
+          dispatch(getAllMajorAction());
         } else {
-          message.error("Failed to add major!")
+          message.error("Failed to add major!");
         }
       }
-      setIsModalVisible(false)
+      setIsModalVisible(false);
     } catch (err) {
-      console.log("Validate Failed:", err)
+      console.log("Validate Failed:", err);
     }
-  }
+  };
 
   const filteredData = majors.filter((major) => {
-    const searchLower = searchText.toLowerCase()
-    const dept = departments.find((d) => String(d.id) === String(major.department))
-    return major.name?.toLowerCase().includes(searchLower) || dept?.name?.toLowerCase().includes(searchLower)
-  })
+    const searchLower = searchText.toLowerCase();
+    const dept = departments.find(
+      (d) => String(d.id) === String(major.department)
+    );
+    return (
+      major.name?.toLowerCase().includes(searchLower) ||
+      dept?.name?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const toggleColumn = (columnKey) => {
     setVisibleColumns((prev) => ({
       ...prev,
       [columnKey]: !prev[columnKey],
-    }))
-  }
+    }));
+  };
+
+  const handleDelete = async (id) => {
+    const res = await dispatch(deleteMajorAction(id));
+    if (res.success) {
+      message.success("Xoá department thành công!");
+      dispatch(getAllMajorAction());
+    } else {
+      message.error("Xoá thất bại!");
+    }
+  };
 
   const columnMenu = {
     items: [
       {
         key: "id",
         label: (
-          <Checkbox checked={visibleColumns.id} onChange={() => toggleColumn("id")}>
+          <Checkbox
+            checked={visibleColumns.id}
+            onChange={() => toggleColumn("id")}
+          >
             ID
           </Checkbox>
         ),
@@ -102,7 +149,10 @@ export default function Major() {
       {
         key: "name",
         label: (
-          <Checkbox checked={visibleColumns.name} onChange={() => toggleColumn("name")}>
+          <Checkbox
+            checked={visibleColumns.name}
+            onChange={() => toggleColumn("name")}
+          >
             Name
           </Checkbox>
         ),
@@ -110,7 +160,10 @@ export default function Major() {
       {
         key: "department",
         label: (
-          <Checkbox checked={visibleColumns.department} onChange={() => toggleColumn("department")}>
+          <Checkbox
+            checked={visibleColumns.department}
+            onChange={() => toggleColumn("department")}
+          >
             Department
           </Checkbox>
         ),
@@ -118,7 +171,10 @@ export default function Major() {
       {
         key: "created_at",
         label: (
-          <Checkbox checked={visibleColumns.created_at} onChange={() => toggleColumn("created_at")}>
+          <Checkbox
+            checked={visibleColumns.created_at}
+            onChange={() => toggleColumn("created_at")}
+          >
             Created At
           </Checkbox>
         ),
@@ -126,42 +182,51 @@ export default function Major() {
       {
         key: "updated_at",
         label: (
-          <Checkbox checked={visibleColumns.updated_at} onChange={() => toggleColumn("updated_at")}>
+          <Checkbox
+            checked={visibleColumns.updated_at}
+            onChange={() => toggleColumn("updated_at")}
+          >
             Updated At
           </Checkbox>
         ),
       },
     ],
-  }
+  };
 
   const allColumns = [
-    { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 80 },
     {
-      title: "Name",
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      visible: visibleColumns.id,
+      width: 80,
+    },
+    {
+      title: "Tên ngành",
       dataIndex: "name",
       key: "name",
       visible: visibleColumns.name,
-      render: (name) => <Tag color="cyan">{name}</Tag>,
+      render: (name) => <Tag color='cyan'>{name}</Tag>,
     },
     {
-      title: "Department",
+      title: "Khoa",
       dataIndex: "department",
       key: "department",
       render: (deptId) => {
-        const dept = departments.find((d) => String(d.id) === String(deptId))
-        return dept ? dept.name : "N/A"
+        const dept = departments.find((d) => String(d.id) === String(deptId));
+        return dept ? dept.name : "N/A";
       },
       visible: visibleColumns.department,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
       visible: visibleColumns.created_at,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -171,58 +236,87 @@ export default function Major() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" icon={<EditOutlined />} onClick={() => showEditModal(record)} className="text-indigo-600">
-          {/* Edit */}
-        </Button>
+        <Space>
+          <Button
+            type='link'
+            icon={<EditOutlined />}
+            onClick={() => showEditModal(record)}
+            className='text-indigo-600'
+          >
+            {/* Edit */}
+          </Button>
+          <Popconfirm
+            title='Bạn có chắc muốn xoá ngành này?'
+            okText='OK'
+            cancelText='Hủy'
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type='link' danger icon={<DeleteOutlined />}>
+              {/* Delete */}
+            </Button>
+          </Popconfirm>
+        </Space>
       ),
       visible: true,
       fixed: "right",
       width: 100,
     },
-  ]
+  ];
 
-  const columns = allColumns.filter((col) => col.visible)
+  const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
-        <div className="mb-6 flex-shrink-0">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-              <FundOutlined className="text-indigo-600 text-lg" />
+    <div className='h-full flex flex-col'>
+      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
+        <div className='mb-6 flex-shrink-0'>
+          <div className='flex items-center gap-3 mb-2'>
+            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
+              <FundOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Majors</h1>
-              <p className="text-sm text-gray-500">Manage major programs and specializations</p>
+              <h1 className='text-2xl font-bold text-gray-900'>Majors</h1>
+              <p className='text-sm text-gray-500'>
+                Manage major programs and specializations
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
-          <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="shadow-sm">
-            Add Major
+        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
+          <Button
+            type='primary'
+            icon={<PlusOutlined />}
+            onClick={showAddModal}
+            size='large'
+            className='shadow-sm'
+          >
+            Thêm mới
           </Button>
 
-          <Space size="middle">
+          <Space size='middle'>
             <Input
-              placeholder="Search majors..."
-              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder='Search majors...'
+              prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size="large"
+              size='large'
               allowClear
-              className="rounded-lg"
+              className='rounded-lg'
             />
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
+              <Button
+                icon={<SettingOutlined />}
+                size='large'
+                className='rounded-lg'
+              >
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className='flex-1 overflow-hidden'>
           <Table
             columns={columns}
             dataSource={filteredData}
@@ -239,23 +333,27 @@ export default function Major() {
       </div>
 
       <Modal
-        title={editingRecord ? "Edit Major" : "Add Major"}
+        title={editingRecord ? "Chỉnh sửa thông tin ngành" : "Thêm ngành mới"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText="Save"
+        okText='Save'
       >
-        <Form form={form} layout="vertical">
-          <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input name!" }]}>
+        <Form form={form} layout='vertical'>
+          <Form.Item
+            label='Tên ngành'
+            name='name'
+            rules={[{ required: true, message: "Vui lòng nhập tên ngành!" }]}
+          >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label="Department"
-            name="department"
-            rules={[{ required: true, message: "Please select department!" }]}
+            label='Khoa'
+            name='department'
+            rules={[{ required: true, message: "Vui lòng chọn khoa!" }]}
           >
-            <Select placeholder="Select department">
+            <Select placeholder='Vui lòng chọn khoa'>
               {departments.map((d) => (
                 <Select.Option key={d.id} value={d.id}>
                   {d.name}
@@ -266,5 +364,5 @@ export default function Major() {
         </Form>
       </Modal>
     </div>
-  )
+  );
 }

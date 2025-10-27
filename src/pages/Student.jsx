@@ -147,28 +147,28 @@ export default function Student() {
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 70 },
     {
-      title: "Student Code",
+      title: "Mã sinh viên",
       dataIndex: "student_code",
       key: "student_code",
       visible: visibleColumns.student_code,
       width: 130,
     },
     {
-      title: "Last Name",
+      title: "Họ",
       render: (_, r) => r.user?.last_name || "N/A",
       key: "last_name",
       visible: visibleColumns.last_name,
       width: 120,
     },
     {
-      title: "First Name",
+      title: "Tên",
       render: (_, r) => r.user?.first_name || "N/A",
       key: "first_name",
       visible: visibleColumns.first_name,
       width: 120,
     },
     {
-      title: "Class",
+      title: "Lớp sinh viên",
       dataIndex: "class_student",
       key: "class_student",
       visible: visibleColumns.class_student,
@@ -183,14 +183,14 @@ export default function Student() {
       width: 200,
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       render: (_, r) => r.user?.phone || "N/A",
       key: "phone",
       visible: visibleColumns.phone,
       width: 120,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       visible: visibleColumns.created_at,
@@ -198,7 +198,7 @@ export default function Student() {
       width: 150,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       visible: visibleColumns.updated_at,
@@ -215,7 +215,7 @@ export default function Student() {
             </Button>
           </Link>
           <Popconfirm
-            title="Bạn có chắc muốn xoá student này?"
+            title="Bạn có chắc muốn xoá sinh viên này?"
             okText="OK"
             cancelText="Hủy"
             onConfirm={() => handleDelete(record.id)}
@@ -252,7 +252,7 @@ export default function Student() {
         <div className="flex items-center justify-between mb-8 gap-4 flex-shrink-0">
           <Link to="/students/detail">
             <Button type="primary" icon={<PlusOutlined />} size="large">
-              Add Student
+              Thêm mới
             </Button>
           </Link>
 

@@ -50,6 +50,8 @@ export default function Course() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
+  const [selectedSemester, setSelectedSemester] = useState(null);
+
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     semester: true,
@@ -61,6 +63,7 @@ export default function Course() {
     start_date: true,
     end_date: true,
     weekday: true,
+    start_period: true,
     created_at: false,
     updated_at: false,
   });
@@ -77,11 +80,13 @@ export default function Course() {
   const showAddModal = () => {
     setEditingRecord(null);
     form.resetFields();
+    setSelectedSemester(null);
     setIsModalVisible(true);
   };
 
   const showEditModal = (record) => {
     setEditingRecord(record);
+    setSelectedSemester(record.semester);
 
     form.setFieldsValue({
       semester: record.semester?.id,
@@ -93,6 +98,7 @@ export default function Course() {
       start_date: record.start_date ? dayjs(record.start_date) : null,
       end_date: record.end_date ? dayjs(record.end_date) : null,
       weekday: record.weekday,
+      start_period: record.start_period
     });
 
     setIsModalVisible(true);
@@ -158,140 +164,17 @@ export default function Course() {
   };
 
   const columnMenu = {
-    items: [
-      {
-        key: "id",
-        label: (
-          <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
-          >
-            ID
-          </Checkbox>
-        ),
-      },
-      {
-        key: "semester",
-        label: (
-          <Checkbox
-            checked={visibleColumns.semester}
-            onChange={() => toggleColumn("semester")}
-          >
-            Semester
-          </Checkbox>
-        ),
-      },
-      {
-        key: "class_st",
-        label: (
-          <Checkbox
-            checked={visibleColumns.class_st}
-            onChange={() => toggleColumn("class_st")}
-          >
-            Class
-          </Checkbox>
-        ),
-      },
-      {
-        key: "teacher",
-        label: (
-          <Checkbox
-            checked={visibleColumns.teacher}
-            onChange={() => toggleColumn("teacher")}
-          >
-            Teacher
-          </Checkbox>
-        ),
-      },
-      {
-        key: "subject",
-        label: (
-          <Checkbox
-            checked={visibleColumns.subject}
-            onChange={() => toggleColumn("subject")}
-          >
-            Subject
-          </Checkbox>
-        ),
-      },
-      {
-        key: "room",
-        label: (
-          <Checkbox
-            checked={visibleColumns.room}
-            onChange={() => toggleColumn("room")}
-          >
-            Room
-          </Checkbox>
-        ),
-      },
-      {
-        key: "max_capacity",
-        label: (
-          <Checkbox
-            checked={visibleColumns.max_capacity}
-            onChange={() => toggleColumn("max_capacity")}
-          >
-            Max Capacity
-          </Checkbox>
-        ),
-      },
-      {
-        key: "start_date",
-        label: (
-          <Checkbox
-            checked={visibleColumns.start_date}
-            onChange={() => toggleColumn("start_date")}
-          >
-            Start date
-          </Checkbox>
-        ),
-      },
-      {
-        key: "end_date",
-        label: (
-          <Checkbox
-            checked={visibleColumns.end_date}
-            onChange={() => toggleColumn("end_date")}
-          >
-            End date
-          </Checkbox>
-        ),
-      },
-      {
-        key: "weekday",
-        label: (
-          <Checkbox
-            checked={visibleColumns.weekday}
-            onChange={() => toggleColumn("weekday")}
-          >
-            Weekday
-          </Checkbox>
-        ),
-      },
-      {
-        key: "created_at",
-        label: (
-          <Checkbox
-            checked={visibleColumns.created_at}
-            onChange={() => toggleColumn("created_at")}
-          >
-            Created At
-          </Checkbox>
-        ),
-      },
-      {
-        key: "updated_at",
-        label: (
-          <Checkbox
-            checked={visibleColumns.updated_at}
-            onChange={() => toggleColumn("updated_at")}
-          >
-            Updated At
-          </Checkbox>
-        ),
-      },
-    ],
+    items: Object.keys(visibleColumns).map((key) => ({
+      key,
+      label: (
+        <Checkbox
+          checked={visibleColumns[key]}
+          onChange={() => toggleColumn(key)}
+        >
+          {key}
+        </Checkbox>
+      ),
+    })),
   };
 
   const allColumns = [
@@ -303,80 +186,86 @@ export default function Course() {
       visible: visibleColumns.id,
     },
     {
-      title: "Semester",
+      title: "Học kỳ",
       dataIndex: "semester",
       key: "semester",
       render: (semester) =>
         semester?.semesters ? (
-          <Tag color='magenta'>{semester.semesters}</Tag>
+          <Tag color="magenta">{semester.semesters}</Tag>
         ) : (
           "N/A"
         ),
       visible: visibleColumns.semester,
     },
     {
-      title: "Class",
+      title: "Lớp sinh viên",
       dataIndex: "class_st",
       key: "class_st",
       render: (class_st) =>
-        class_st?.name ? <Tag color='blue'>{class_st.name}</Tag> : "N/A",
+        class_st?.name ? <Tag color="blue">{class_st.name}</Tag> : "N/A",
       visible: visibleColumns.class_st,
     },
     {
-      title: "Teacher",
+      title: "Giáo viên",
       dataIndex: "teacher",
       key: "teacher",
       render: (instructor) => instructor?.name || "N/A",
       visible: visibleColumns.teacher,
     },
     {
-      title: "Subject",
+      title: "Môn học",
       dataIndex: "subject",
       key: "subject",
       render: (subject) => subject?.name || "N/A",
       visible: visibleColumns.subject,
     },
     {
-      title: "Room",
+      title: "Phòng",
       dataIndex: "room",
       key: "room",
       render: (room) =>
-        room?.room_code ? <Tag color='orange'>{room.room_code}</Tag> : "N/A",
+        room?.room_code ? <Tag color="orange">{room.room_code}</Tag> : "N/A",
       visible: visibleColumns.room,
     },
     {
-      title: "Max Capacity",
+      title: "Số lượng tối đa",
       dataIndex: "max_capacity",
       key: "max_capacity",
       visible: visibleColumns.max_capacity,
     },
     {
-      title: "Start date",
+      title: "Ngày bắt đầu",
       dataIndex: "start_date",
       key: "start_date",
       visible: visibleColumns.start_date,
     },
     {
-      title: "End date",
+      title: "Ngày kết thúc",
       dataIndex: "end_date",
       key: "end_date",
       visible: visibleColumns.end_date,
     },
     {
-      title: "Weekday",
+      title: "Thứ",
       dataIndex: "weekday",
       key: "weekday",
       visible: visibleColumns.weekday,
     },
     {
-      title: "Created At",
+      title: "Tiết bắt đầu",
+      dataIndex: "start_period",
+      key: "start_period",
+      visible: visibleColumns.start_period,
+    },
+    {
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
       visible: visibleColumns.created_at,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -387,13 +276,11 @@ export default function Course() {
       key: "action",
       render: (_, record) => (
         <Button
-          type='link'
+          type="link"
           icon={<EditOutlined />}
           onClick={() => showEditModal(record)}
-          className='text-indigo-600'
-        >
-          {/* Edit */}
-        </Button>
+          className="text-indigo-600"
+        />
       ),
       visible: true,
       fixed: "right",
@@ -404,90 +291,93 @@ export default function Course() {
   const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className='h-full flex flex-col'>
-      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
-        <div className='mb-6 flex-shrink-0'>
-          <div className='flex items-center gap-3 mb-2'>
-            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
-              <ReadOutlined className='text-indigo-600 text-lg' />
+    <div className="h-full flex flex-col">
+      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
+        <div className="mb-6 flex-shrink-0">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <ReadOutlined className="text-indigo-600 text-lg" />
             </div>
             <div>
-              <h1 className='text-2xl font-bold text-gray-900'>Courses</h1>
-              <p className='text-sm text-gray-500'>
+              <h1 className="text-2xl font-bold text-gray-900">Lớp tín chỉ</h1>
+              <p className="text-sm text-gray-500">
                 Manage course schedules and assignments
               </p>
             </div>
           </div>
         </div>
 
-        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
+        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Button
-            type='primary'
+            type="primary"
             icon={<PlusOutlined />}
             onClick={showAddModal}
-            size='large'
-            className='shadow-sm'
+            size="large"
+            className="shadow-sm"
           >
-            Add Course
+            Thêm mới
           </Button>
 
-          <Space size='middle'>
+          <Space size="middle">
             <Input
-              placeholder='Search courses...'
-              prefix={<SearchOutlined className='text-gray-400' />}
+              placeholder="Search courses..."
+              prefix={<SearchOutlined className="text-gray-400" />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size='large'
+              size="large"
               allowClear
-              className='rounded-lg'
+              className="rounded-lg"
             />
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button
-                icon={<SettingOutlined />}
-                size='large'
-                className='rounded-lg'
-              >
+              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className='flex-1 overflow-hidden'>
+        <div className="flex-1 overflow-hidden">
           <Table
             columns={columns}
             dataSource={filteredData}
-            rowKey='id'
+            rowKey="id"
             bordered
             pagination={{
               pageSize: 10,
               showSizeChanger: true,
               showTotal: (total) => `Total ${total} courses`,
             }}
-            // scroll={{ x: "max-content", y: "calc(100vh - 400px)" }}
           />
         </div>
       </div>
 
+      {/* ====== Modal Add/Edit ====== */}
       <Modal
         title={editingRecord ? "Edit Course" : "Add Course"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText='Save'
+        okText="Save"
         width={800}
       >
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout="vertical">
           {/* ====== Row 1: Semester - Class ====== */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label='Semester'
-                name='semester'
-                rules={[{ required: true, message: "Please select semester!" }]}
+                label="Học kỳ"
+                name="semester"
+                rules={[{ required: true, message: "Vui lòng chọn học kỳ!" }]}
               >
-                <Select placeholder='Select semester'>
+                <Select
+                  placeholder="Vui lòng chọn học kỳ"
+                  onChange={(value) => {
+                    const semester = semesters.find((s) => s.id === value);
+                    setSelectedSemester(semester);
+                    form.setFieldsValue({ start_date: null, end_date: null });
+                  }}
+                >
                   {semesters?.map((s) => (
                     <Select.Option key={s.id} value={s.id}>
                       {s.semesters}
@@ -499,11 +389,11 @@ export default function Course() {
 
             <Col span={12}>
               <Form.Item
-                label='Class'
-                name='class_st'
-                rules={[{ required: true, message: "Please select class!" }]}
+                label="Lớp sinh viên"
+                name="class_st"
+                rules={[{ required: true, message: "Vui lòng chọn lớp sinh viên!" }]}
               >
-                <Select placeholder='Select class'>
+                <Select placeholder="Vui lòng chọn lớp sinh viên">
                   {classes?.map((c) => (
                     <Select.Option key={c.id} value={c.id}>
                       {c.name}
@@ -518,11 +408,11 @@ export default function Course() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label='Teacher'
-                name='teacher'
-                rules={[{ required: true, message: "Please select teacher!" }]}
+                label="Giáo viên"
+                name="teacher"
+                rules={[{ required: true, message: "Vui lòng chọn giáo viên!" }]}
               >
-                <Select placeholder='Select teacher'>
+                <Select placeholder="Vui lòng chọn giáo viên">
                   {teachers?.map((i) => (
                     <Select.Option key={i.id} value={i.id}>
                       {i.user.first_name} {i.user.last_name}
@@ -534,11 +424,11 @@ export default function Course() {
 
             <Col span={12}>
               <Form.Item
-                label='Room'
-                name='room'
-                rules={[{ required: true, message: "Please select room!" }]}
+                label="Phòng"
+                name="room"
+                rules={[{ required: true, message: "Vui lòng chọn phòng!" }]}
               >
-                <Select placeholder='Select room'>
+                <Select placeholder="Vui lòng chọn phòng">
                   {rooms?.map((i) => (
                     <Select.Option key={i.id} value={i.id}>
                       {i.room_code} - {i.building}
@@ -553,11 +443,11 @@ export default function Course() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label='Subject'
-                name='subject'
-                rules={[{ required: true, message: "Please select subject!" }]}
+                label="Môn học"
+                name="subject"
+                rules={[{ required: true, message: "Vui lòng chọn môn học!" }]}
               >
-                <Select placeholder='Select subject'>
+                <Select placeholder="Vui lòng chọn môn học">
                   {subjects?.map((s) => (
                     <Select.Option key={s.id} value={s.id}>
                       {s.name}
@@ -569,13 +459,17 @@ export default function Course() {
 
             <Col span={12}>
               <Form.Item
-                label='Max Capacity'
-                name='max_capacity'
+                label="Số lượng"
+                name="max_capacity"
                 rules={[
-                  { required: true, message: "Please input max capacity!" },
+                  { required: true, message: "Vui lòng nhập số lượng tối đa!" },
                 ]}
               >
-                <Input type='number' min={1} placeholder='Enter max capacity' />
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="Vui lòng nhập số lượng tối đa"
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -584,23 +478,39 @@ export default function Course() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label='Start Date'
-                name='start_date'
-                rules={[
-                  { required: true, message: "Please select start date!" },
-                ]}
+                label="Ngày bắt đầu"
+                name="start_date"
+                rules={[{ required: true, message: "Vui lòng chọn ngày bắt đầu!" }]}
               >
-                <DatePicker format='YYYY-MM-DD' style={{ width: "100%" }} />
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => {
+                    if (!selectedSemester) return false;
+                    const start = dayjs(selectedSemester.start_date);
+                    const end = dayjs(selectedSemester.end_date);
+                    return current && (current < start || current > end);
+                  }}
+                />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label='End Date'
-                name='end_date'
-                rules={[{ required: true, message: "Please select end date!" }]}
+                label="Ngày kết thúc"
+                name="end_date"
+                rules={[{ required: true, message: "Vui lòng chọn ngày kết thúc!" }]}
               >
-                <DatePicker format='YYYY-MM-DD' style={{ width: "100%" }} />
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => {
+                    if (!selectedSemester) return false;
+                    const start = dayjs(selectedSemester.start_date);
+                    const end = dayjs(selectedSemester.end_date);
+                    return current && (current < start || current > end);
+                  }}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -609,21 +519,36 @@ export default function Course() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label='Weekday'
-                name='weekday'
-                rules={[{ required: true, message: "Please select weekday!" }]}
+                label="Thứ"
+                name="weekday"
+                rules={[{ required: true, message: "Vui lòng chọn thứ!" }]}
               >
-                <Select placeholder='Select weekday'>
-                  <Select.Option value='Monday'>Monday</Select.Option>
-                  <Select.Option value='Tuesday'>Tuesday</Select.Option>
-                  <Select.Option value='Wednesday'>Wednesday</Select.Option>
-                  <Select.Option value='Thursday'>Thursday</Select.Option>
-                  <Select.Option value='Friday'>Friday</Select.Option>
-                  <Select.Option value='Saturday'>Saturday</Select.Option>
+                <Select placeholder="Select weekday">
+                  <Select.Option value="Monday">Monday</Select.Option>
+                  <Select.Option value="Tuesday">Tuesday</Select.Option>
+                  <Select.Option value="Wednesday">Wednesday</Select.Option>
+                  <Select.Option value="Thursday">Thursday</Select.Option>
+                  <Select.Option value="Friday">Friday</Select.Option>
+                  <Select.Option value="Saturday">Saturday</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Tiết bắt đầu"
+                name="start_period"
+                rules={[{ required: true, message: "Vui lòng nhập tiết bắt đầu!" }]}
+              >
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="Vui lòng nhập tiết bắt đầu"
+                />
+              </Form.Item>
+            </Col>
           </Row>
+
         </Form>
       </Modal>
     </div>

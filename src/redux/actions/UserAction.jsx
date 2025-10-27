@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-
+import { jwtDecode } from "jwt-decode";
 import { userService } from "../../../service/UserService";
 import { LOGIN_ACTION } from "../types/UserType";
 
@@ -9,9 +9,17 @@ export const loginAction = (thongTinDangNhap) => {
     try {
       const result = await userService.login(thongTinDangNhap);
       if (result.status === 200) {
+        const accessToken = result.data.data.access;
+        const payload = jwtDecode(accessToken);
+        console.log("Payload JWT:", payload);
         dispatch({
           type: LOGIN_ACTION,
-          user: result.data.data,
+          access_token: result.data.data.access,
+          user: {
+            user_id: payload.user_id,
+            full_name: payload.name,
+            role: payload.role,
+          }
         });
         return { success: true, data: result.data.data };
       }

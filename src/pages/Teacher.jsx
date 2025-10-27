@@ -1,5 +1,3 @@
-"use client"
-
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react"
 import { Table, Button, Space, Popconfirm, message, Input, Dropdown, Checkbox } from "antd"
@@ -125,14 +123,14 @@ export default function Teacher() {
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 70 },
     {
-      title: "Last Name",
+      title: "Họ",
       render: (_, r) => r.user?.last_name || "N/A",
       key: "last_name",
       visible: visibleColumns.last_name,
       width: 150,
     },
     {
-      title: "First Name",
+      title: "Tên",
       render: (_, r) => r.user?.first_name || "N/A",
       key: "first_name",
       visible: visibleColumns.first_name,
@@ -146,14 +144,14 @@ export default function Teacher() {
       width: 220,
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       render: (_, r) => r.user?.phone || "N/A",
       key: "phone",
       visible: visibleColumns.phone,
       width: 130,
     },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       visible: visibleColumns.created_at,
@@ -161,7 +159,7 @@ export default function Teacher() {
       width: 150,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       visible: visibleColumns.updated_at,
@@ -178,7 +176,7 @@ export default function Teacher() {
             </Button>
           </Link>
           <Popconfirm
-            title="Bạn có chắc muốn xoá teacher này?"
+            title="Bạn có chắc muốn xoá giáo viên này?"
             okText="OK"
             cancelText="Hủy"
             onConfirm={() => handleDelete(record.id)}
@@ -206,7 +204,7 @@ export default function Teacher() {
               {/* <UserCheckOutlined className="text-indigo-600 text-lg" /> */}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Teachers</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Giáo viên</h1>
               <p className="text-sm text-gray-500">Manage teacher information and records</p>
             </div>
           </div>
@@ -215,7 +213,7 @@ export default function Teacher() {
         <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Link to="/teachers/detail">
             <Button type="primary" icon={<PlusOutlined />} size="large" className="shadow-sm">
-              Add Teacher
+              Thêm mới
             </Button>
           </Link>
 

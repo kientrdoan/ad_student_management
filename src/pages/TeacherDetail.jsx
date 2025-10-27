@@ -92,11 +92,11 @@ export default function TeacherDetail() {
   return (
     <>
       {contextHolder}
-      <div className="h-full overflow-auto p-6">
+      <div className="h-full overflow-auto">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/teachers")} className="mb-4">
-              Back to Teachers
+              Back
             </Button>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
@@ -114,33 +114,33 @@ export default function TeacherDetail() {
           <Card className="shadow-sm border border-gray-200">
             <Form form={form} layout="vertical" onFinish={handleSubmit}>
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                {/* <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
                   Teacher Information
-                </h3>
+                </h3> */}
                 <Row gutter={16}>
                   <Col span={8}>
                     <Form.Item
-                      label="Instructor Code"
+                      label="Mã giáo viên"
                       name="teacher_code"
-                      rules={[{ required: true, message: "Please input instructor code!" }]}
+                      rules={[{ required: true, message: "Vui lòng nhập mã giáo viên!" }]}
                     >
                       <Input placeholder="e.g. T20001" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label="Degree" name="degree">
+                    <Form.Item label="Học vị" name="degree">
                       <Input placeholder="e.g. PhD, Master" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label="Title" name="title">
+                    <Form.Item label="Chức danh" name="title">
                       <Input placeholder="e.g. Professor" size="large" />
                     </Form.Item>
                   </Col>
                 </Row>
 
                 <Form.Item
-                  label="Department"
+                  label="Khoa"
                   name="department"
                   rules={[{ required: true, message: "Please select department!" }]}
                 >
@@ -155,13 +155,13 @@ export default function TeacherDetail() {
               </div>
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                {/* <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
                   Personal Information
-                </h3>
+                </h3> */}
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item
-                      label="First Name"
+                      label="Tên"
                       name="first_name"
                       rules={[{ required: true, message: "Please input first name!" }]}
                     >
@@ -170,7 +170,7 @@ export default function TeacherDetail() {
                   </Col>
                   <Col span={12}>
                     <Form.Item
-                      label="Last Name"
+                      label="Họ"
                       name="last_name"
                       rules={[{ required: true, message: "Please input last name!" }]}
                     >
@@ -193,7 +193,7 @@ export default function TeacherDetail() {
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item label="Phone" name="phone" rules={[{ required: true, message: "Please input phone!" }]}>
+                    <Form.Item label="Số điện thoại" name="phone" rules={[{ required: true, message: "Please input phone!" }]}>
                       <Input placeholder="Enter phone" size="large" />
                     </Form.Item>
                   </Col>
@@ -201,17 +201,17 @@ export default function TeacherDetail() {
 
                 <Row gutter={16}>
                   <Col span={8}>
-                    <Form.Item label="Identity Number" name="identity_number">
+                    <Form.Item label="CCCD" name="identity_number">
                       <Input placeholder="ID/Passport" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label="Date of Birth" name="date_of_birth">
+                    <Form.Item label="Ngày sinh" name="date_of_birth">
                       <DatePicker style={{ width: "100%" }} size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label="Gender" name="gender">
+                    <Form.Item label="Giới tính" name="gender">
                       <Select placeholder="Select gender" size="large">
                         <Select.Option value="Nam">Male</Select.Option>
                         <Select.Option value="Nữ">Female</Select.Option>
@@ -221,7 +221,7 @@ export default function TeacherDetail() {
                   </Col>
                 </Row>
 
-                <Form.Item label="Address" name="address">
+                <Form.Item label="Địa chỉ" name="address">
                   <Input.TextArea rows={2} placeholder="Enter address" />
                 </Form.Item>
               </div>

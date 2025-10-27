@@ -41,6 +41,7 @@ export const getRoomAction = (id) => {
 export const addRoomAction = (payload) => {
   return async (dispatch) => {
     try {
+      console.log("payload", payload)
       const result = await roomService.addRoom(payload);
       console.log("result", result)
       if (result.status === 200) {

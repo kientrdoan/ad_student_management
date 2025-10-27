@@ -2,15 +2,15 @@ import { NavLink } from "react-router-dom"
 import { FiHome, FiUsers, FiBook, FiCalendar, FiGrid, FiLayers, FiBookOpen, FiUser, FiUserCheck } from "react-icons/fi"
 
 const menuItems = [
-  { name: "Departments", path: "/departments", icon: FiGrid },
-  { name: "Majors", path: "/majors", icon: FiLayers },
-  { name: "Class", path: "/class", icon: FiUsers },
-  { name: "Subjects", path: "/subjects", icon: FiBook },
-  { name: "Semesters", path: "/semesters", icon: FiCalendar },
-  { name: "Rooms", path: "/rooms", icon: FiHome },
-  { name: "Courses", path: "/courses", icon: FiBookOpen },
-  { name: "Students", path: "/students", icon: FiUser },
-  { name: "Teachers", path: "/teachers", icon: FiUserCheck },
+  { name: "Khoa", path: "/departments", icon: FiGrid },
+  { name: "Ngành", path: "/majors", icon: FiLayers },
+  { name: "Môn học", path: "/subjects", icon: FiBook },
+  { name: "Học kỳ", path: "/semesters", icon: FiCalendar },
+  { name: "Phòng học", path: "/rooms", icon: FiHome },
+  { name: "Lớp sinh viên", path: "/class", icon: FiUsers },
+  { name: "Sinh viên", path: "/students", icon: FiUser },
+  { name: "Giáo viên", path: "/teachers", icon: FiUserCheck },
+  { name: "Lớp tín chỉ", path: "/courses", icon: FiBookOpen },
 ]
 
 export default function SlideBar() {
@@ -18,8 +18,8 @@ export default function SlideBar() {
     <div className="bg-[#1e293b] text-white w-64 flex-shrink-0 flex flex-col shadow-xl">
       <div className="flex items-center justify-center p-6 border-b border-slate-700">
         <div className="text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Student</h1>
-          <p className="text-sm text-slate-400 mt-1">Management System</p>
+          <h1 className="text-2xl font-bold tracking-tight">ADMIN</h1>
+          {/* <p className="text-sm text-slate-400 mt-1">Management System</p> */}
         </div>
       </div>
 

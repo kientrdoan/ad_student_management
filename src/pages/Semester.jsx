@@ -194,25 +194,25 @@ export default function Semester() {
 
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 80 },
-    { title: "Year", dataIndex: "year", key: "year", visible: visibleColumns.year },
+    { title: "Năm học", dataIndex: "year", key: "year", visible: visibleColumns.year },
     {
-      title: "Semester",
+      title: "Học kỳ",
       dataIndex: "semesters",
       key: "semesters",
       visible: visibleColumns.semesters,
       render: (sem) => <Tag color="geekblue">{sem}</Tag>,
     },
-    { title: "Start date", dataIndex: "start_date", key: "start_date", visible: visibleColumns.start_date },
-    { title: "End date", dataIndex: "end_date", key: "end_date", visible: visibleColumns.end_date },
+    { title: "Ngày bắt đầu", dataIndex: "start_date", key: "start_date", visible: visibleColumns.start_date },
+    { title: "Ngày kết thúc", dataIndex: "end_date", key: "end_date", visible: visibleColumns.end_date },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
       visible: visibleColumns.created_at,
     },
     {
-      title: "Updated At",
+      title: "Cập nhật gần nhất",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
@@ -227,7 +227,7 @@ export default function Semester() {
             {/* Edit */}
           </Button>
           <Popconfirm
-            title="Bạn có chắc muốn xoá semester này?"
+            title="Bạn có chắc muốn xoá học kỳ này?"
             okText="OK"
             cancelText="Hủy"
             onConfirm={() => handleDelete(record.id)}
@@ -263,7 +263,7 @@ export default function Semester() {
 
         <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="shadow-sm">
-            Add Semester
+            Thêm mới
           </Button>
 
           <Space size="middle">
@@ -309,10 +309,10 @@ export default function Semester() {
         okText="Save"
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="year" name="year" rules={[{ required: true, message: "Please input year!" }]}>
+          <Form.Item label="Năm học" name="year" rules={[{ required: true, message: "Vui lòng nhập năm học!" }]}>
             <Input min={1} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="Semester" name="semesters" rules={[{ required: true, message: "Please select semester!" }]}>
+          <Form.Item label="Học kỳ" name="semesters" rules={[{ required: true, message: "Vui lòng chọn học kỳ!" }]}>
             <Select placeholder="Select semester">
               <Select.Option value="Học kỳ 1">Học kỳ 1</Select.Option>
               <Select.Option value="Học kỳ 2">Học kỳ 2</Select.Option>
@@ -320,13 +320,13 @@ export default function Semester() {
             </Select>
           </Form.Item>
           <Form.Item
-            label="Start date"
+            label="Ngày bắt đầu"
             name="start_date"
-            rules={[{ required: true, message: "Please select start date!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập ngày bắt đầu!" }]}
           >
             <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="End date" name="end_date" rules={[{ required: true, message: "Please select end date!" }]}>
+          <Form.Item label="Ngày kết thúc" name="end_date" rules={[{ required: true, message: "Vui lòng nhập ngày kết thúc!" }]}>
             <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
         </Form>

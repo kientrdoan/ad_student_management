@@ -69,40 +69,47 @@ export default function SubjectDetail() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/subjects")} className="mb-4">
-              Back to Subjects
+              Back
             </Button>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
                 <BookOutlined className="text-indigo-600 text-xl" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{id ? "Edit Subject" : "Add New Subject"}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{id ? "Chỉnh sửa thông tin môn học" : "Thêm mới môn học"}</h1>
                 <p className="text-sm text-gray-500">{id ? "Update subject information" : "Create a new subject"}</p>
               </div>
             </div>
           </div>
 
           <Card className="shadow-sm border border-gray-200">
-            <Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={{ credit: 3 }}>
+            <Form form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              // initialValues={{ credit: 3 }}
+              onValuesChange={(changedValues, allValues) => {
+                if (changedValues.credit !== undefined) {
+                  form.setFieldsValue({
+                    total_period: changedValues.credit * 15,
+                  })
+                }
+              }}>
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                  Basic Information
-                </h3>
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item
-                      label="Subject Code"
+                      label="Mã môn"
                       name="code"
-                      rules={[{ required: true, message: "Please input subject code!" }]}
+                      rules={[{ required: true, message: "Vui lòng nhập mã môn học!" }]}
                     >
                       <Input placeholder="e.g. CS101" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item
-                      label="Subject Name"
+                      label="Tên môn"
                       name="name"
-                      rules={[{ required: true, message: "Please input subject name!" }]}
+                      rules={[{ required: true, message: "Vui lòng nhập tên môn học!" }]}
                     >
                       <Input placeholder="e.g. Introduction to Programming" size="large" />
                     </Form.Item>
@@ -112,16 +119,16 @@ export default function SubjectDetail() {
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item
-                      label="Credit"
+                      label="Tín chỉ"
                       name="credit"
-                      rules={[{ required: true, message: "Please input credit!" }]}
+                      rules={[{ required: true, message: "Vui lòng nhập số tín chỉ!" }]}
                     >
                       <InputNumber min={1} max={10} style={{ width: "100%" }} size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item label="Major" name="major" rules={[{ required: true, message: "Please select major!" }]}>
-                      <Select placeholder="Select major" size="large">
+                    <Form.Item label="Ngành" name="major" rules={[{ required: true, message: "Vui lòng chọn ngành!" }]}>
+                      <Select placeholder="Chọn ngành" size="large">
                         {majors?.map((m) => (
                           <Select.Option key={m.id} value={m.id}>
                             {m.name}
@@ -132,49 +139,24 @@ export default function SubjectDetail() {
                   </Col>
                 </Row>
 
-                <Form.Item label="Description" name="description">
+                <Form.Item label="Mô tả" name="description">
                   <Input.TextArea rows={3} placeholder="Enter subject description..." />
                 </Form.Item>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-                  Period Information
-                </h3>
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <Form.Item
-                      label="Total Period"
-                      name="total_period"
-                      rules={[{ required: true, message: "Please input total period!" }]}
-                    >
-                      <InputNumber min={1} style={{ width: "100%" }} size="large" />
-                    </Form.Item>
-                  </Col>
-                  {/* <Col span={8}>
-                    <Form.Item
-                      label="Theory Period"
-                      name="theory_period"
-                      rules={[{ required: true, message: "Please input theory period!" }]}
-                    >
-                      <InputNumber min={0} style={{ width: "100%" }} size="large" />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item
-                      label="Lab Period"
-                      name="lab_period"
-                      rules={[{ required: true, message: "Please input lab period!" }]}
-                    >
-                      <InputNumber min={0} style={{ width: "100%" }} size="large" />
-                    </Form.Item>
-                  </Col> */}
-                </Row>
+                <Form.Item
+                  label="Tổng số tiết"
+                  name="total_period"
+                  rules={[{ required: true, message: "Vui lòng nhập tổng số tiết!" }]}
+                >
+                  <InputNumber min={1} style={{ width: "100%" }} size="large" disabled />
+                </Form.Item>
               </div>
 
               <Form.Item className="mb-0">
                 <Button type="primary" htmlType="submit" size="large" block>
-                  {id ? "Update Subject" : "Create Subject"}
+                  {id ? "Cập nhật" : "Lứu thông tin"}
                 </Button>
               </Form.Item>
             </Form>

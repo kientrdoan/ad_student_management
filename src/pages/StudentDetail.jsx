@@ -22,7 +22,7 @@ import {
   editStudentAction,
   getStudentAction,
 } from "../redux/actions/StudentAction";
-import { getAllMajorAction } from "../redux/actions/MajorAction";
+// import { getAllMajorAction } from "../redux/actions/MajorAction";
 import { getAllClassAction } from "../redux/actions/ClassAction";
 
 export default function StudentDetail() {
@@ -41,7 +41,7 @@ export default function StudentDetail() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getAllMajorAction());
+      // await dispatch(getAllMajorAction());
       await dispatch(getAllClassAction());
 
       if (id) {
@@ -49,7 +49,7 @@ export default function StudentDetail() {
         if (res.success) {
           form.setFieldsValue({
             student_code: res.data.student_code,
-            major: res.data.major,
+            // major: res.data.major,
             class_student: res.data.class_student.id,
             first_name: res.data.user?.first_name,
             last_name: res.data.user?.last_name,
@@ -74,7 +74,7 @@ export default function StudentDetail() {
   const handleSubmit = async (values) => {
     const payload = {
       student_code: values.student_code,
-      major: values.major,
+      // major: values.major,
       class_student: values.class_student,
       user: {
         email: values.email,
@@ -113,7 +113,7 @@ export default function StudentDetail() {
   return (
     <>
       {contextHolder}
-      <div className='h-full overflow-auto p-6'>
+      <div className='h-full overflow-auto'>
         <div className='max-w-4xl mx-auto'>
           <div className='mb-6'>
             <Button
@@ -121,7 +121,7 @@ export default function StudentDetail() {
               onClick={() => navigate("/students")}
               className='mb-4'
             >
-              Back to Students
+              Back
             </Button>
             <div className='flex items-center gap-3'>
               <div className='w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center'>
@@ -129,7 +129,7 @@ export default function StudentDetail() {
               </div>
               <div>
                 <h1 className='text-3xl font-bold text-gray-900'>
-                  {id ? "Edit Student" : "Add New Student"}
+                  {id ? "Cập nhật thông tin sinh viên" : "Thêm mới sinh viên"}
                 </h1>
                 <p className='text-sm text-gray-500'>
                   {id
@@ -142,35 +142,51 @@ export default function StudentDetail() {
 
           <Card className='shadow-sm border border-gray-200'>
             <Form form={form} layout='vertical' onFinish={handleSubmit}>
-              <div className='mb-6'>
-                <h3 className='text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200'>
+              <div className=''>
+                {/* <h3 className='text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200'>
                   Student Information
-                </h3>
+                </h3> */}
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item
-                      label='Student Code'
+                      label='Mã sinh viên'
                       name='student_code'
                       rules={[
                         {
                           required: true,
-                          message: "Please input student code!",
+                          message: "Vui lòng nhập mã sinh viên!",
                         },
                       ]}
                     >
                       <Input placeholder='e.g. S20001' size='large' />
                     </Form.Item>
                   </Col>
-                  <Col span={12}>
+                  {/* <Col span={12}>
                     <Form.Item
-                      label='Major'
+                      label='Ngành'
                       name='major'
                       rules={[
-                        { required: true, message: "Please select major!" },
+                        { required: true, message: "Vui lòng chọn ngành!" },
                       ]}
                     >
-                      <Select placeholder='Select major' size='large'>
+                      <Select placeholder='Vui lòng chọn ngành' size='large'>
                         {majors?.map((m) => (
+                          <Select.Option key={m.id} value={m.id}>
+                            {m.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col> */}
+
+                  <Col span={12}>
+                    <Form.Item
+                      label='Lớp sinh viên'
+                      name='class_student'
+                      rules={[{ required: true, message: "Vui lòng chọn lớp sinh viên!" }]}
+                    >
+                      <Select placeholder='Vui lòng chọn lớp sinh viên' size='large'>
+                        {classes?.map((m) => (
                           <Select.Option key={m.id} value={m.id}>
                             {m.name}
                           </Select.Option>
@@ -181,45 +197,33 @@ export default function StudentDetail() {
                 </Row>
               </div>
 
-              <Form.Item
-                label='Class'
-                name='class_student'
-                rules={[{ required: true, message: "Please select class!" }]}
-              >
-                <Select placeholder='Select major' size='large'>
-                  {classes?.map((m) => (
-                    <Select.Option key={m.id} value={m.id}>
-                      {m.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
+             
 
               <div className='mb-6'>
-                <h3 className='text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200'>
+                {/* <h3 className='text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200'>
                   Personal Information
-                </h3>
+                </h3> */}
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item
-                      label='First Name'
+                      label='Tên'
                       name='first_name'
                       rules={[
-                        { required: true, message: "Please input first name!" },
+                        { required: true, message: "Vui lòng nhập tên!" },
                       ]}
                     >
-                      <Input placeholder='Enter first name' size='large' />
+                      <Input placeholder='Vui lòng nhập tên' size='large' />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item
-                      label='Last Name'
+                      label='Họ'
                       name='last_name'
                       rules={[
-                        { required: true, message: "Please input last name!" },
+                        { required: true, message: "Vui lòng nhập họ!" },
                       ]}
                     >
-                      <Input placeholder='Enter last name' size='large' />
+                      <Input placeholder='Vui lòng nhập họ' size='large' />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -230,39 +234,39 @@ export default function StudentDetail() {
                       label='Email'
                       name='email'
                       rules={[
-                        { required: true, message: "Please input email!" },
+                        { required: true, message: "Vui lòng nhập email!" },
                         { type: "email", message: "Invalid email format!" },
                       ]}
                     >
-                      <Input placeholder='Enter email' size='large' />
+                      <Input placeholder='Vui lòng nhập email' size='large' />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item
-                      label='Phone'
+                      label='Số điện thoại'
                       name='phone'
                       rules={[
-                        { required: true, message: "Please input phone!" },
+                        { required: true, message: "Vui lòng nhập số điện thoại!" },
                       ]}
                     >
-                      <Input placeholder='Enter phone number' size='large' />
+                      <Input placeholder='Vui lòng nhập số điện thoại' size='large' />
                     </Form.Item>
                   </Col>
                 </Row>
 
                 <Row gutter={16}>
                   <Col span={8}>
-                    <Form.Item label='Identity Number' name='identity_number'>
-                      <Input placeholder='ID/Passport' size='large' />
+                    <Form.Item label='CCCD' name='identity_number'>
+                      <Input placeholder='Vui lòng nhập cccd' size='large' />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label='Date of Birth' name='birthday'>
+                    <Form.Item label='Ngày sinh' name='birthday'>
                       <DatePicker style={{ width: "100%" }} size='large' />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label='Gender' name='gender'>
+                    <Form.Item label='Giới tính' name='gender'>
                       <Select placeholder='Select gender' size='large'>
                         <Select.Option value='Nam'>Male</Select.Option>
                         <Select.Option value='Nữ'>Female</Select.Option>
@@ -272,7 +276,7 @@ export default function StudentDetail() {
                   </Col>
                 </Row>
 
-                <Form.Item label='Address' name='address'>
+                <Form.Item label='Địa chỉ' name='address'>
                   <Input.TextArea rows={2} placeholder='Enter address' />
                 </Form.Item>
               </div>

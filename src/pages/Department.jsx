@@ -79,7 +79,7 @@ export default function Department() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteDepartmentAction(id))
     if (res.success) {
-      message.success("Xoá department thành công!")
+      message.success("Xoá khoa thành công!")
       dispatch(getAllAction())
     } else {
       message.error("Xoá thất bại!")
@@ -146,29 +146,29 @@ export default function Department() {
   const allColumns = [
     { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 80 },
     {
-      title: "Code",
+      title: "Mã khoa",
       dataIndex: "code",
       key: "code",
       visible: visibleColumns.code,
       render: (code) => <Tag color="green">{code}</Tag>,
     },
-    { title: "Name", dataIndex: "name", key: "name", visible: visibleColumns.name },
+    { title: "Tên Khoa", dataIndex: "name", key: "name", visible: visibleColumns.name },
     {
-      title: "Created At",
+      title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
       visible: visibleColumns.created_at,
     },
     {
-      title: "Updated At",
+      title: "Thời gian cập nhật",
       dataIndex: "updated_at",
       key: "updated_at",
       render: (date) => (date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "N/A"),
       visible: visibleColumns.updated_at,
     },
     {
-      title: "Action",
+      title: "Thao tác",
       key: "action",
       render: (_, record) => (
         <Space>
@@ -213,7 +213,7 @@ export default function Department() {
 
         <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="shadow-sm">
-            Add Department
+            Thêm mới
           </Button>
 
           <Space size="middle">
@@ -259,10 +259,10 @@ export default function Department() {
         okText="Save"
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Code" name="code" rules={[{ required: true, message: "Please input code!" }]}>
+          <Form.Item label="Mã khoa" name="code" rules={[{ required: true, message: "Please input code!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input name!" }]}>
+          <Form.Item label="Tên khoa" name="name" rules={[{ required: true, message: "Please input name!" }]}>
             <Input />
           </Form.Item>
         </Form>
