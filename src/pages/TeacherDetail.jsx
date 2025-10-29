@@ -128,12 +128,12 @@ export default function TeacherDetail() {
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label="Học vị" name="degree">
+                    <Form.Item label="Học vị" name="degree" rules={[{ required: true, message: "Vui lòng nhập học vị!" }]}>
                       <Input placeholder="e.g. PhD, Master" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item label="Chức danh" name="title">
+                    <Form.Item label="Chức danh" name="title" rules={[{ required: true, message: "Vui lòng nhập học vị!" }]}>
                       <Input placeholder="e.g. Professor" size="large" />
                     </Form.Item>
                   </Col>

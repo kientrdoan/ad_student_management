@@ -51,6 +51,9 @@ export default function Course() {
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
   const [selectedSemester, setSelectedSemester] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+
+  const PERIODS_PER_DAY = 5; // cố định 5 tiết/ngày
 
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
@@ -81,24 +84,26 @@ export default function Course() {
     setEditingRecord(null);
     form.resetFields();
     setSelectedSemester(null);
+    setSelectedSubject(null);
     setIsModalVisible(true);
   };
 
   const showEditModal = (record) => {
     setEditingRecord(record);
     setSelectedSemester(record.semester);
+    setSelectedSubject(record.subject);
 
     form.setFieldsValue({
       semester: record.semester?.id,
       class_st: record.class_st?.id,
-      teacher: record.teacher?.id,
       subject: record.subject?.id,
-      room: record.room?.id,
-      max_capacity: record.max_capacity,
       start_date: record.start_date ? dayjs(record.start_date) : null,
       end_date: record.end_date ? dayjs(record.end_date) : null,
+      max_capacity: record.max_capacity,
       weekday: record.weekday,
-      start_period: record.start_period
+      start_period: record.start_period,
+      room: record.room?.id,
+      teacher: record.teacher?.id,
     });
 
     setIsModalVisible(true);
@@ -142,6 +147,7 @@ export default function Course() {
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setSelectedSubject(null);
   };
 
   const filteredData = courses.filter((course) => {
@@ -191,7 +197,7 @@ export default function Course() {
       key: "semester",
       render: (semester) =>
         semester?.semesters ? (
-          <Tag color="magenta">{semester.semesters}</Tag>
+          <Tag color='magenta'>{semester.semesters}</Tag>
         ) : (
           "N/A"
         ),
@@ -202,7 +208,7 @@ export default function Course() {
       dataIndex: "class_st",
       key: "class_st",
       render: (class_st) =>
-        class_st?.name ? <Tag color="blue">{class_st.name}</Tag> : "N/A",
+        class_st?.name ? <Tag color='blue'>{class_st.name}</Tag> : "N/A",
       visible: visibleColumns.class_st,
     },
     {
@@ -224,7 +230,7 @@ export default function Course() {
       dataIndex: "room",
       key: "room",
       render: (room) =>
-        room?.room_code ? <Tag color="orange">{room.room_code}</Tag> : "N/A",
+        room?.room_code ? <Tag color='orange'>{room.room_code}</Tag> : "N/A",
       visible: visibleColumns.room,
     },
     {
@@ -276,10 +282,10 @@ export default function Course() {
       key: "action",
       render: (_, record) => (
         <Button
-          type="link"
+          type='link'
           icon={<EditOutlined />}
           onClick={() => showEditModal(record)}
-          className="text-indigo-600"
+          className='text-indigo-600'
         />
       ),
       visible: true,
@@ -291,57 +297,61 @@ export default function Course() {
   const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
-        <div className="mb-6 flex-shrink-0">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-              <ReadOutlined className="text-indigo-600 text-lg" />
+    <div className='h-full flex flex-col'>
+      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
+        <div className='mb-6 flex-shrink-0'>
+          <div className='flex items-center gap-3 mb-2'>
+            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
+              <ReadOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Lớp tín chỉ</h1>
-              <p className="text-sm text-gray-500">
+              <h1 className='text-2xl font-bold text-gray-900'>Lớp tín chỉ</h1>
+              <p className='text-sm text-gray-500'>
                 Manage course schedules and assignments
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
+        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
           <Button
-            type="primary"
+            type='primary'
             icon={<PlusOutlined />}
             onClick={showAddModal}
-            size="large"
-            className="shadow-sm"
+            size='large'
+            className='shadow-sm'
           >
             Thêm mới
           </Button>
 
-          <Space size="middle">
+          <Space size='middle'>
             <Input
-              placeholder="Search courses..."
-              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder='Search courses...'
+              prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size="large"
+              size='large'
               allowClear
-              className="rounded-lg"
+              className='rounded-lg'
             />
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
+              <Button
+                icon={<SettingOutlined />}
+                size='large'
+                className='rounded-lg'
+              >
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className='flex-1 overflow-hidden'>
           <Table
             columns={columns}
             dataSource={filteredData}
-            rowKey="id"
+            rowKey='id'
             bordered
             pagination={{
               pageSize: 10,
@@ -358,20 +368,20 @@ export default function Course() {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Save"
+        okText='Save'
         width={800}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout='vertical'>
           {/* ====== Row 1: Semester - Class ====== */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Học kỳ"
-                name="semester"
+                label='Học kỳ'
+                name='semester'
                 rules={[{ required: true, message: "Vui lòng chọn học kỳ!" }]}
               >
                 <Select
-                  placeholder="Vui lòng chọn học kỳ"
+                  placeholder='Vui lòng chọn học kỳ'
                   onChange={(value) => {
                     const semester = semesters.find((s) => s.id === value);
                     setSelectedSemester(semester);
@@ -380,7 +390,7 @@ export default function Course() {
                 >
                   {semesters?.map((s) => (
                     <Select.Option key={s.id} value={s.id}>
-                      {s.semesters}
+                      {s.semesters} {s.year}
                     </Select.Option>
                   ))}
                 </Select>
@@ -389,11 +399,13 @@ export default function Course() {
 
             <Col span={12}>
               <Form.Item
-                label="Lớp sinh viên"
-                name="class_st"
-                rules={[{ required: true, message: "Vui lòng chọn lớp sinh viên!" }]}
+                label='Lớp sinh viên'
+                name='class_st'
+                rules={[
+                  { required: true, message: "Vui lòng chọn lớp sinh viên!" },
+                ]}
               >
-                <Select placeholder="Vui lòng chọn lớp sinh viên">
+                <Select placeholder='Vui lòng chọn lớp sinh viên'>
                   {classes?.map((c) => (
                     <Select.Option key={c.id} value={c.id}>
                       {c.name}
@@ -404,53 +416,25 @@ export default function Course() {
             </Col>
           </Row>
 
-          {/* ====== Row 2: Teacher - Room ====== */}
+          {/* ====== Row 2: Subject - Max Capacity ====== */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Giáo viên"
-                name="teacher"
-                rules={[{ required: true, message: "Vui lòng chọn giáo viên!" }]}
-              >
-                <Select placeholder="Vui lòng chọn giáo viên">
-                  {teachers?.map((i) => (
-                    <Select.Option key={i.id} value={i.id}>
-                      {i.user.first_name} {i.user.last_name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item
-                label="Phòng"
-                name="room"
-                rules={[{ required: true, message: "Vui lòng chọn phòng!" }]}
-              >
-                <Select placeholder="Vui lòng chọn phòng">
-                  {rooms?.map((i) => (
-                    <Select.Option key={i.id} value={i.id}>
-                      {i.room_code} - {i.building}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {/* ====== Row 3: Subject - Max Capacity ====== */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Môn học"
-                name="subject"
+                label='Môn học'
+                name='subject'
                 rules={[{ required: true, message: "Vui lòng chọn môn học!" }]}
               >
-                <Select placeholder="Vui lòng chọn môn học">
+                <Select
+                  placeholder='Vui lòng chọn môn học'
+                  onChange={(value) => {
+                    const subject = subjects.find((s) => s.id === value);
+                    setSelectedSubject(subject);
+                    form.setFieldsValue({ start_date: null, end_date: null });
+                  }}
+                >
                   {subjects?.map((s) => (
                     <Select.Option key={s.id} value={s.id}>
-                      {s.name}
+                      {s.name} ({s.credit} tín chỉ)
                     </Select.Option>
                   ))}
                 </Select>
@@ -459,31 +443,128 @@ export default function Course() {
 
             <Col span={12}>
               <Form.Item
-                label="Số lượng"
-                name="max_capacity"
+                label='Số lượng'
+                name='max_capacity'
                 rules={[
                   { required: true, message: "Vui lòng nhập số lượng tối đa!" },
                 ]}
               >
                 <Input
-                  type="number"
+                  type='number'
                   min={1}
-                  placeholder="Vui lòng nhập số lượng tối đa"
+                  placeholder='Nhập số lượng tối đa'
                 />
               </Form.Item>
             </Col>
           </Row>
 
-          {/* ====== Row 4: Start Date - End Date ====== */}
+          {/* ====== Row 3: Start Date - End Date ====== */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Ngày bắt đầu"
-                name="start_date"
-                rules={[{ required: true, message: "Vui lòng chọn ngày bắt đầu!" }]}
+                label='Ngày bắt đầu'
+                name='start_date'
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng chọn ngày bắt đầu!",
+                  },
+                  {
+                    validator: (_, value) => {
+                      if (!value || !selectedSemester) return Promise.resolve();
+                      const totalPeriods = selectedSubject?.total_period || 0;
+                      const totalSessions = Math.ceil(totalPeriods / 5);
+                      const endDate = dayjs(value).add(
+                        totalSessions - 1,
+                        "week"
+                      );
+                      const semesterEnd = dayjs(selectedSemester.end_date);
+                      if (endDate.isAfter(semesterEnd)) {
+                        return Promise.reject(
+                          new Error(
+                            `Ngày kết thúc dự kiến ${endDate.format(
+                              "YYYY-MM-DD"
+                            )} vượt quá học kỳ!`
+                          )
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
               >
                 <DatePicker
-                  format="YYYY-MM-DD"
+                  format='YYYY-MM-DD'
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => {
+                    if (!selectedSemester) return true;
+                    const semesterStart = dayjs(selectedSemester.start_date);
+                    const semesterEnd = dayjs(selectedSemester.end_date);
+                    return current < semesterStart || current > semesterEnd;
+                  }}
+                  onChange={(date) => {
+                    if (!date) {
+                      form.setFieldsValue({ end_date: null });
+                      return;
+                    }
+
+                    const semesterStart = dayjs(selectedSemester.start_date);
+                    const semesterEnd = dayjs(selectedSemester.end_date);
+
+                    if (
+                      date.isBefore(semesterStart) ||
+                      date.isAfter(semesterEnd)
+                    ) {
+                      message.error(
+                        "Ngày bắt đầu không phù hợp với học kỳ đã chọn!"
+                      );
+                      form.setFieldsValue({ start_date: null, end_date: null });
+                      return;
+                    }
+
+                    if (selectedSubject?.total_period) {
+                      const totalPeriods = selectedSubject.total_period; // tổng số tiết
+                      const periodsPerDay = 5; // cố định 5 tiết/ngày
+                      const totalSessions = Math.ceil(
+                        totalPeriods / periodsPerDay
+                      ); // số buổi cần học
+
+                      // Tính ngày kết thúc dự kiến
+                      let endDate = dayjs(date).add(totalSessions - 1, "week");
+
+                      // Nếu vượt học kỳ thì fix bằng ngày kết thúc học kỳ
+                      if (endDate.isAfter(semesterEnd)) {
+                        endDate = semesterEnd;
+                        message.warning(
+                          `Ngày kết thúc dự kiến đã vượt học kỳ, tự động set bằng ${semesterEnd.format(
+                            "YYYY-MM-DD"
+                          )}`
+                        );
+                      }
+
+                      // Set vào form để hiển thị ngay
+                      form.setFieldsValue({
+                        start_date: date,
+                        end_date: endDate,
+                      });
+                    } else {
+                      form.setFieldsValue({ start_date: date });
+                    }
+                  }}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label='Ngày kết thúc'
+                name='end_date'
+                rules={[
+                  { required: true, message: "Vui lòng chọn ngày kết thúc!" },
+                ]}
+              >
+                <DatePicker
+                  format='YYYY-MM-DD'
                   style={{ width: "100%" }}
                   disabledDate={(current) => {
                     if (!selectedSemester) return false;
@@ -494,61 +575,78 @@ export default function Course() {
                 />
               </Form.Item>
             </Col>
-
-            <Col span={12}>
-              <Form.Item
-                label="Ngày kết thúc"
-                name="end_date"
-                rules={[{ required: true, message: "Vui lòng chọn ngày kết thúc!" }]}
-              >
-                <DatePicker
-                  format="YYYY-MM-DD"
-                  style={{ width: "100%" }}
-                  disabledDate={(current) => {
-                    if (!selectedSemester) return false;
-                    const start = dayjs(selectedSemester.start_date);
-                    const end = dayjs(selectedSemester.end_date);
-                    return current && (current < start || current > end);
-                  }}
-                />
-              </Form.Item>
-            </Col>
           </Row>
 
-          {/* ====== Row 5: Weekday ====== */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Thứ"
-                name="weekday"
-                rules={[{ required: true, message: "Vui lòng chọn thứ!" }]}
-              >
-                <Select placeholder="Select weekday">
-                  <Select.Option value="Monday">Monday</Select.Option>
-                  <Select.Option value="Tuesday">Tuesday</Select.Option>
-                  <Select.Option value="Wednesday">Wednesday</Select.Option>
-                  <Select.Option value="Thursday">Thursday</Select.Option>
-                  <Select.Option value="Friday">Friday</Select.Option>
-                  <Select.Option value="Saturday">Saturday</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
+          {/* ====== ONLY SHOW THESE FIELDS WHEN EDITING ====== */}
+          {editingRecord && (
+            <>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Thứ'
+                    name='weekday'
+                    rules={[
+                      { required: true, message: "Vui lòng nhập thứ học!" },
+                    ]}
+                  >
+                    <Input placeholder='Ví dụ: 2, 3, 4, ...' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label='Tiết bắt đầu'
+                    name='start_period'
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng nhập tiết bắt đầu!",
+                      },
+                    ]}
+                  >
+                    <Input type='number' min={1} />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-            <Col span={12}>
-              <Form.Item
-                label="Tiết bắt đầu"
-                name="start_period"
-                rules={[{ required: true, message: "Vui lòng nhập tiết bắt đầu!" }]}
-              >
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="Vui lòng nhập tiết bắt đầu"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Phòng học'
+                    name='room'
+                    rules={[
+                      { required: true, message: "Vui lòng chọn phòng!" },
+                    ]}
+                  >
+                    <Select placeholder='Chọn phòng'>
+                      {rooms?.map((r) => (
+                        <Select.Option key={r.id} value={r.id}>
+                          {r.room_code}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
 
+                <Col span={12}>
+                  <Form.Item
+                    label='Giáo viên'
+                    name='teacher'
+                    rules={[
+                      { required: true, message: "Vui lòng chọn giáo viên!" },
+                    ]}
+                  >
+                    <Select placeholder='Chọn giáo viên'>
+                      {teachers?.map((t) => (
+                        <Select.Option key={t.id} value={t.id}>
+                          {t.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </>
+          )}
         </Form>
       </Modal>
     </div>
