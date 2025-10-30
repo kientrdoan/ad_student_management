@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -11,289 +10,293 @@ import {
   message,
   Row,
   Col,
+  Upload,
 } from "antd";
-import { UserOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  ArrowLeftOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-
 import {
   addStudentAction,
   editStudentAction,
   getStudentAction,
 } from "../redux/actions/StudentAction";
-// import { getAllMajorAction } from "../redux/actions/MajorAction";
 import { getAllClassAction } from "../redux/actions/ClassAction";
 
 export default function StudentDetail() {
-  console.log("[v0] StudentDetail component is rendering");
-
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const majors = useSelector((state) => state.MajorReducer.majors);
-  const classes = useSelector((state) => state.ClassReducer.classes);
-
-  const [messageApi, contextHolder] = message.useMessage();
   const { id } = useParams();
+  const classes = useSelector((state) => state.ClassReducer.classes);
+  const [messageApi, contextHolder] = message.useMessage();
 
-  console.log("[v0] StudentDetail - Route ID:", id);
-
+  const [fileList, setFileList] = useState([]);
+  
   useEffect(() => {
     const fetchData = async () => {
-      // await dispatch(getAllMajorAction());
       await dispatch(getAllClassAction());
 
       if (id) {
         const res = await dispatch(getStudentAction(id));
         if (res.success) {
+          const u = res.data.user;
+
+          // ✅ Gán dữ liệu form
           form.setFieldsValue({
             student_code: res.data.student_code,
-            // major: res.data.major,
-            class_student: res.data.class_student.id,
-            first_name: res.data.user?.first_name,
-            last_name: res.data.user?.last_name,
-            email: res.data.user?.email,
-            phone: res.data.user?.phone,
-            address: res.data.user?.address,
-            identity_number: res.data.user?.identity_number,
-            birthday: res.data.user?.birthday
-              ? dayjs(res.data.user.birthday)
-              : null,
-            gender: res.data.user?.gender === "M" ? "Nam" : "Nữ",
+            class_student: res.data.class_student?.id,
+            first_name: u?.first_name,
+            last_name: u?.last_name,
+            email: u?.email,
+            phone: u?.phone,
+            address: u?.address,
+            identity_number: u?.identity_number,
+            birthday: u?.birthday ? dayjs(u.birthday) : null,
+            gender: u?.gender === "M" ? "Nam" : "Nữ",
           });
-        } else {
-          messageApi.error("Không tìm thấy student!");
+
+          // ✅ Hiển thị ảnh preview nếu có (sửa chỗ này)
+          if (u?.url) {
+            const imgUrl = u.url.startsWith("http")
+              ? u.url
+              : `http://localhost:8000${u.url}`;
+
+            setFileList([
+              {
+                uid: "-1",
+                name: "avatar.jpg",
+                status: "done",
+                url: imgUrl,
+              },
+            ]);
+          } else {
+            setFileList([]);
+          }
         }
       }
     };
-
     fetchData();
-  }, [dispatch, id, form, messageApi]);
+  }, [dispatch, id, form]);
 
   const handleSubmit = async (values) => {
-    const payload = {
-      student_code: values.student_code,
-      // major: values.major,
-      class_student: values.class_student,
-      user: {
-        email: values.email,
-        first_name: values.first_name,
-        last_name: values.last_name,
-        phone: values.phone,
-        address: values.address,
-        identity_number: values.identity_number,
-        birthday: values.birthday ? values.birthday.format("YYYY-MM-DD") : null,
-        gender: values.gender === "Nam" ? "M" : "F",
-        password: "12345",
-        role: "STUDENT",
-        is_active: true,
-      },
-    };
+    const formData = new FormData();
 
-    if (id) {
-      const res = await dispatch(editStudentAction(id, payload));
-      if (res.success) {
-        messageApi.success("Cập nhật student thành công!");
-        setTimeout(() => navigate("/students"), 1000);
-      } else {
-        messageApi.error("Thao tác thất bại!");
+    // Dữ liệu sinh viên
+    formData.append("student_code", values.student_code);
+    formData.append("class_student", values.class_student);
+
+    // Dữ liệu user
+    formData.append("user.email", values.email);
+    formData.append("user.first_name", values.first_name);
+    formData.append("user.last_name", values.last_name);
+    formData.append("user.phone", values.phone);
+    formData.append("user.address", values.address || "");
+    formData.append("user.identity_number", values.identity_number || "");
+    formData.append(
+      "user.birthday",
+      values.birthday ? values.birthday.format("YYYY-MM-DD") : ""
+    );
+    formData.append("user.gender", values.gender === "Nam" ? "M" : "F");
+    formData.append("user.password", "12345");
+    formData.append("user.role", "STUDENT");
+    formData.append("user.is_active", "true");
+
+    // XỬ LÝ FILE ẢNH
+    if (fileList.length > 0) {
+      const file = fileList[0];
+      if (file.originFileObj) {
+        // File mới được chọn từ máy
+        formData.append("user.url", file.originFileObj);
       }
+      // Nếu là ảnh cũ (chỉ có url), backend sẽ giữ nguyên
     } else {
-      const res = await dispatch(addStudentAction(payload));
+      // Không có file → xóa avatar (nếu muốn)
+      // formData.append("user.url", ""); // Gửi rỗng để xóa
+    }
+
+    // DEBUG: Xem dữ liệu gửi đi
+    console.group("FormData Debug");
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(key, value.name, value.size, "bytes");
+      } else {
+        console.log(key, value);
+      }
+    }
+    console.groupEnd();
+
+    try {
+      const res = id
+        ? await dispatch(editStudentAction(id, formData))
+        : await dispatch(addStudentAction(formData));
+
       if (res.success) {
-        messageApi.success("Thêm student thành công!");
+        messageApi.success(id ? "Cập nhật thành công!" : "Thêm thành công!");
         setTimeout(() => navigate("/students"), 1000);
       } else {
-        messageApi.error("Thao tác thất bại!");
+        messageApi.error(res.message || "Thao tác thất bại!");
       }
+    } catch (error) {
+      messageApi.error("Lỗi hệ thống!");
+      console.error(error);
     }
   };
 
   return (
     <>
       {contextHolder}
-      <div className='h-full overflow-auto'>
-        <div className='max-w-4xl mx-auto'>
-          <div className='mb-6'>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={() => navigate("/students")}
-              className='mb-4'
-            >
-              Back
-            </Button>
-            <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center'>
-                <UserOutlined className='text-indigo-600 text-xl' />
-              </div>
-              <div>
-                <h1 className='text-3xl font-bold text-gray-900'>
-                  {id ? "Cập nhật thông tin sinh viên" : "Thêm mới sinh viên"}
-                </h1>
-                <p className='text-sm text-gray-500'>
-                  {id
-                    ? "Update student information"
-                    : "Create a new student record"}
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className='max-w-4xl mx-auto'>
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/students")}
+          className='mb-4'
+        >
+          Quay lại
+        </Button>
 
-          <Card className='shadow-sm border border-gray-200'>
-            <Form form={form} layout='vertical' onFinish={handleSubmit}>
-              <div className=''>
-                {/* <h3 className='text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200'>
-                  Student Information
-                </h3> */}
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item
-                      label='Mã sinh viên'
-                      name='student_code'
-                      rules={[
-                        {
-                          required: true,
-                          message: "Vui lòng nhập mã sinh viên!",
-                        },
-                      ]}
-                    >
-                      <Input placeholder='e.g. S20001' size='large' />
-                    </Form.Item>
-                  </Col>
-                  {/* <Col span={12}>
-                    <Form.Item
-                      label='Ngành'
-                      name='major'
-                      rules={[
-                        { required: true, message: "Vui lòng chọn ngành!" },
-                      ]}
-                    >
-                      <Select placeholder='Vui lòng chọn ngành' size='large'>
-                        {majors?.map((m) => (
-                          <Select.Option key={m.id} value={m.id}>
-                            {m.name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  </Col> */}
+        <Card title={id ? "Chỉnh sửa sinh viên" : "Thêm sinh viên mới"}>
+          <Form form={form} layout='vertical' onFinish={handleSubmit}>
+            {/* UPLOAD ẢNH - KHÔNG DÙNG name='file' */}
+            <Form.Item label='Ảnh đại diện'>
+              <Upload
+                listType='picture-card'
+                fileList={fileList}
+                beforeUpload={() => false} // Ngăn upload tự động
+                onChange={({ fileList: newList }) => {
+                  // Chỉ giữ 1 file
+                  setFileList(newList.slice(-1));
+                }}
+                onRemove={() => setFileList([])}
+                accept='.png,.jpg,.jpeg'
+                maxCount={1}
+              >
+                {fileList.length < 1 && (
+                  <div>
+                    <UploadOutlined />
+                    <div style={{ marginTop: 8 }}>Chọn ảnh</div>
+                  </div>
+                )}
+              </Upload>
+            </Form.Item>
 
-                  <Col span={12}>
-                    <Form.Item
-                      label='Lớp sinh viên'
-                      name='class_student'
-                      rules={[{ required: true, message: "Vui lòng chọn lớp sinh viên!" }]}
-                    >
-                      <Select placeholder='Vui lòng chọn lớp sinh viên' size='large'>
-                        {classes?.map((m) => (
-                          <Select.Option key={m.id} value={m.id}>
-                            {m.name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </div>
-
-             
-
-              <div className='mb-6'>
-                {/* <h3 className='text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200'>
-                  Personal Information
-                </h3> */}
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item
-                      label='Tên'
-                      name='first_name'
-                      rules={[
-                        { required: true, message: "Vui lòng nhập tên!" },
-                      ]}
-                    >
-                      <Input placeholder='Vui lòng nhập tên' size='large' />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item
-                      label='Họ'
-                      name='last_name'
-                      rules={[
-                        { required: true, message: "Vui lòng nhập họ!" },
-                      ]}
-                    >
-                      <Input placeholder='Vui lòng nhập họ' size='large' />
-                    </Form.Item>
-                  </Col>
-                </Row>
-
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item
-                      label='Email'
-                      name='email'
-                      rules={[
-                        { required: true, message: "Vui lòng nhập email!" },
-                        { type: "email", message: "Invalid email format!" },
-                      ]}
-                    >
-                      <Input placeholder='Vui lòng nhập email' size='large' />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item
-                      label='Số điện thoại'
-                      name='phone'
-                      rules={[
-                        { required: true, message: "Vui lòng nhập số điện thoại!" },
-                      ]}
-                    >
-                      <Input placeholder='Vui lòng nhập số điện thoại' size='large' />
-                    </Form.Item>
-                  </Col>
-                </Row>
-
-                <Row gutter={16}>
-                  <Col span={8}>
-                    <Form.Item label='CCCD' name='identity_number'>
-                      <Input placeholder='Vui lòng nhập cccd' size='large' />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item label='Ngày sinh' name='birthday'>
-                      <DatePicker style={{ width: "100%" }} size='large' />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item label='Giới tính' name='gender'>
-                      <Select placeholder='Select gender' size='large'>
-                        <Select.Option value='Nam'>Male</Select.Option>
-                        <Select.Option value='Nữ'>Female</Select.Option>
-                        <Select.Option value='Khác'>Other</Select.Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
-
-                <Form.Item label='Địa chỉ' name='address'>
-                  <Input.TextArea rows={2} placeholder='Enter address' />
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label='Mã sinh viên'
+                  name='student_code'
+                  rules={[{ required: true, message: "Nhập mã sinh viên!" }]}
+                >
+                  <Input placeholder='VD: S20001' size='large' />
                 </Form.Item>
-              </div>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label='Lớp sinh viên'
+                  name='class_student'
+                  rules={[{ required: true, message: "Chọn lớp sinh viên!" }]}
+                >
+                  <Select
+                    placeholder='Chọn lớp'
+                    size='large'
+                    loading={!classes}
+                  >
+                    {classes?.map((c) => (
+                      <Select.Option key={c.id} value={c.id}>
+                        {c.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-              <Form.Item className='mb-0'>
-                <Space size='middle'>
-                  <Button type='primary' htmlType='submit' size='large'>
-                    {id ? "Update Student" : "Create Student"}
-                  </Button>
-                  <Button size='large' onClick={() => navigate("/students")}>
-                    Cancel
-                  </Button>
-                </Space>
-              </Form.Item>
-            </Form>
-          </Card>
-        </div>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label='Tên'
+                  name='first_name'
+                  rules={[{ required: true, message: "Nhập tên!" }]}
+                >
+                  <Input size='large' />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label='Họ'
+                  name='last_name'
+                  rules={[{ required: true, message: "Nhập họ!" }]}
+                >
+                  <Input size='large' />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label='Email'
+                  name='email'
+                  rules={[
+                    { required: true, message: "Nhập email!" },
+                    { type: "email", message: "Email không hợp lệ!" },
+                  ]}
+                >
+                  <Input size='large' />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label='Số điện thoại'
+                  name='phone'
+                  rules={[{ required: true, message: "Nhập số điện thoại!" }]}
+                >
+                  <Input size='large' />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item label='CCCD' name='identity_number'>
+                  <Input size='large' />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label='Ngày sinh' name='birthday'>
+                  <DatePicker style={{ width: "100%" }} size='large' />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label='Giới tính' name='gender'>
+                  <Select placeholder='Chọn giới tính' size='large'>
+                    <Select.Option value='Nam'>Nam</Select.Option>
+                    <Select.Option value='Nữ'>Nữ</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Form.Item label='Địa chỉ' name='address'>
+              <Input.TextArea rows={2} placeholder='Nhập địa chỉ' />
+            </Form.Item>
+
+            <Form.Item>
+              <Space>
+                <Button type='primary' htmlType='submit' size='large'>
+                  {id ? "Cập nhật" : "Thêm mới"}
+                </Button>
+                <Button size='large' onClick={() => navigate("/students")}>
+                  Hủy
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Card>
       </div>
     </>
   );
