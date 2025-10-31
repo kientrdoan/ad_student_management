@@ -69,6 +69,8 @@ export default function Semester() {
       ...record,
       start_date: record.start_date ? dayjs(record.start_date) : null,
       end_date: record.end_date ? dayjs(record.end_date) : null,
+      open_date: record.open_date ? dayjs(record.open_date) : null,
+      close_date: record.close_date ? dayjs(record.close_date) : null,
     });
     setIsModalVisible(true);
   };
@@ -140,107 +142,17 @@ export default function Semester() {
   };
 
   const columnMenu = {
-    items: [
-      {
-        key: "id",
-        label: (
-          <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
-          >
-            ID
-          </Checkbox>
-        ),
-      },
-      {
-        key: "year",
-        label: (
-          <Checkbox
-            checked={visibleColumns.year}
-            onChange={() => toggleColumn("year")}
-          >
-            Year
-          </Checkbox>
-        ),
-      },
-      {
-        key: "semesters",
-        label: (
-          <Checkbox
-            checked={visibleColumns.semesters}
-            onChange={() => toggleColumn("semesters")}
-          >
-            Semester
-          </Checkbox>
-        ),
-      },
-      {
-        key: "start_date",
-        label: (
-          <Checkbox
-            checked={visibleColumns.start_date}
-            onChange={() => toggleColumn("start_date")}
-          >
-            Start Date
-          </Checkbox>
-        ),
-      },
-      {
-        key: "end_date",
-        label: (
-          <Checkbox
-            checked={visibleColumns.end_date}
-            onChange={() => toggleColumn("end_date")}
-          >
-            End Date
-          </Checkbox>
-        ),
-      },
-       {
-        key: "open_date",
-        label: (
-          <Checkbox
-            checked={visibleColumns.open_date}
-            onChange={() => toggleColumn("open_date")}
-          >
-            Open Date
-          </Checkbox>
-        ),
-      },
-       {
-        key: "close_date",
-        label: (
-          <Checkbox
-            checked={visibleColumns.close_date}
-            onChange={() => toggleColumn("close_date")}
-          >
-            Close Date
-          </Checkbox>
-        ),
-      },
-      {
-        key: "created_at",
-        label: (
-          <Checkbox
-            checked={visibleColumns.created_at}
-            onChange={() => toggleColumn("created_at")}
-          >
-            Created At
-          </Checkbox>
-        ),
-      },
-      {
-        key: "updated_at",
-        label: (
-          <Checkbox
-            checked={visibleColumns.updated_at}
-            onChange={() => toggleColumn("updated_at")}
-          >
-            Updated At
-          </Checkbox>
-        ),
-      },
-    ],
+    items: Object.keys(visibleColumns).map((key) => ({
+      key,
+      label: (
+        <Checkbox
+          checked={visibleColumns[key]}
+          onChange={() => toggleColumn(key)}
+        >
+          {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+        </Checkbox>
+      ),
+    })),
   };
 
   const allColumns = [
@@ -262,7 +174,7 @@ export default function Semester() {
       dataIndex: "semesters",
       key: "semesters",
       visible: visibleColumns.semesters,
-      render: (sem) => <Tag color='geekblue'>{sem}</Tag>,
+      render: (sem) => <Tag color="geekblue">{sem}</Tag>,
     },
     {
       title: "Ngày bắt đầu",
@@ -308,22 +220,18 @@ export default function Semester() {
       render: (_, record) => (
         <Space>
           <Button
-            type='link'
+            type="link"
             icon={<EditOutlined />}
             onClick={() => showEditModal(record)}
-            className='text-indigo-600'
-          >
-            {/* Edit */}
-          </Button>
+            className="text-indigo-600"
+          />
           <Popconfirm
-            title='Bạn có chắc muốn xoá học kỳ này?'
-            okText='OK'
-            cancelText='Hủy'
+            title="Bạn có chắc muốn xoá học kỳ này?"
+            okText="OK"
+            cancelText="Hủy"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type='link' danger icon={<DeleteOutlined />}>
-              {/* Delete */}
-            </Button>
+            <Button type="link" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
@@ -336,68 +244,63 @@ export default function Semester() {
   const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className='h-full flex flex-col'>
-      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
-        <div className='mb-6 flex-shrink-0'>
-          <div className='flex items-center gap-3 mb-2'>
-            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
-              <CalendarOutlined className='text-indigo-600 text-lg' />
+    <div className="h-full flex flex-col">
+      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
+        <div className="mb-6 flex-shrink-0">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <CalendarOutlined className="text-indigo-600 text-lg" />
             </div>
             <div>
-              <h1 className='text-2xl font-bold text-gray-900'>Semesters</h1>
-              <p className='text-sm text-gray-500'>
+              <h1 className="text-2xl font-bold text-gray-900">Semesters</h1>
+              <p className="text-sm text-gray-500">
                 Manage academic semester periods
               </p>
             </div>
           </div>
         </div>
 
-        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
+        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
           <Button
-            type='primary'
+            type="primary"
             icon={<PlusOutlined />}
             onClick={showAddModal}
-            size='large'
-            className='shadow-sm'
+            size="large"
+            className="shadow-sm"
           >
             Thêm mới
           </Button>
 
-          <Space size='middle'>
+          <Space size="middle">
             <Input
-              placeholder='Search semesters...'
-              prefix={<SearchOutlined className='text-gray-400' />}
+              placeholder="Search semesters..."
+              prefix={<SearchOutlined className="text-gray-400" />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size='large'
+              size="large"
               allowClear
-              className='rounded-lg'
+              className="rounded-lg"
             />
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button
-                icon={<SettingOutlined />}
-                size='large'
-                className='rounded-lg'
-              >
+              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className='flex-1 overflow-hidden'>
+        <div className="flex-1 overflow-hidden">
           <Table
             columns={columns}
             dataSource={filteredData}
-            rowKey='id'
+            rowKey="id"
             bordered
             pagination={{
               pageSize: 10,
               showSizeChanger: true,
               showTotal: (total) => `Total ${total} semesters`,
             }}
-            // scroll={{ x: "max-content", y: "calc(100vh - 400px)" }}
           />
         </div>
       </div>
@@ -407,52 +310,48 @@ export default function Semester() {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText='Save'
+        okText="Save"
       >
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout="vertical">
           <Form.Item
-            label='Năm học'
-            name='year'
+            label="Năm học"
+            name="year"
             rules={[{ required: true, message: "Vui lòng nhập năm học!" }]}
           >
             <Input min={1} style={{ width: "100%" }} />
           </Form.Item>
 
           <Form.Item
-            label='Học kỳ'
-            name='semesters'
+            label="Học kỳ"
+            name="semesters"
             rules={[{ required: true, message: "Vui lòng chọn học kỳ!" }]}
           >
-            <Select placeholder='Select semester'>
-              <Select.Option value='Học kỳ 1'>Học kỳ 1</Select.Option>
-              <Select.Option value='Học kỳ 2'>Học kỳ 2</Select.Option>
-              <Select.Option value='Học kỳ 3'>Học kỳ 3</Select.Option>
+            <Select placeholder="Select semester">
+              <Select.Option value="Học kỳ 1">Học kỳ 1</Select.Option>
+              <Select.Option value="Học kỳ 2">Học kỳ 2</Select.Option>
+              <Select.Option value="Học kỳ 3">Học kỳ 3</Select.Option>
             </Select>
           </Form.Item>
 
           {/* Ngày bắt đầu */}
           <Form.Item
-            label='Ngày bắt đầu'
-            name='start_date'
+            label="Ngày bắt đầu"
+            name="start_date"
             rules={[{ required: true, message: "Vui lòng nhập ngày bắt đầu!" }]}
           >
             <DatePicker
-              format='YYYY-MM-DD'
+              format="YYYY-MM-DD"
               style={{ width: "100%" }}
               onChange={(date) => {
                 if (date) {
-                  const openDate = dayjs(date).subtract(3, "day");
-                  const endDate = dayjs(date).add(4, "month");
+                  const openDate = date.subtract(3, "day");
+                  const endDate = date.add(4, "month");
+                  const closeDate = openDate.add(2, "day");
 
-                  // tự động set open_date & end_date
                   form.setFieldsValue({
                     open_date: openDate,
                     end_date: endDate,
-                  });
-
-                  // tự động set close_date = open_date + 2 ngày
-                  form.setFieldsValue({
-                    close_date: dayjs(openDate).add(2, "day"),
+                    close_date: closeDate,
                   });
                 } else {
                   form.setFieldsValue({
@@ -467,30 +366,25 @@ export default function Semester() {
 
           {/* Ngày kết thúc */}
           <Form.Item
-            label='Ngày kết thúc'
-            name='end_date'
-            rules={[
-              { required: true, message: "Vui lòng nhập ngày kết thúc!" },
-            ]}
+            label="Ngày kết thúc"
+            name="end_date"
+            rules={[{ required: true, message: "Vui lòng nhập ngày kết thúc!" }]}
           >
-            <DatePicker format='YYYY-MM-DD' style={{ width: "100%" }} />
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
 
           {/* Ngày mở đăng ký */}
           <Form.Item
-            label='Ngày mở đăng ký'
-            name='open_date'
-            rules={[
-              { required: true, message: "Vui lòng nhập ngày mở đăng ký!" },
-            ]}
+            label="Ngày mở đăng ký"
+            name="open_date"
+            rules={[{ required: true, message: "Vui lòng nhập ngày mở đăng ký!" }]}
           >
             <DatePicker
-              format='YYYY-MM-DD'
-              style={{ width: "100%", opacity: 0.9 }}
+              format="YYYY-MM-DD"
+              style={{ width: "100%" }}
               onChange={(date) => {
                 if (date) {
-                  const closeDate = dayjs(date).add(2, "day");
-                  form.setFieldsValue({ close_date: closeDate });
+                  form.setFieldsValue({ close_date: date.add(2, "day") });
                 } else {
                   form.setFieldsValue({ close_date: null });
                 }
@@ -500,17 +394,11 @@ export default function Semester() {
 
           {/* Ngày đóng đăng ký (disabled) */}
           <Form.Item
-            label='Ngày đóng đăng ký'
-            name='close_date'
-            rules={[
-              { required: true, message: "Vui lòng nhập ngày đóng đăng ký!" },
-            ]}
+            label="Ngày đóng đăng ký"
+            name="close_date"
+            rules={[{ required: true, message: "Vui lòng nhập ngày đóng đăng ký!" }]}
           >
-            <DatePicker
-              format='YYYY-MM-DD'
-              style={{ width: "100%" }}
-              disabled
-            />
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} disabled />
           </Form.Item>
         </Form>
       </Modal>
