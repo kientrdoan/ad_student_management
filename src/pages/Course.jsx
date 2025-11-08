@@ -31,7 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addCourseAction,
   editCourseAction,
-  getAllCourseAction,
+  // getAllCourseAction,
   getAllCourseBySemesterAction,
   resetScheduleAction,
   setScheduleAction,
@@ -47,6 +47,7 @@ import { getAllRoomAction } from "../redux/actions/RoomAction";
 import dayjs from "dayjs";
 
 export default function Course() {
+  const [messageApi, contextHolder] = message.useMessage()
   const dispatch = useDispatch();
   const [semester, setSemester] = useState(null);
 
@@ -360,13 +361,16 @@ export default function Course() {
       semester_id: semester,
       population_size: 100,
       generations: 200,
-      file: scheduleFile,
+      excel_file: scheduleFile,
     };
 
     try {
       const result = await dispatch(setScheduleAction(payload));
       if (result.success) {
-        message.success("Xếp lịch học thành công!");
+        messageApi.open({
+        type: 'success',
+        content: 'Xếp lịch thành công!',
+      });
         dispatch(getAllCourseBySemesterAction(semester));
         setIsScheduleModalVisible(false);
       } else {
@@ -402,6 +406,7 @@ export default function Course() {
 
   return (
     <div className='h-full flex flex-col'>
+      {contextHolder}
       <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
         <div className='mb-6 flex-shrink-0'>
           <div className='flex items-center gap-3 mb-2'>
