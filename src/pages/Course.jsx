@@ -47,7 +47,7 @@ import { getAllRoomAction } from "../redux/actions/RoomAction";
 import dayjs from "dayjs";
 
 export default function Course() {
-  const [messageApi, contextHolder] = message.useMessage()
+  const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const [semester, setSemester] = useState(null);
 
@@ -325,19 +325,6 @@ export default function Course() {
     },
   ];
 
-  // const setSchedule = async () => {
-  //   const payload = {
-  //     semester_id: semester,
-  //     population_size: 100,
-  //     generations: 200,
-  //   };
-  //   const resutl = await dispatch(setScheduleAction(payload));
-  //   if (resutl.success) {
-  //     message.success("Xếp lịch học thành công!");
-  //     dispatch(getAllCourseBySemesterAction(semester));
-  //   }
-  // };
-
   const resetSchedule = async () => {
     if (!semester) {
       message.warning("Vui lòng chọn học kỳ trước khi khôi phục!");
@@ -355,6 +342,14 @@ export default function Course() {
       message.warning("Vui lòng chọn học kỳ trước khi xếp lịch!");
       return;
     }
+
+    if (!scheduleFile) {
+      messageApi.open({
+        type: 'warning',
+        content: 'Xin lòng chọn file',
+      });
+      return;
+    }
     setLoadingSchedule(true);
 
     const payload = {
@@ -364,13 +359,15 @@ export default function Course() {
       excel_file: scheduleFile,
     };
 
+    console.log("🎯 Payload xếp lịch:", payload);
+
     try {
       const result = await dispatch(setScheduleAction(payload));
       if (result.success) {
         messageApi.open({
-        type: 'success',
-        content: 'Xếp lịch thành công!',
-      });
+          type: "success",
+          content: "Xếp lịch thành công!",
+        });
         dispatch(getAllCourseBySemesterAction(semester));
         setIsScheduleModalVisible(false);
       } else {
@@ -390,11 +387,11 @@ export default function Course() {
   };
 
   const handleScheduleFileChange = (info) => {
-    if (info.file.status === "removed") {
+    if (info.fileList.length === 0) {
       setScheduleFile(null);
       return;
     }
-    setScheduleFile(info.file.originFileObj);
+    setScheduleFile(info.fileList[0].originFileObj);
   };
 
   const showScheduleModal = () => {
@@ -434,7 +431,12 @@ export default function Course() {
           </Button>
 
           <Spin spinning={loadingSchedule}>
-            <Button type='primary' onClick={showScheduleModal} size='large' loading={loadingSchedule}>
+            <Button
+              type='primary'
+              onClick={showScheduleModal}
+              size='large'
+              loading={loadingSchedule}
+            >
               Xếp lịch
             </Button>
           </Spin>
