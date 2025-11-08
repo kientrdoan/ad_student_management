@@ -13,6 +13,10 @@ export class SemesterService extends BaseService {
     return this.get_token(`/admins/semesters/${id}`);
   };
 
+  getCurrentSemester = () => {
+    return this.get_token(`/admins/current-semesters`);
+  };
+
   addSemester = (payload) => {
     return this.post_token(`/admins/semesters/`, payload)
   }

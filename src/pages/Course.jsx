@@ -16,6 +16,8 @@ import {
   DatePicker,
   Row,
   Col,
+  Spin,
+  Upload,
 } from "antd";
 import {
   SearchOutlined,
@@ -23,14 +25,21 @@ import {
   EditOutlined,
   PlusOutlined,
   ReadOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addCourseAction,
   editCourseAction,
   getAllCourseAction,
+  getAllCourseBySemesterAction,
+  resetScheduleAction,
+  setScheduleAction,
 } from "../redux/actions/CourseAction";
-import { getAllSemesterAction } from "../redux/actions/SemesterAction";
+import {
+  getAllSemesterAction,
+  getCurrentSemesterAction,
+} from "../redux/actions/SemesterAction";
 import { getAllClassAction } from "../redux/actions/ClassAction";
 import { getAllTeacherAction } from "../redux/actions/TeacherAction";
 import { getAllSubjectAction } from "../redux/actions/SubjectAction";
@@ -39,12 +48,21 @@ import dayjs from "dayjs";
 
 export default function Course() {
   const dispatch = useDispatch();
+  const [semester, setSemester] = useState(null);
+
   const courses = useSelector((state) => state.CourseReducer.courses);
   const semesters = useSelector((state) => state.SemesterReducer.semesters);
+  const current_semester = useSelector(
+    (state) => state.SemesterReducer.current_semester
+  );
   const classes = useSelector((state) => state.ClassReducer.classes);
   const teachers = useSelector((state) => state.TeacherReducer.teachers);
   const subjects = useSelector((state) => state.SubjectReducer.subjects);
   const rooms = useSelector((state) => state.RoomReducer.rooms);
+
+  const [isScheduleModalVisible, setIsScheduleModalVisible] = useState(false);
+  const [scheduleFile, setScheduleFile] = useState(null);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
@@ -72,13 +90,25 @@ export default function Course() {
   });
 
   useEffect(() => {
-    dispatch(getAllCourseAction());
     dispatch(getAllSemesterAction());
+    dispatch(getCurrentSemesterAction());
     dispatch(getAllClassAction());
     dispatch(getAllTeacherAction());
     dispatch(getAllSubjectAction());
     dispatch(getAllRoomAction());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (semester) {
+      dispatch(getAllCourseBySemesterAction(semester));
+    }
+  }, [semester, dispatch]);
+
+  useEffect(() => {
+    if (current_semester?.id && !semester) {
+      setSemester(current_semester.id);
+    }
+  }, [current_semester, semester]);
 
   const showAddModal = () => {
     setEditingRecord(null);
@@ -133,7 +163,7 @@ export default function Course() {
             ? "Edit course successfully!"
             : "Add course successfully!"
         );
-        dispatch(getAllCourseAction());
+        dispatch(getAllCourseBySemesterAction(semester));
         setIsModalVisible(false);
         form.resetFields();
       } else {
@@ -294,6 +324,80 @@ export default function Course() {
     },
   ];
 
+  // const setSchedule = async () => {
+  //   const payload = {
+  //     semester_id: semester,
+  //     population_size: 100,
+  //     generations: 200,
+  //   };
+  //   const resutl = await dispatch(setScheduleAction(payload));
+  //   if (resutl.success) {
+  //     message.success("Xếp lịch học thành công!");
+  //     dispatch(getAllCourseBySemesterAction(semester));
+  //   }
+  // };
+
+  const resetSchedule = async () => {
+    if (!semester) {
+      message.warning("Vui lòng chọn học kỳ trước khi khôi phục!");
+      return;
+    }
+    const resutl = await dispatch(resetScheduleAction(semester));
+    if (resutl.success) {
+      message.success("Khôi phục lịch học thành công!");
+      dispatch(getAllCourseBySemesterAction(semester));
+    }
+  };
+
+  const handleScheduleOk = async () => {
+    if (!semester) {
+      message.warning("Vui lòng chọn học kỳ trước khi xếp lịch!");
+      return;
+    }
+    setLoadingSchedule(true);
+
+    const payload = {
+      semester_id: semester,
+      population_size: 100,
+      generations: 200,
+      file: scheduleFile,
+    };
+
+    try {
+      const result = await dispatch(setScheduleAction(payload));
+      if (result.success) {
+        message.success("Xếp lịch học thành công!");
+        dispatch(getAllCourseBySemesterAction(semester));
+        setIsScheduleModalVisible(false);
+      } else {
+        message.error("Xếp lịch thất bại!");
+      }
+    } catch (err) {
+      console.error(err);
+      message.error("Đã có lỗi xảy ra khi xếp lịch!");
+    } finally {
+      setLoadingSchedule(false);
+    }
+  };
+
+  const handleScheduleCancel = () => {
+    setIsScheduleModalVisible(false);
+    setScheduleFile(null);
+  };
+
+  const handleScheduleFileChange = (info) => {
+    if (info.file.status === "removed") {
+      setScheduleFile(null);
+      return;
+    }
+    setScheduleFile(info.file.originFileObj);
+  };
+
+  const showScheduleModal = () => {
+    setScheduleFile(null);
+    setIsScheduleModalVisible(true);
+  };
+
   const columns = allColumns.filter((col) => col.visible);
 
   return (
@@ -323,6 +427,36 @@ export default function Course() {
           >
             Thêm mới
           </Button>
+
+          <Spin spinning={loadingSchedule}>
+            <Button type='primary' onClick={showScheduleModal} size='large' loading={loadingSchedule}>
+              Xếp lịch
+            </Button>
+          </Spin>
+
+          <Button
+            type='primary'
+            // icon={<PlusOutlined />}
+            onClick={resetSchedule}
+            size='large'
+            className='shadow-sm'
+          >
+            Khôi phục
+          </Button>
+
+          <Select
+            value={semester ?? undefined}
+            onChange={(value) => {
+              console.log("🎯 Chọn semester:", value);
+              setSemester(value);
+            }}
+            options={semesters.map((s) => ({
+              value: s.id,
+              label: `${s.semesters} - Năm học ${s.year}`,
+            }))}
+            placeholder='Chọn học kỳ'
+            className='w-full md:w-1/3'
+          />
 
           <Space size='middle'>
             <Input
@@ -648,6 +782,26 @@ export default function Course() {
             </>
           )}
         </Form>
+      </Modal>
+
+      <Modal
+        title='Xếp lịch tự động'
+        open={isScheduleModalVisible}
+        onOk={handleScheduleOk}
+        onCancel={handleScheduleCancel}
+        confirmLoading={loadingSchedule}
+        okText='Xếp lịch'
+        width={600}
+      >
+        <Upload
+          accept='.xlsx,.xls'
+          beforeUpload={() => false}
+          onChange={handleScheduleFileChange}
+          maxCount={1}
+          listType='text'
+        >
+          <Button icon={<UploadOutlined />}>Upload file (.xlsx)</Button>
+        </Upload>
       </Modal>
     </div>
   );
