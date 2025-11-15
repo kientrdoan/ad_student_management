@@ -18,6 +18,7 @@ import {
   Col,
   Spin,
   Upload,
+  Popconfirm,
 } from "antd";
 import {
   SearchOutlined,
@@ -26,10 +27,12 @@ import {
   PlusOutlined,
   ReadOutlined,
   UploadOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addCourseAction,
+  deleteCourseAction,
   editCourseAction,
   // getAllCourseAction,
   getAllCourseBySemesterAction,
@@ -45,6 +48,8 @@ import { getAllTeacherAction } from "../redux/actions/TeacherAction";
 import { getAllSubjectAction } from "../redux/actions/SubjectAction";
 import { getAllRoomAction } from "../redux/actions/RoomAction";
 import dayjs from "dayjs";
+import * as XLSX from "xlsx";
+import { BiRecycle } from "react-icons/bi";
 
 export default function Course() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -61,14 +66,19 @@ export default function Course() {
   const subjects = useSelector((state) => state.SubjectReducer.subjects);
   const rooms = useSelector((state) => state.RoomReducer.rooms);
 
+  const [isImportModalVisible, setIsImportModalVisible] = useState(false);
+  const [importFile, setImportFile] = useState(null);
   const [isScheduleModalVisible, setIsScheduleModalVisible] = useState(false);
   const [scheduleFile, setScheduleFile] = useState(null);
+  const [holidayFile, setHolidayFile] = useState(null);
+
   const [loadingSchedule, setLoadingSchedule] = useState(false);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
 
@@ -86,24 +96,25 @@ export default function Course() {
     end_date: true,
     weekday: true,
     start_period: true,
+    is_deleted: true,
     created_at: false,
     updated_at: false,
   });
 
   useEffect(() => {
-    dispatch(getAllSemesterAction());
-    dispatch(getCurrentSemesterAction());
-    dispatch(getAllClassAction());
-    dispatch(getAllTeacherAction());
-    dispatch(getAllSubjectAction());
-    dispatch(getAllRoomAction());
-  }, [dispatch]);
+    dispatch(getAllSemesterAction(statusFilter));
+    dispatch(getCurrentSemesterAction(statusFilter));
+    dispatch(getAllClassAction(statusFilter));
+    dispatch(getAllTeacherAction(statusFilter));
+    dispatch(getAllSubjectAction(statusFilter));
+    dispatch(getAllRoomAction(statusFilter));
+  }, [dispatch, statusFilter]);
 
   useEffect(() => {
     if (semester) {
-      dispatch(getAllCourseBySemesterAction(semester));
+      dispatch(getAllCourseBySemesterAction(semester, statusFilter));
     }
-  }, [semester, dispatch]);
+  }, [semester, dispatch, statusFilter]);
 
   useEffect(() => {
     if (current_semester?.id && !semester) {
@@ -164,7 +175,7 @@ export default function Course() {
             ? "Edit course successfully!"
             : "Add course successfully!"
         );
-        dispatch(getAllCourseBySemesterAction(semester));
+        dispatch(getAllCourseBySemesterAction(semester, statusFilter));
         setIsModalVisible(false);
         form.resetFields();
       } else {
@@ -192,6 +203,32 @@ export default function Course() {
       course.max_capacity?.toString().includes(searchLower)
     );
   });
+
+  const handleStatus = (value) => {
+    if (value === "all") {
+      dispatch(getAllSemesterAction({}));
+      dispatch(getCurrentSemesterAction({}));
+      dispatch(getAllClassAction({}));
+      dispatch(getAllTeacherAction({}));
+      dispatch(getAllSubjectAction({}));
+      dispatch(getAllRoomAction({}));
+    } else if (value === "active") {
+      dispatch(getAllSemesterAction(statusFilter));
+      dispatch(getCurrentSemesterAction(statusFilter));
+      dispatch(getAllClassAction(statusFilter));
+      dispatch(getAllTeacherAction(statusFilter));
+      dispatch(getAllSubjectAction(statusFilter));
+      dispatch(getAllRoomAction(statusFilter));
+    } else {
+      dispatch(getAllSemesterAction(statusFilter));
+      dispatch(getCurrentSemesterAction(statusFilter));
+      dispatch(getAllClassAction(statusFilter));
+      dispatch(getAllTeacherAction(statusFilter));
+      dispatch(getAllSubjectAction(statusFilter));
+      dispatch(getAllRoomAction(statusFilter));
+    }
+    setStatusFilter(value);
+  };
 
   const toggleColumn = (columnKey) => {
     setVisibleColumns((prev) => ({
@@ -295,6 +332,20 @@ export default function Course() {
       visible: visibleColumns.start_period,
     },
     {
+      title: "Trạng thái",
+      dataIndex: "is_deleted",
+      key: "is_deleted",
+      visible: visibleColumns.is_deleted,
+      render: (is_deleted) =>
+        is_deleted === undefined ? (
+          <Tag color='default'>N/A</Tag>
+        ) : is_deleted === false ? (
+          <Tag color='green'>Hoạt động</Tag>
+        ) : (
+          <Tag color='red'>Không hoạt động</Tag>
+        ),
+    },
+    {
       title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
@@ -311,19 +362,47 @@ export default function Course() {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Button
-          type='link'
-          icon={<EditOutlined />}
-          onClick={() => showEditModal(record)}
-          className='text-indigo-600'
-        />
-      ),
+      render: (_, record) =>
+        record.is_deleted === true ? (
+          <Button
+              type='link'
+              icon={<BiRecycle />}
+              onClick={() => handleDelete(record.id)}
+              className='text-indigo-600'
+          />
+        ) : (
+          <Space>
+            <Button
+              type='link'
+              icon={<EditOutlined />}
+              onClick={() => showEditModal(record)}
+              className='text-indigo-600'
+            />
+            <Popconfirm
+              title='Bạn có chắc muốn xoá thông tin lop này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Button type='link' danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 100,
     },
   ];
+
+  const handleDelete = async (id) => {
+    const res = await dispatch(deleteCourseAction(id));
+    if (res.success) {
+      messageApi.success("thành công!");
+      dispatch(getAllCourseBySemesterAction(semester, statusFilter));
+    } else {
+      messageApi.error("Thất bại!");
+    }
+  };
 
   const resetSchedule = async () => {
     if (!semester) {
@@ -333,7 +412,7 @@ export default function Course() {
     const resutl = await dispatch(resetScheduleAction(semester));
     if (resutl.success) {
       message.success("Khôi phục lịch học thành công!");
-      dispatch(getAllCourseBySemesterAction(semester));
+      dispatch(getAllCourseBySemesterAction(semester, "active"));
     }
   };
 
@@ -345,11 +424,12 @@ export default function Course() {
 
     if (!scheduleFile) {
       messageApi.open({
-        type: 'warning',
-        content: 'Xin lòng chọn file',
+        type: "warning",
+        content: "Vui lòng chọn file thời khóa biểu!",
       });
       return;
     }
+
     setLoadingSchedule(true);
 
     const payload = {
@@ -357,6 +437,7 @@ export default function Course() {
       population_size: 100,
       generations: 200,
       excel_file: scheduleFile,
+      holiday_file: holidayFile || null, // thêm file ngày lễ (có thể null)
     };
 
     console.log("🎯 Payload xếp lịch:", payload);
@@ -368,7 +449,7 @@ export default function Course() {
           type: "success",
           content: "Xếp lịch thành công!",
         });
-        dispatch(getAllCourseBySemesterAction(semester));
+        dispatch(getAllCourseBySemesterAction(semester, "active"));
         setIsScheduleModalVisible(false);
       } else {
         message.error("Xếp lịch thất bại!");
@@ -397,6 +478,81 @@ export default function Course() {
   const showScheduleModal = () => {
     setScheduleFile(null);
     setIsScheduleModalVisible(true);
+  };
+
+  const parseExcel = async (file) => {
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    // Trả về danh sách JSON từ Excel
+    return XLSX.utils.sheet_to_json(sheet);
+  };
+
+  const handleImportOk = async () => {
+    if (!importFile) {
+      message.warning("Vui lòng chọn file Excel!");
+      return;
+    }
+
+    try {
+      // 1. Parse file Excel
+      const excelData = await parseExcel(importFile);
+
+      if (excelData.length === 0) {
+        message.error("Excel không có dòng dữ liệu!");
+        return;
+      }
+
+      let success = 0;
+      let errors = [];
+
+      // 2. Loop từng dòng và gọi API tuần tự
+      for (let i = 0; i < excelData.length; i++) {
+        const row = excelData[i];
+
+        // Tạo payload phù hợp API bên Kien
+        const payload = {
+          subject: row.subject,
+          class_st: row.class_st,
+          max_capacity: row.max_capacity,
+          semester: semester,
+        };
+
+        const res = await dispatch(addCourseAction(payload));
+
+        if (res?.success) {
+          success++;
+        } else {
+          errors.push({
+            row: i + 2,
+            error: res?.message || "Lỗi không xác định",
+          });
+        }
+      }
+
+      // 3. Thông báo kết quả
+      if (success > 0) {
+        message.success(
+          `Import thành công ${success}/${excelData.length} dòng!`
+        );
+      }
+
+      if (errors.length > 0) {
+        console.warn("Lỗi import:", errors);
+        message.error(`${errors.length} dòng bị lỗi (check console).`);
+      }
+
+      // 4. Refresh danh sách
+      dispatch(getAllCourseBySemesterAction(semester, statusFilter));
+
+      // 5. Reset UI
+      setIsImportModalVisible(false);
+      setImportFile(null);
+    } catch (err) {
+      console.error(err);
+      message.error("Import thất bại, vui lòng kiểm tra file Excel!");
+    }
   };
 
   const columns = allColumns.filter((col) => col.visible);
@@ -430,27 +586,6 @@ export default function Course() {
             Thêm mới
           </Button>
 
-          <Spin spinning={loadingSchedule}>
-            <Button
-              type='primary'
-              onClick={showScheduleModal}
-              size='large'
-              loading={loadingSchedule}
-            >
-              Xếp lịch
-            </Button>
-          </Spin>
-
-          <Button
-            type='primary'
-            // icon={<PlusOutlined />}
-            onClick={resetSchedule}
-            size='large'
-            className='shadow-sm'
-          >
-            Khôi phục
-          </Button>
-
           <Select
             value={semester ?? undefined}
             onChange={(value) => {
@@ -476,6 +611,19 @@ export default function Course() {
               allowClear
               className='rounded-lg'
             />
+
+            <Select
+              value={statusFilter}
+              onChange={handleStatus}
+              style={{ width: 180 }}
+              size='large'
+              options={[
+                { value: "all", label: "Tất cả" },
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Không hoạt động" },
+              ]}
+            />
+
             <Dropdown menu={columnMenu} trigger={["click"]}>
               <Button
                 icon={<SettingOutlined />}
@@ -486,6 +634,43 @@ export default function Course() {
               </Button>
             </Dropdown>
           </Space>
+        </div>
+
+        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
+          <div>
+            <Button
+              type='primary'
+              // icon={<PlusOutlined />}
+              onClick={() => setIsImportModalVisible(true)}
+              size='large'
+              className='shadow-sm'
+            >
+              Import data
+            </Button>
+          </div>
+
+          <div className='flex items-center mb-6 gap-4 flex-shrink-0'>
+            <Spin spinning={loadingSchedule}>
+              <Button
+                type='primary'
+                onClick={showScheduleModal}
+                size='large'
+                loading={loadingSchedule}
+              >
+                Xếp lịch
+              </Button>
+            </Spin>
+
+            <Button
+              type='primary'
+              // icon={<PlusOutlined />}
+              onClick={resetSchedule}
+              size='large'
+              className='shadow-sm'
+            >
+              Khôi phục
+            </Button>
+          </div>
         </div>
 
         <div className='flex-1 overflow-hidden'>
@@ -599,128 +784,142 @@ export default function Course() {
             </Col>
           </Row>
 
-          {/* ====== Row 3: Start Date - End Date ====== */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label='Ngày bắt đầu'
-                name='start_date'
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng chọn ngày bắt đầu!",
-                  },
-                  {
-                    validator: (_, value) => {
-                      if (!value || !selectedSemester) return Promise.resolve();
-                      const totalPeriods = selectedSubject?.total_period || 0;
-                      const totalSessions = Math.ceil(totalPeriods / 5);
-                      const endDate = dayjs(value).add(
-                        totalSessions - 1,
-                        "week"
-                      );
-                      const semesterEnd = dayjs(selectedSemester.end_date);
-                      if (endDate.isAfter(semesterEnd)) {
-                        return Promise.reject(
-                          new Error(
-                            `Ngày kết thúc dự kiến ${endDate.format(
-                              "YYYY-MM-DD"
-                            )} vượt quá học kỳ!`
-                          )
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  },
-                ]}
-              >
-                <DatePicker
-                  format='YYYY-MM-DD'
-                  style={{ width: "100%" }}
-                  disabledDate={(current) => {
-                    if (!selectedSemester) return true;
-                    const semesterStart = dayjs(selectedSemester.start_date);
-                    const semesterEnd = dayjs(selectedSemester.end_date);
-                    return current < semesterStart || current > semesterEnd;
-                  }}
-                  onChange={(date) => {
-                    if (!date) {
-                      form.setFieldsValue({ end_date: null });
-                      return;
-                    }
-
-                    const semesterStart = dayjs(selectedSemester.start_date);
-                    const semesterEnd = dayjs(selectedSemester.end_date);
-
-                    if (
-                      date.isBefore(semesterStart) ||
-                      date.isAfter(semesterEnd)
-                    ) {
-                      message.error(
-                        "Ngày bắt đầu không phù hợp với học kỳ đã chọn!"
-                      );
-                      form.setFieldsValue({ start_date: null, end_date: null });
-                      return;
-                    }
-
-                    if (selectedSubject?.total_period) {
-                      const totalPeriods = selectedSubject.total_period; // tổng số tiết
-                      const periodsPerDay = 5; // cố định 5 tiết/ngày
-                      const totalSessions = Math.ceil(
-                        totalPeriods / periodsPerDay
-                      ); // số buổi cần học
-
-                      // Tính ngày kết thúc dự kiến
-                      let endDate = dayjs(date).add(totalSessions - 1, "week");
-
-                      // Nếu vượt học kỳ thì fix bằng ngày kết thúc học kỳ
-                      if (endDate.isAfter(semesterEnd)) {
-                        endDate = semesterEnd;
-                        message.warning(
-                          `Ngày kết thúc dự kiến đã vượt học kỳ, tự động set bằng ${semesterEnd.format(
-                            "YYYY-MM-DD"
-                          )}`
-                        );
-                      }
-
-                      // Set vào form để hiển thị ngay
-                      form.setFieldsValue({
-                        start_date: date,
-                        end_date: endDate,
-                      });
-                    } else {
-                      form.setFieldsValue({ start_date: date });
-                    }
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item
-                label='Ngày kết thúc'
-                name='end_date'
-                rules={[
-                  { required: true, message: "Vui lòng chọn ngày kết thúc!" },
-                ]}
-              >
-                <DatePicker
-                  format='YYYY-MM-DD'
-                  style={{ width: "100%" }}
-                  disabledDate={(current) => {
-                    if (!selectedSemester) return false;
-                    const start = dayjs(selectedSemester.start_date);
-                    const end = dayjs(selectedSemester.end_date);
-                    return current && (current < start || current > end);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
           {/* ====== ONLY SHOW THESE FIELDS WHEN EDITING ====== */}
           {editingRecord && (
             <>
+              {/* ====== Row 3: Start Date - End Date ====== */}
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Ngày bắt đầu'
+                    name='start_date'
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn ngày bắt đầu!",
+                      },
+                      {
+                        validator: (_, value) => {
+                          if (!value || !selectedSemester)
+                            return Promise.resolve();
+                          const totalPeriods =
+                            selectedSubject?.total_period || 0;
+                          const totalSessions = Math.ceil(totalPeriods / 5);
+                          const endDate = dayjs(value).add(
+                            totalSessions - 1,
+                            "week"
+                          );
+                          const semesterEnd = dayjs(selectedSemester.end_date);
+                          if (endDate.isAfter(semesterEnd)) {
+                            return Promise.reject(
+                              new Error(
+                                `Ngày kết thúc dự kiến ${endDate.format(
+                                  "YYYY-MM-DD"
+                                )} vượt quá học kỳ!`
+                              )
+                            );
+                          }
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
+                  >
+                    <DatePicker
+                      format='YYYY-MM-DD'
+                      style={{ width: "100%" }}
+                      disabledDate={(current) => {
+                        if (!selectedSemester) return true;
+                        const semesterStart = dayjs(
+                          selectedSemester.start_date
+                        );
+                        const semesterEnd = dayjs(selectedSemester.end_date);
+                        return current < semesterStart || current > semesterEnd;
+                      }}
+                      onChange={(date) => {
+                        if (!date) {
+                          form.setFieldsValue({ end_date: null });
+                          return;
+                        }
+
+                        const semesterStart = dayjs(
+                          selectedSemester.start_date
+                        );
+                        const semesterEnd = dayjs(selectedSemester.end_date);
+
+                        if (
+                          date.isBefore(semesterStart) ||
+                          date.isAfter(semesterEnd)
+                        ) {
+                          message.error(
+                            "Ngày bắt đầu không phù hợp với học kỳ đã chọn!"
+                          );
+                          form.setFieldsValue({
+                            start_date: null,
+                            end_date: null,
+                          });
+                          return;
+                        }
+
+                        if (selectedSubject?.total_period) {
+                          const totalPeriods = selectedSubject.total_period; // tổng số tiết
+                          const periodsPerDay = 5; // cố định 5 tiết/ngày
+                          const totalSessions = Math.ceil(
+                            totalPeriods / periodsPerDay
+                          ); // số buổi cần học
+
+                          // Tính ngày kết thúc dự kiến
+                          let endDate = dayjs(date).add(
+                            totalSessions - 1,
+                            "week"
+                          );
+
+                          // Nếu vượt học kỳ thì fix bằng ngày kết thúc học kỳ
+                          if (endDate.isAfter(semesterEnd)) {
+                            endDate = semesterEnd;
+                            message.warning(
+                              `Ngày kết thúc dự kiến đã vượt học kỳ, tự động set bằng ${semesterEnd.format(
+                                "YYYY-MM-DD"
+                              )}`
+                            );
+                          }
+
+                          // Set vào form để hiển thị ngay
+                          form.setFieldsValue({
+                            start_date: date,
+                            end_date: endDate,
+                          });
+                        } else {
+                          form.setFieldsValue({ start_date: date });
+                        }
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+
+                <Col span={12}>
+                  <Form.Item
+                    label='Ngày kết thúc'
+                    name='end_date'
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn ngày kết thúc!",
+                      },
+                    ]}
+                  >
+                    <DatePicker
+                      format='YYYY-MM-DD'
+                      style={{ width: "100%" }}
+                      disabledDate={(current) => {
+                        if (!selectedSemester) return false;
+                        const start = dayjs(selectedSemester.start_date);
+                        const end = dayjs(selectedSemester.end_date);
+                        return current && (current < start || current > end);
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
@@ -800,6 +999,7 @@ export default function Course() {
         okText='Xếp lịch'
         width={600}
       >
+        <p className='mb-2 font-semibold'>File danh sách lớp:</p>
         <Upload
           accept='.xlsx,.xls'
           beforeUpload={() => false}
@@ -807,8 +1007,54 @@ export default function Course() {
           maxCount={1}
           listType='text'
         >
-          <Button icon={<UploadOutlined />}>Upload file (.xlsx)</Button>
+          <Button icon={<UploadOutlined />}>
+            Upload file thời khóa biểu (.xlsx)
+          </Button>
         </Upload>
+
+        <p className='mt-4 mb-2 font-semibold'>File ngày lễ (tùy chọn):</p>
+        <Upload
+          accept='.xlsx,.xls'
+          beforeUpload={() => false}
+          onChange={(info) => {
+            if (info.fileList.length === 0) {
+              setHolidayFile(null);
+              return;
+            }
+            setHolidayFile(info.fileList[0].originFileObj);
+          }}
+          maxCount={1}
+          listType='text'
+        >
+          <Button icon={<UploadOutlined />}>Upload file ngày lễ (.xlsx)</Button>
+        </Upload>
+      </Modal>
+
+      <Modal
+        title='Import Excel Courses'
+        open={isImportModalVisible}
+        onOk={handleImportOk}
+        onCancel={() => setIsImportModalVisible(false)}
+        okText='Import'
+      >
+        <Upload
+          beforeUpload={() => false} // tự quản lý file
+          onChange={(info) => {
+            if (info.fileList.length > 0) {
+              setImportFile(info.fileList[0].originFileObj);
+            } else {
+              setImportFile(null);
+            }
+          }}
+          maxCount={1}
+        >
+          <Button icon={<UploadOutlined />}>Chọn file Excel</Button>
+        </Upload>
+
+        <p className='mt-2 text-gray-500 text-sm'>
+          Hỗ trợ: .xlsx | Format chứa các cột: semester, class, subject,
+          teacher, room, start_date...
+        </p>
       </Modal>
     </div>
   );

@@ -3,11 +3,16 @@
 import { majorService } from "../../../service/MajorService";
 import { GET_ALL_MAJOR } from "../types/MajorType";
 
-
-export const getAllMajorAction = () => {
+export const getAllMajorAction = (statusFilter) => {
   return async (dispatch) => {
+    var payload = {};
     try {
-      const result = await majorService.getAll();
+      if (statusFilter !== "all") {
+        payload = {
+          is_deleted: statusFilter === "active" ? 0 : 1,
+        };
+      }
+      const result = await majorService.getAll(payload);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_MAJOR,
@@ -36,7 +41,6 @@ export const addMajorAction = (payload) => {
     }
   };
 };
-
 
 export const editMajorAction = (payload) => {
   return async (dispatch) => {

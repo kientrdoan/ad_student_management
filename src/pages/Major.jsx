@@ -32,8 +32,10 @@ import {
   getAllMajorAction,
 } from "../redux/actions/MajorAction";
 import dayjs from "dayjs";
+import { BiRecycle } from "react-icons/bi";
 
 export default function Major() {
+  const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const majors = useSelector((state) => state.MajorReducer.majors);
   const departments = useSelector(
@@ -44,21 +46,23 @@ export default function Major() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     name: true,
     department: true,
     created_at: true,
     updated_at: true,
+    is_deleted: true,
   });
 
   useEffect(() => {
     const loadData = async () => {
-      await dispatch(getAllAction());
-      await dispatch(getAllMajorAction());
+      await dispatch(getAllAction(statusFilter));
+      await dispatch(getAllMajorAction(statusFilter));
     };
     loadData();
-  }, [dispatch]);
+  }, [dispatch, statusFilter]);
 
   const showAddModal = () => {
     setEditingRecord(null);
@@ -76,33 +80,29 @@ export default function Major() {
   };
 
   const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      if (editingRecord) {
-        console.log("Update major:", { ...editingRecord, ...values });
-        const res = await dispatch(
-          editMajorAction({ ...editingRecord, ...values })
-        );
-        if (res.success) {
-          message.success("edit major successfully!");
-          dispatch(getAllMajorAction());
-        } else {
-          message.error("Failed to edit major!");
-        }
+    const values = await form.validateFields();
+    if (editingRecord) {
+      const res = await dispatch(
+        editMajorAction({ ...editingRecord, ...values })
+      );
+      if (res.success) {
+        messageApi.success("edit major successfully!");
+        dispatch(getAllMajorAction(statusFilter));
       } else {
-        console.log("Add major:", values);
-        const res = await dispatch(addMajorAction(values));
-        if (res.success) {
-          message.success("Add major successfully!");
-          dispatch(getAllMajorAction());
-        } else {
-          message.error("Failed to add major!");
-        }
+        messageApi.error("Failed to edit major!");
       }
-      setIsModalVisible(false);
-    } catch (err) {
-      console.log("Validate Failed:", err);
+    } else {
+      const res = await dispatch(addMajorAction(values));
+      if (res.success) {
+        messageApi.success("Thêm ngành thành công!");
+        dispatch(getAllMajorAction(statusFilter));
+      } else {
+         messageApi.error(
+            res.error?.response?.data?.message || "Thêm ngành thất bại!"
+          );
+      }
     }
+    setIsModalVisible(false);
   };
 
   const filteredData = majors.filter((major) => {
@@ -123,13 +123,30 @@ export default function Major() {
     }));
   };
 
+  const handleStatus = (value) => {
+    const payload = {
+      is_deleted: value === "active" ? 1 : 0,
+    };
+    if (value === "all") {
+      dispatch(getAllAction({}));
+      dispatch(getAllMajorAction({}));
+    } else if (value === "active") {
+      dispatch(getAllAction(payload));
+      dispatch(getAllMajorAction(payload));
+    } else {
+      dispatch(getAllAction(payload));
+      dispatch(getAllMajorAction(payload));
+    }
+    setStatusFilter(value);
+  };
+
   const handleDelete = async (id) => {
     const res = await dispatch(deleteMajorAction(id));
     if (res.success) {
-      message.success("Xoá department thành công!");
-      dispatch(getAllMajorAction());
+      messageApi.success("Thành công!");
+      dispatch(getAllMajorAction(statusFilter));
     } else {
-      message.error("Xoá thất bại!");
+      messageApi.error("Xoá thất bại!");
     }
   };
 
@@ -212,11 +229,28 @@ export default function Major() {
       title: "Khoa",
       dataIndex: "department",
       key: "department",
-      render: (deptId) => {
-        const dept = departments.find((d) => String(d.id) === String(deptId));
-        return dept ? dept.name : "N/A";
+      render: (department) => {
+        // Kiểm tra nếu department là object có chứa tên
+        if (department && department.department_name) {
+          return department.department_name;
+        }
+        return "N/A";
       },
       visible: visibleColumns.department,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "is_deleted",
+      key: "is_deleted",
+      visible: visibleColumns.is_deleted,
+      render: (is_deleted) =>
+        is_deleted === undefined ? (
+          <Tag color='default'>N/A</Tag>
+        ) : is_deleted === false ? (
+          <Tag color='green'>Hoạt động</Tag>
+        ) : (
+          <Tag color='red'>Không hoạt động</Tag>
+        ),
     },
     {
       title: "Ngày tạo",
@@ -235,28 +269,32 @@ export default function Major() {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Space>
+      render: (_, record) =>
+        record.is_deleted === true ? (
           <Button
             type='link'
-            icon={<EditOutlined />}
-            onClick={() => showEditModal(record)}
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
             className='text-indigo-600'
-          >
-            {/* Edit */}
-          </Button>
-          <Popconfirm
-            title='Bạn có chắc muốn xoá ngành này?'
-            okText='OK'
-            cancelText='Hủy'
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type='link' danger icon={<DeleteOutlined />}>
-              {/* Delete */}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
+          />
+        ) : (
+          <Space>
+            <Button
+              type='link'
+              icon={<EditOutlined />}
+              onClick={() => showEditModal(record)}
+              className='text-indigo-600'
+            />
+            <Popconfirm
+              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Button type='link' danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 100,
@@ -267,6 +305,7 @@ export default function Major() {
 
   return (
     <div className='h-full flex flex-col'>
+      {contextHolder}
       <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
         <div className='mb-6 flex-shrink-0'>
           <div className='flex items-center gap-3 mb-2'>
@@ -304,6 +343,19 @@ export default function Major() {
               allowClear
               className='rounded-lg'
             />
+
+            <Select
+              value={statusFilter}
+              onChange={handleStatus}
+              style={{ width: 180 }}
+              size='large'
+              options={[
+                { value: "all", label: "Tất cả" },
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Không hoạt động" },
+              ]}
+            />
+
             <Dropdown menu={columnMenu} trigger={["click"]}>
               <Button
                 icon={<SettingOutlined />}

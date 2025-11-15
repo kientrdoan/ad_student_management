@@ -32,8 +32,10 @@ import {
   editSemesterAction,
   getAllSemesterAction,
 } from "../redux/actions/SemesterAction";
+import { BiRecycle } from "react-icons/bi";
 
 export default function Semester() {
+  const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const semesters = useSelector((state) => state.SemesterReducer.semesters);
 
@@ -41,12 +43,14 @@ export default function Semester() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     year: true,
     semesters: true,
     start_date: true,
     end_date: true,
+    is_deleted: true,
     created_at: false,
     updated_at: false,
     open_date: true,
@@ -54,8 +58,8 @@ export default function Semester() {
   });
 
   useEffect(() => {
-    dispatch(getAllSemesterAction());
-  }, [dispatch]);
+    dispatch(getAllSemesterAction(statusFilter));
+  }, [dispatch, statusFilter]);
 
   const showAddModal = () => {
     setEditingRecord(null);
@@ -84,8 +88,12 @@ export default function Semester() {
           ? values.start_date.format("YYYY-MM-DD")
           : null,
         end_date: values.end_date ? values.end_date.format("YYYY-MM-DD") : null,
-        open_date: values.open_date ? values.open_date.format("YYYY-MM-DD") : null,
-        close_date: values.close_date ? values.close_date.format("YYYY-MM-DD") : null,
+        open_date: values.open_date
+          ? values.open_date.format("YYYY-MM-DD")
+          : null,
+        close_date: values.close_date
+          ? values.close_date.format("YYYY-MM-DD")
+          : null,
       };
 
       if (editingRecord) {
@@ -94,18 +102,18 @@ export default function Semester() {
           editSemesterAction(editingRecord.id, newValues)
         );
         if (res.success) {
-          message.success("Edit semester successfully!");
+          messageApi.success("Sửa thành công!");
           dispatch(getAllSemesterAction());
         } else {
-          message.error("Failed to edit semester!");
+          messageApi.error("Sửa thật bại!");
         }
       } else {
         const res = await dispatch(addSemesterAction(formattedValues));
         if (res.success) {
-          message.success("Add semester successfully!");
+          messageApi.success("Thêm thành công!");
           dispatch(getAllSemesterAction());
         } else {
-          message.error("Failed to add semester!");
+          messageApi.error(res?.error?.response?.data?.message);
         }
       }
       setIsModalVisible(false);
@@ -117,10 +125,10 @@ export default function Semester() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteSemesterAction(id));
     if (res.success) {
-      message.success("Xoá semester thành công!");
+      messageApi.success("Xoá semester thành công!");
       dispatch(getAllSemesterAction());
     } else {
-      message.error("Xoá thất bại!");
+      messageApi.error("Xoá thất bại!");
     }
   };
 
@@ -133,6 +141,17 @@ export default function Semester() {
       semester.end_date?.includes(searchLower)
     );
   });
+
+  const handleStatus = (value) => {
+    if (value === "all") {
+      dispatch(getAllSemesterAction({}));
+    } else if (value === "active") {
+      dispatch(getAllSemesterAction(statusFilter));
+    } else {
+      dispatch(getAllSemesterAction(statusFilter));
+    }
+    setStatusFilter(value);
+  };
 
   const toggleColumn = (columnKey) => {
     setVisibleColumns((prev) => ({
@@ -174,7 +193,7 @@ export default function Semester() {
       dataIndex: "semesters",
       key: "semesters",
       visible: visibleColumns.semesters,
-      render: (sem) => <Tag color="geekblue">{sem}</Tag>,
+      render: (sem) => <Tag color='geekblue'>{sem}</Tag>,
     },
     {
       title: "Ngày bắt đầu",
@@ -201,6 +220,20 @@ export default function Semester() {
       visible: visibleColumns.close_date,
     },
     {
+      title: "Trạng thái",
+      dataIndex: "is_deleted",
+      key: "is_deleted",
+      visible: visibleColumns.is_deleted,
+      render: (is_deleted) =>
+        is_deleted === undefined ? (
+          <Tag color='default'>N/A</Tag>
+        ) : is_deleted === false ? (
+          <Tag color='green'>Hoạt động</Tag>
+        ) : (
+          <Tag color='red'>Không hoạt động</Tag>
+        ),
+    },
+    {
       title: "Ngày tạo",
       dataIndex: "created_at",
       key: "created_at",
@@ -217,24 +250,32 @@ export default function Semester() {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Space>
+      render: (_, record) =>
+        record.is_deleted === true ? (
           <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => showEditModal(record)}
-            className="text-indigo-600"
+            type='link'
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
+            className='text-indigo-600'
           />
-          <Popconfirm
-            title="Bạn có chắc muốn xoá học kỳ này?"
-            okText="OK"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type="link" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
+        ) : (
+          <Space>
+            <Button
+              type='link'
+              icon={<EditOutlined />}
+              onClick={() => showEditModal(record)}
+              className='text-indigo-600'
+            />
+            <Popconfirm
+              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Button type='link' danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 150,
@@ -244,57 +285,75 @@ export default function Semester() {
   const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
-        <div className="mb-6 flex-shrink-0">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-              <CalendarOutlined className="text-indigo-600 text-lg" />
+    <div className='h-full flex flex-col'>
+      {contextHolder}
+      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
+        <div className='mb-6 flex-shrink-0'>
+          <div className='flex items-center gap-3 mb-2'>
+            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
+              <CalendarOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Semesters</h1>
-              <p className="text-sm text-gray-500">
+              <h1 className='text-2xl font-bold text-gray-900'>Semesters</h1>
+              <p className='text-sm text-gray-500'>
                 Manage academic semester periods
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
+        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
           <Button
-            type="primary"
+            type='primary'
             icon={<PlusOutlined />}
             onClick={showAddModal}
-            size="large"
-            className="shadow-sm"
+            size='large'
+            className='shadow-sm'
           >
             Thêm mới
           </Button>
 
-          <Space size="middle">
+          <Space size='middle'>
             <Input
-              placeholder="Search semesters..."
-              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder='Search semesters...'
+              prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size="large"
+              size='large'
               allowClear
-              className="rounded-lg"
+              className='rounded-lg'
             />
+
+            <Select
+              value={statusFilter}
+              onChange={handleStatus}
+              style={{ width: 180 }}
+              size='large'
+              options={[
+                { value: "all", label: "Tất cả" },
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Không hoạt động" },
+              ]}
+            />
+
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
+              <Button
+                icon={<SettingOutlined />}
+                size='large'
+                className='rounded-lg'
+              >
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className='flex-1 overflow-hidden'>
           <Table
             columns={columns}
             dataSource={filteredData}
-            rowKey="id"
+            rowKey='id'
             bordered
             pagination={{
               pageSize: 10,
@@ -310,37 +369,37 @@ export default function Semester() {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText="Save"
+        okText='Save'
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout='vertical'>
           <Form.Item
-            label="Năm học"
-            name="year"
+            label='Năm học'
+            name='year'
             rules={[{ required: true, message: "Vui lòng nhập năm học!" }]}
           >
             <Input min={1} style={{ width: "100%" }} />
           </Form.Item>
 
           <Form.Item
-            label="Học kỳ"
-            name="semesters"
+            label='Học kỳ'
+            name='semesters'
             rules={[{ required: true, message: "Vui lòng chọn học kỳ!" }]}
           >
-            <Select placeholder="Select semester">
-              <Select.Option value="Học kỳ 1">Học kỳ 1</Select.Option>
-              <Select.Option value="Học kỳ 2">Học kỳ 2</Select.Option>
-              <Select.Option value="Học kỳ 3">Học kỳ 3</Select.Option>
+            <Select placeholder='Select semester'>
+              <Select.Option value='Học kỳ 1'>Học kỳ 1</Select.Option>
+              <Select.Option value='Học kỳ 2'>Học kỳ 2</Select.Option>
+              <Select.Option value='Học kỳ 3'>Học kỳ 3</Select.Option>
             </Select>
           </Form.Item>
 
           {/* Ngày bắt đầu */}
           <Form.Item
-            label="Ngày bắt đầu"
-            name="start_date"
+            label='Ngày bắt đầu'
+            name='start_date'
             rules={[{ required: true, message: "Vui lòng nhập ngày bắt đầu!" }]}
           >
             <DatePicker
-              format="YYYY-MM-DD"
+              format='YYYY-MM-DD'
               style={{ width: "100%" }}
               onChange={(date) => {
                 if (date) {
@@ -366,21 +425,25 @@ export default function Semester() {
 
           {/* Ngày kết thúc */}
           <Form.Item
-            label="Ngày kết thúc"
-            name="end_date"
-            rules={[{ required: true, message: "Vui lòng nhập ngày kết thúc!" }]}
+            label='Ngày kết thúc'
+            name='end_date'
+            rules={[
+              { required: true, message: "Vui lòng nhập ngày kết thúc!" },
+            ]}
           >
-            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+            <DatePicker format='YYYY-MM-DD' style={{ width: "100%" }} />
           </Form.Item>
 
           {/* Ngày mở đăng ký */}
           <Form.Item
-            label="Ngày mở đăng ký"
-            name="open_date"
-            rules={[{ required: true, message: "Vui lòng nhập ngày mở đăng ký!" }]}
+            label='Ngày mở đăng ký'
+            name='open_date'
+            rules={[
+              { required: true, message: "Vui lòng nhập ngày mở đăng ký!" },
+            ]}
           >
             <DatePicker
-              format="YYYY-MM-DD"
+              format='YYYY-MM-DD'
               style={{ width: "100%" }}
               onChange={(date) => {
                 if (date) {
@@ -394,11 +457,17 @@ export default function Semester() {
 
           {/* Ngày đóng đăng ký (disabled) */}
           <Form.Item
-            label="Ngày đóng đăng ký"
-            name="close_date"
-            rules={[{ required: true, message: "Vui lòng nhập ngày đóng đăng ký!" }]}
+            label='Ngày đóng đăng ký'
+            name='close_date'
+            rules={[
+              { required: true, message: "Vui lòng nhập ngày đóng đăng ký!" },
+            ]}
           >
-            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} disabled />
+            <DatePicker
+              format='YYYY-MM-DD'
+              style={{ width: "100%" }}
+              disabled
+            />
           </Form.Item>
         </Form>
       </Modal>

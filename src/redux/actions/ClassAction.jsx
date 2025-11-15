@@ -5,10 +5,16 @@ import { GET_ALL_CLASS } from "../types/ClassType";
 
 
 
-export const getAllClassAction = () => {
+export const getAllClassAction = (statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await classService.getAllClass();
+      var payload = {}
+      if(statusFilter !== 'all'){
+        payload= {
+          is_deleted: statusFilter==='active'? 0: 1
+        }
+      }
+      const result = await classService.getAllClass(payload);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_CLASS,

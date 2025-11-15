@@ -1,8 +1,19 @@
-"use client"
+"use client";
 
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react"
-import { Table, Button, Space, Popconfirm, message, Input, Dropdown, Checkbox, Tag } from "antd"
+import { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  message,
+  Input,
+  Dropdown,
+  Checkbox,
+  Tag,
+  Select,
+} from "antd";
 import {
   SearchOutlined,
   SettingOutlined,
@@ -10,17 +21,21 @@ import {
   DeleteOutlined,
   PlusOutlined,
   UserOutlined,
-} from "@ant-design/icons"
-import { useDispatch, useSelector } from "react-redux"
-import { getAllStudentAction, deleteStudentAction } from "../redux/actions/StudentAction"
-import { getAllClassAction } from "../redux/actions/ClassAction"
-import { Link } from "react-router-dom"
-import dayjs from "dayjs"
+} from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllStudentAction,
+  deleteStudentAction,
+} from "../redux/actions/StudentAction";
+import { getAllClassAction } from "../redux/actions/ClassAction";
+import { Link } from "react-router-dom";
+import dayjs from "dayjs";
 
 export default function Student() {
-  const dispatch = useDispatch()
-  const students = useSelector((state) => state.StudentReducer.students)
-  const [searchText, setSearchText] = useState("")
+  const dispatch = useDispatch();
+  const students = useSelector((state) => state.StudentReducer.students);
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     student_code: true,
@@ -29,27 +44,28 @@ export default function Student() {
     class_student: true,
     email: true,
     phone: true,
+    is_deleted: true,
     created_at: false,
     updated_at: false,
-  })
+  });
 
   useEffect(() => {
-    dispatch(getAllStudentAction())
-    dispatch(getAllClassAction())
-  }, [dispatch])
+    dispatch(getAllStudentAction(statusFilter));
+    dispatch(getAllClassAction(statusFilter));
+  }, [dispatch, statusFilter]);
 
   const handleDelete = async (id) => {
-    const res = await dispatch(deleteStudentAction(id))
+    const res = await dispatch(deleteStudentAction(id));
     if (res.success) {
-      message.success("Xoá student thành công!")
-      dispatch(getAllStudentAction())
+      message.success("Xoá student thành công!");
+      dispatch(getAllStudentAction());
     } else {
-      message.error("Xoá thất bại!")
+      message.error("Xoá thất bại!");
     }
-  }
+  };
 
   const filteredData = students.filter((student) => {
-    const searchLower = searchText.toLowerCase()
+    const searchLower = searchText.toLowerCase();
     return (
       student.student_code?.toLowerCase().includes(searchLower) ||
       student.user?.last_name?.toLowerCase().includes(searchLower) ||
@@ -57,22 +73,39 @@ export default function Student() {
       student.class_student?.toLowerCase().includes(searchLower) ||
       student.user?.email?.toLowerCase().includes(searchLower) ||
       student.user?.phone?.toLowerCase().includes(searchLower)
-    )
-  })
+    );
+  });
+
+  const handleStatus = (value) => {
+    const payload = {
+      is_deleted: value === "active" ? 1 : 0,
+    };
+    if (value === "all") {
+      dispatch(getAllStudentAction({}));
+    } else if (value === "active") {
+      dispatch(getAllStudentAction(payload));
+    } else {
+      dispatch(getAllStudentAction(payload));
+    }
+    setStatusFilter(value);
+  };
 
   const toggleColumn = (columnKey) => {
     setVisibleColumns((prev) => ({
       ...prev,
       [columnKey]: !prev[columnKey],
-    }))
-  }
+    }));
+  };
 
   const columnMenu = {
     items: [
       {
         key: "id",
         label: (
-          <Checkbox checked={visibleColumns.id} onChange={() => toggleColumn("id")}>
+          <Checkbox
+            checked={visibleColumns.id}
+            onChange={() => toggleColumn("id")}
+          >
             ID
           </Checkbox>
         ),
@@ -80,7 +113,10 @@ export default function Student() {
       {
         key: "student_code",
         label: (
-          <Checkbox checked={visibleColumns.student_code} onChange={() => toggleColumn("student_code")}>
+          <Checkbox
+            checked={visibleColumns.student_code}
+            onChange={() => toggleColumn("student_code")}
+          >
             Student Code
           </Checkbox>
         ),
@@ -88,7 +124,10 @@ export default function Student() {
       {
         key: "last_name",
         label: (
-          <Checkbox checked={visibleColumns.last_name} onChange={() => toggleColumn("last_name")}>
+          <Checkbox
+            checked={visibleColumns.last_name}
+            onChange={() => toggleColumn("last_name")}
+          >
             Last Name
           </Checkbox>
         ),
@@ -96,7 +135,10 @@ export default function Student() {
       {
         key: "first_name",
         label: (
-          <Checkbox checked={visibleColumns.first_name} onChange={() => toggleColumn("first_name")}>
+          <Checkbox
+            checked={visibleColumns.first_name}
+            onChange={() => toggleColumn("first_name")}
+          >
             First Name
           </Checkbox>
         ),
@@ -104,7 +146,10 @@ export default function Student() {
       {
         key: "class_student",
         label: (
-          <Checkbox checked={visibleColumns.class_student} onChange={() => toggleColumn("class_student")}>
+          <Checkbox
+            checked={visibleColumns.class_student}
+            onChange={() => toggleColumn("class_student")}
+          >
             Class
           </Checkbox>
         ),
@@ -112,7 +157,10 @@ export default function Student() {
       {
         key: "email",
         label: (
-          <Checkbox checked={visibleColumns.email} onChange={() => toggleColumn("email")}>
+          <Checkbox
+            checked={visibleColumns.email}
+            onChange={() => toggleColumn("email")}
+          >
             Email
           </Checkbox>
         ),
@@ -120,7 +168,10 @@ export default function Student() {
       {
         key: "phone",
         label: (
-          <Checkbox checked={visibleColumns.phone} onChange={() => toggleColumn("phone")}>
+          <Checkbox
+            checked={visibleColumns.phone}
+            onChange={() => toggleColumn("phone")}
+          >
             Phone
           </Checkbox>
         ),
@@ -128,7 +179,10 @@ export default function Student() {
       {
         key: "created_at",
         label: (
-          <Checkbox checked={visibleColumns.created_at} onChange={() => toggleColumn("created_at")}>
+          <Checkbox
+            checked={visibleColumns.created_at}
+            onChange={() => toggleColumn("created_at")}
+          >
             Created At
           </Checkbox>
         ),
@@ -136,16 +190,25 @@ export default function Student() {
       {
         key: "updated_at",
         label: (
-          <Checkbox checked={visibleColumns.updated_at} onChange={() => toggleColumn("updated_at")}>
+          <Checkbox
+            checked={visibleColumns.updated_at}
+            onChange={() => toggleColumn("updated_at")}
+          >
             Updated At
           </Checkbox>
         ),
       },
     ],
-  }
+  };
 
   const allColumns = [
-    { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 70 },
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      visible: visibleColumns.id,
+      width: 70,
+    },
     {
       title: "Mã sinh viên",
       dataIndex: "student_code",
@@ -172,7 +235,8 @@ export default function Student() {
       dataIndex: "class_student",
       key: "class_student",
       visible: visibleColumns.class_student,
-      render: (class_student) => (class_student ? <Tag color="blue">{class_student.name}</Tag> : "N/A"),
+      render: (class_student) =>
+        class_student ? <Tag color='blue'>{class_student.name}</Tag> : "N/A",
       width: 100,
     },
     {
@@ -188,6 +252,20 @@ export default function Student() {
       key: "phone",
       visible: visibleColumns.phone,
       width: 120,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "is_deleted",
+      key: "is_deleted",
+      visible: visibleColumns.is_deleted,
+      render: (is_deleted) =>
+        is_deleted === undefined ? (
+          <Tag color='default'>N/A</Tag>
+        ) : is_deleted === false ? (
+          <Tag color='green'>Hoạt động</Tag>
+        ) : (
+          <Tag color='red'>Không hoạt động</Tag>
+        ),
     },
     {
       title: "Ngày tạo",
@@ -210,17 +288,21 @@ export default function Student() {
       render: (_, record) => (
         <Space>
           <Link to={`/students/detail/${record.id}`}>
-            <Button type="link" icon={<EditOutlined />} className="text-indigo-600">
+            <Button
+              type='link'
+              icon={<EditOutlined />}
+              className='text-indigo-600'
+            >
               {/* Edit */}
             </Button>
           </Link>
           <Popconfirm
-            title="Bạn có chắc muốn xoá sinh viên này?"
-            okText="OK"
-            cancelText="Hủy"
+            title='Bạn có chắc muốn xoá sinh viên này?'
+            okText='OK'
+            cancelText='Hủy'
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type='link' danger icon={<DeleteOutlined />}>
               {/* Delete */}
             </Button>
           </Popconfirm>
@@ -230,51 +312,68 @@ export default function Student() {
       fixed: "right",
       width: 180,
     },
-  ]
+  ];
 
-  const columns = allColumns.filter((col) => col.visible)
+  const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-white rounded-lg border border-[#d4d1c6] p-8 flex flex-col h-full">
-        <div className="mb-8 flex-shrink-0">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-md bg-[#f5f3ed] flex items-center justify-center border border-[#d4d1c6]">
-              <UserOutlined className="text-[#2c3e50] text-xl" />
+    <div className='h-full flex flex-col'>
+      <div className='bg-white rounded-lg border border-[#d4d1c6] p-8 flex flex-col h-full'>
+        <div className='mb-8 flex-shrink-0'>
+          <div className='flex items-center gap-4 mb-2'>
+            <div className='w-12 h-12 rounded-md bg-[#f5f3ed] flex items-center justify-center border border-[#d4d1c6]'>
+              <UserOutlined className='text-[#2c3e50] text-xl' />
             </div>
             <div>
-              <h1 className="text-3xl font-serif font-semibold text-gray-900">Students</h1>
-              <p className="text-sm text-gray-600 mt-1">Manage student information and records</p>
+              <h1 className='text-3xl font-serif font-semibold text-gray-900'>
+                Students
+              </h1>
+              <p className='text-sm text-gray-600 mt-1'>
+                Manage student information and records
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-8 gap-4 flex-shrink-0">
-          <Link to="/students/detail">
-            <Button type="primary" icon={<PlusOutlined />} size="large">
+        <div className='flex items-center justify-between mb-8 gap-4 flex-shrink-0'>
+          <Link to='/students/detail'>
+            <Button type='primary' icon={<PlusOutlined />} size='large'>
               Thêm mới
             </Button>
           </Link>
 
-          <Space size="middle">
+          <Space size='middle'>
             <Input
-              placeholder="Search students..."
-              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder='Search students...'
+              prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size="large"
+              size='large'
               allowClear
             />
+
+            <Select
+              value={statusFilter}
+              onChange={handleStatus}
+              style={{ width: 180 }}
+              size='large'
+              options={[
+                { value: "all", label: "Tất cả" },
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Không hoạt động" },
+              ]}
+            />
+
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button icon={<SettingOutlined />} size="large">
+              <Button icon={<SettingOutlined />} size='large'>
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className='flex-1 overflow-hidden'>
           <Table
             bordered
             columns={columns}
@@ -290,5 +389,5 @@ export default function Student() {
         </div>
       </div>
     </div>
-  )
+  );
 }

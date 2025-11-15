@@ -4,10 +4,16 @@ import { roomService } from "../../../service/RoomService";
 import { GET_ALL_ROOM } from "../types/RoomType";
 
 
-export const getAllRoomAction = () => {
+export const getAllRoomAction = (statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await roomService.getAllRoom();
+      var payload = {}
+      if (statusFilter !== "all"){
+        payload = {
+          is_active: statusFilter==='active'?1:0
+        }
+      }
+      const result = await roomService.getAllRoom(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         dispatch({

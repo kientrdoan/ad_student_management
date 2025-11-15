@@ -19,9 +19,10 @@ export class BaseService {
     });
   };
 
-  get = (url) => {
+  get = (url, params= null) => {
     return Axios({
       url: `${DOMAIN}${url}`,
+      params: params,
       method: "GET",
     });
   };
@@ -34,10 +35,11 @@ export class BaseService {
     });
   };
 
-  get_token = (url) => {
+  get_token = (url, params= null) => {
     return Axios({
       url: `${DOMAIN}${url}`,
       method: "GET",
+      params: params,
       headers: { Authorization: "Bearer " + localStorage.getItem(TOKEN) },
     });
   };

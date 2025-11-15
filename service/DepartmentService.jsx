@@ -5,8 +5,8 @@ export class DepartmentService extends BaseService {
     super();
   }
 
-  getAll = () => {
-    return this.get_token("/admins/departments/");
+  getAll = (payload) => {
+    return this.get_token(`/admins/departments/`, payload);
   };
 
   addDepartment = (payload) => {

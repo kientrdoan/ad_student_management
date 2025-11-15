@@ -3,10 +3,16 @@
 import { teacherService } from "../../../service/TeacherService";
 import { GET_ALL_TEACHER } from "../types/TeacherType";
 
-export const getAllTeacherAction = () => {
+export const getAllTeacherAction = (statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await teacherService.getAllTeacher();
+      var payload = {}
+      if(statusFilter !== "all"){
+        payload = {
+          is_deleted: statusFilter==="active"? 0 : 1,
+        }
+      }
+      const result = await teacherService.getAllTeacher(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         dispatch({

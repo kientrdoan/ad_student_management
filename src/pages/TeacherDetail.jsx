@@ -43,7 +43,7 @@ export default function TeacherDetail() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getAllAction());
+      await dispatch(getAllAction("active"));
 
       if (id) {
         const res = await dispatch(getTeacherAction(id));

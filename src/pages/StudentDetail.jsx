@@ -39,7 +39,7 @@ export default function StudentDetail() {
   
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getAllClassAction());
+      await dispatch(getAllClassAction("active"));
 
       if (id) {
         const res = await dispatch(getStudentAction(id));

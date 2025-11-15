@@ -5,8 +5,8 @@ export class RoomService extends BaseService {
     super();
   }
 
-  getAllRoom = () => {
-    return this.get_token("/admins/rooms/");
+  getAllRoom = (payload) => {
+    return this.get_token(`/admins/rooms/`, payload);
   };
 
   getRoom = (id) => {

@@ -23,7 +23,7 @@ export default function SubjectDetail() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getAllMajorAction())
+      await dispatch(getAllMajorAction("active"))
 
       if (id) {
         const res = await dispatch(getSubjectAction(id))
@@ -58,7 +58,7 @@ export default function SubjectDetail() {
       messageApi.success(id ? "Cập nhật môn học thành công!" : "Thêm môn học thành công!")
       setTimeout(() => navigate("/subjects"), 1000)
     } else {
-      messageApi.error("Thao tác thất bại!")
+      messageApi.error(res?.error?.response?.data?.message || "Thất bại")
     }
   }
 

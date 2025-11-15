@@ -5,8 +5,8 @@ export class SubjectService extends BaseService {
     super();
   }
 
-  getAllSubject = () => {
-    return this.get_token("/admins/subjects/");
+  getAllSubject = (payload) => {
+    return this.get_token(`/admins/subjects/`, payload);
   };
 
   getSubject = (id) => {

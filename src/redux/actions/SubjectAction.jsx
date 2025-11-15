@@ -5,10 +5,16 @@ import { GET_ALL_SUBJECT } from "../types/SubjectType";
 
 
 
-export const getAllSubjectAction = () => {
+export const getAllSubjectAction = (statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await subjectService.getAllSubject();
+      var payload = {};
+      if (statusFilter !== "all") {
+        payload = {
+          is_deleted: statusFilter === "active" ? 0 : 1,
+        };
+      }
+      const result = await subjectService.getAllSubject(payload);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_SUBJECT,

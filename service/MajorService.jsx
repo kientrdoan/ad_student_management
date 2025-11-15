@@ -5,8 +5,8 @@ export class MajorService extends BaseService {
     super();
   }
 
-  getAll = () => {
-    return this.get_token("/admins/majors/");
+  getAll = (payload) => {
+    return this.get_token(`/admins/majors/`, payload);
   };
 
   addMajor = (payload) => {

@@ -1,20 +1,43 @@
-"use client"
+"use client";
 
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react"
-import { Table, Button, Space, Input, Dropdown, Checkbox, Tag, Popconfirm, message } from "antd"
-import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, BookOutlined, DeleteOutlined } from "@ant-design/icons"
-import { useDispatch, useSelector } from "react-redux"
-import { getAllMajorAction } from "../redux/actions/MajorAction"
-import { deleteSubjectAction, getAllSubjectAction } from "../redux/actions/SubjectAction"
-import { Link } from "react-router-dom"
-import dayjs from "dayjs"
+import { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Space,
+  Input,
+  Dropdown,
+  Checkbox,
+  Tag,
+  Popconfirm,
+  message,
+  Select,
+} from "antd";
+import {
+  SearchOutlined,
+  SettingOutlined,
+  EditOutlined,
+  PlusOutlined,
+  BookOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllMajorAction } from "../redux/actions/MajorAction";
+import {
+  deleteSubjectAction,
+  getAllSubjectAction,
+} from "../redux/actions/SubjectAction";
+import { Link } from "react-router-dom";
+import dayjs from "dayjs";
+import { BiRectangle, BiRecycle } from "react-icons/bi";
 
 export default function Subject() {
-  const dispatch = useDispatch()
-  const majors = useSelector((state) => state.MajorReducer.majors)
-  const subjects = useSelector((state) => state.SubjectReducer.subjects)
-  const [searchText, setSearchText] = useState("")
+  const dispatch = useDispatch();
+  const majors = useSelector((state) => state.MajorReducer.majors);
+  const subjects = useSelector((state) => state.SubjectReducer.subjects);
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     code: true,
@@ -22,52 +45,73 @@ export default function Subject() {
     credit: true,
     total_period: true,
     major: true,
+    is_deleted: true,
     created_at: true,
-    updated_at: true,
-  })
+    updated_at: false,
+  });
 
   useEffect(() => {
     const loadData = async () => {
-      await dispatch(getAllMajorAction())
-      await dispatch(getAllSubjectAction())
-    }
-    loadData()
-  }, [dispatch])
+      await dispatch(getAllMajorAction(statusFilter));
+      await dispatch(getAllSubjectAction(statusFilter));
+    };
+    loadData();
+  }, [dispatch, statusFilter]);
 
   const filteredData = subjects.filter((subject) => {
-    const searchLower = searchText.toLowerCase()
-    const major = majors.find((m) => String(m.id) === String(subject.major))
+    const searchLower = searchText.toLowerCase();
+    const major = majors.find((m) => String(m.id) === String(subject.major));
     return (
       subject.code?.toLowerCase().includes(searchLower) ||
       subject.name?.toLowerCase().includes(searchLower) ||
       subject.credit?.toString().includes(searchLower) ||
       major?.name?.toLowerCase().includes(searchLower)
-    )
-  })
+    );
+  });
 
   const toggleColumn = (columnKey) => {
     setVisibleColumns((prev) => ({
       ...prev,
       [columnKey]: !prev[columnKey],
-    }))
-  }
+    }));
+  };
+
+  const handleStatus = (value) => {
+    const payload = {
+      is_deleted: value === "active" ? 1 : 0,
+    };
+    if (value === "all") {
+      dispatch(getAllMajorAction({}));
+      dispatch(getAllSubjectAction({}));
+    } else if (value === "active") {
+      dispatch(getAllMajorAction(payload));
+      dispatch(getAllSubjectAction(payload));
+    } else {
+      dispatch(getAllMajorAction(payload));
+      dispatch(getAllSubjectAction(payload));
+    }
+    setStatusFilter(value);
+  };
 
   const handleDelete = async (id) => {
-    const res = await dispatch(deleteSubjectAction(id))
+    const res = await dispatch(deleteSubjectAction(id));
     if (res.success) {
-      message.success("Xoá môn học thành công!")
-      dispatch(getAllSubjectAction())
+      message.success("Xoá môn học thành công!");
+      dispatch(getAllSubjectAction(statusFilter));
     } else {
-      message.error("Xoá thất bại!")
+      message.error("Xoá thất bại!");
     }
-  }
+  };
 
   const columnMenu = {
     items: [
       {
         key: "id",
         label: (
-          <Checkbox checked={visibleColumns.id} onChange={() => toggleColumn("id")}>
+          <Checkbox
+            checked={visibleColumns.id}
+            onChange={() => toggleColumn("id")}
+          >
             ID
           </Checkbox>
         ),
@@ -75,7 +119,10 @@ export default function Subject() {
       {
         key: "code",
         label: (
-          <Checkbox checked={visibleColumns.code} onChange={() => toggleColumn("code")}>
+          <Checkbox
+            checked={visibleColumns.code}
+            onChange={() => toggleColumn("code")}
+          >
             Code
           </Checkbox>
         ),
@@ -83,7 +130,10 @@ export default function Subject() {
       {
         key: "name",
         label: (
-          <Checkbox checked={visibleColumns.name} onChange={() => toggleColumn("name")}>
+          <Checkbox
+            checked={visibleColumns.name}
+            onChange={() => toggleColumn("name")}
+          >
             Name
           </Checkbox>
         ),
@@ -91,7 +141,10 @@ export default function Subject() {
       {
         key: "credit",
         label: (
-          <Checkbox checked={visibleColumns.credit} onChange={() => toggleColumn("credit")}>
+          <Checkbox
+            checked={visibleColumns.credit}
+            onChange={() => toggleColumn("credit")}
+          >
             Credit
           </Checkbox>
         ),
@@ -99,7 +152,10 @@ export default function Subject() {
       {
         key: "total_period",
         label: (
-          <Checkbox checked={visibleColumns.total_period} onChange={() => toggleColumn("total_period")}>
+          <Checkbox
+            checked={visibleColumns.total_period}
+            onChange={() => toggleColumn("total_period")}
+          >
             Total Period
           </Checkbox>
         ),
@@ -107,15 +163,22 @@ export default function Subject() {
       {
         key: "major",
         label: (
-          <Checkbox checked={visibleColumns.major} onChange={() => toggleColumn("major")}>
+          <Checkbox
+            checked={visibleColumns.major}
+            onChange={() => toggleColumn("major")}
+          >
             Major
           </Checkbox>
         ),
       },
+
       {
         key: "created_at",
         label: (
-          <Checkbox checked={visibleColumns.created_at} onChange={() => toggleColumn("created_at")}>
+          <Checkbox
+            checked={visibleColumns.created_at}
+            onChange={() => toggleColumn("created_at")}
+          >
             Created At
           </Checkbox>
         ),
@@ -123,22 +186,31 @@ export default function Subject() {
       {
         key: "updated_at",
         label: (
-          <Checkbox checked={visibleColumns.updated_at} onChange={() => toggleColumn("updated_at")}>
+          <Checkbox
+            checked={visibleColumns.updated_at}
+            onChange={() => toggleColumn("updated_at")}
+          >
             Updated At
           </Checkbox>
         ),
       },
     ],
-  }
+  };
 
   const allColumns = [
-    { title: "ID", dataIndex: "id", key: "id", width: 70, visible: visibleColumns.id },
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 70,
+      visible: visibleColumns.id,
+    },
     {
       title: "Mã môn",
       dataIndex: "code",
       key: "code",
       visible: visibleColumns.code,
-      render: (code) => <Tag color="purple">{code}</Tag>,
+      render: (code) => <Tag color='purple'>{code}</Tag>,
       width: 120,
     },
     {
@@ -166,12 +238,29 @@ export default function Subject() {
       title: "Ngành",
       dataIndex: "major",
       key: "major",
-      render: (id) => {
-        const major = majors.find((m) => String(m.id) === String(id))
-        return major ? major.name : "N/A"
+      render: (major) => {
+        // Kiểm tra nếu department là object có chứa tên
+        if (major && major.major_name) {
+          return major.major_name;
+        }
+        return "N/A";
       },
       visible: visibleColumns.major,
       width: 180,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "is_deleted",
+      key: "is_deleted",
+      visible: visibleColumns.is_deleted,
+      render: (is_deleted) =>
+        is_deleted === undefined ? (
+          <Tag color='default'>N/A</Tag>
+        ) : is_deleted === false ? (
+          <Tag color='green'>Hoạt động</Tag>
+        ) : (
+          <Tag color='red'>Không hoạt động</Tag>
+        ),
     },
     {
       title: "Ngày tạo",
@@ -192,75 +281,111 @@ export default function Subject() {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-       <Space>
-          <Link to={`/subjects/detail/${record.id}`}>
-            <Button type="link" icon={<EditOutlined />} className="text-indigo-600">
-            {/* Edit */}
-            </Button>
-          </Link>
-          <Popconfirm
-            title="Bạn có chắc muốn xoá môn học này?"
-            okText="OK"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type="link" danger icon={<DeleteOutlined />}>
-              {/* Delete */}
-            </Button>
-          </Popconfirm>
-       </Space>
-      ),
+      render: (_, record) =>
+        record.is_deleted === true ? (
+          <Button
+            type='link'
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
+            className='text-indigo-600'
+          />
+        ) : (
+          <Space>
+            <Link to={`/subjects/detail/${record.id}`}>
+              <Button
+                type='link'
+                icon={<EditOutlined />}
+                className='text-indigo-600'
+              >
+                {/* Edit */}
+              </Button>
+            </Link>
+            <Popconfirm
+              title='Bạn có chắc muốn xoá môn học này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Button type='link' danger icon={<DeleteOutlined />}>
+                {/* Delete */}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 100,
     },
-  ]
+  ];
 
-  const columns = allColumns.filter((col) => col.visible)
+  const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
-        <div className="mb-6 flex-shrink-0">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-              <BookOutlined className="text-indigo-600 text-lg" />
+    <div className='h-full flex flex-col'>
+      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
+        <div className='mb-6 flex-shrink-0'>
+          <div className='flex items-center gap-3 mb-2'>
+            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
+              <BookOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Môn học</h1>
-              <p className="text-sm text-gray-500">Manage subject information</p>
+              <h1 className='text-2xl font-bold text-gray-900'>Môn học</h1>
+              <p className='text-sm text-gray-500'>
+                Manage subject information
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
-          <Link to="/subjects/detail">
-            <Button type="primary" icon={<PlusOutlined />} size="large" className="shadow-sm">
+        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
+          <Link to='/subjects/detail'>
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              size='large'
+              className='shadow-sm'
+            >
               Thêm mới
             </Button>
           </Link>
 
-          <Space size="middle">
+          <Space size='middle'>
             <Input
-              placeholder="Search subjects..."
-              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder='Search subjects...'
+              prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size="large"
+              size='large'
               allowClear
-              className="rounded-lg"
+              className='rounded-lg'
             />
+
+            <Select
+              value={statusFilter}
+              onChange={handleStatus}
+              style={{ width: 180 }}
+              size='large'
+              options={[
+                { value: "all", label: "Tất cả" },
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Không hoạt động" },
+              ]}
+            />
+
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
+              <Button
+                icon={<SettingOutlined />}
+                size='large'
+                className='rounded-lg'
+              >
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className='flex-1 overflow-hidden'>
           <Table
             columns={columns}
             dataSource={filteredData}
@@ -276,5 +401,5 @@ export default function Subject() {
         </div>
       </div>
     </div>
-  )
+  );
 }

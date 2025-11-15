@@ -5,8 +5,8 @@ export class StudentService extends BaseService {
     super();
   }
 
-  getAll = () => {
-    return this.get_token("/admins/students/");
+  getAll = (paylpad) => {
+    return this.get_token(`/admins/students/`, paylpad);
   };
 
   getStudent = (id) => {

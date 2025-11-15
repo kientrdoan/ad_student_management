@@ -9,12 +9,12 @@ export class CourseService extends BaseService {
     return this.get_token("/admins/courses/");
   };
 
-  getAllCourseBySemester = (semester_id) => {
-    return this.get_token(`/admins/courses/${semester_id}`);
+  getAllCourseBySemester = (semester_id, payload) => {
+    return this.get_token(`/admins/courses/${semester_id}`, payload);
   };
 
   getCourse = (id) => {
-    return this.get_token(`/admins/courses/${id}`);
+    return this.get_token(`/admins/course/${id}`);
   };
 
   addCourse = (payload) => {
@@ -22,11 +22,11 @@ export class CourseService extends BaseService {
   }
 
   editCourse = (id, payload) => {
-    return this.put(`/admins/courses/${id}`, payload)
+    return this.put(`/admins/course/${id}`, payload)
   }
 
   deleteCourse = (id) => {
-    return this.delete(`/admins/courses/${id}`)
+    return this.delete(`/admins/course/${id}`)
   }
 
   setSchedule = (payload) => {

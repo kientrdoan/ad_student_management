@@ -1,113 +1,162 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Table, Button, Modal, Form, Input, Select, Space, message, Dropdown, Checkbox, Tag, Popconfirm } from "antd"
-import { SearchOutlined, SettingOutlined, EditOutlined, PlusOutlined, UsergroupAddOutlined, DeleteOutlined } from "@ant-design/icons"
-import { useDispatch, useSelector } from "react-redux"
-import { getAllMajorAction } from "../redux/actions/MajorAction"
-import { addClassAction, deleteClassAction, editClassAction, getAllClassAction } from "../redux/actions/ClassAction"
-import dayjs from "dayjs"
+import { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  message,
+  Dropdown,
+  Checkbox,
+  Tag,
+  Popconfirm,
+} from "antd";
+import {
+  SearchOutlined,
+  SettingOutlined,
+  EditOutlined,
+  PlusOutlined,
+  UsergroupAddOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllMajorAction } from "../redux/actions/MajorAction";
+import {
+  addClassAction,
+  deleteClassAction,
+  editClassAction,
+  getAllClassAction,
+} from "../redux/actions/ClassAction";
+import dayjs from "dayjs";
+import { BiCycling, BiRecycle } from "react-icons/bi";
 
 export default function Class() {
-  const dispatch = useDispatch()
-  const majors = useSelector((state) => state.MajorReducer.majors)
-  const classes = useSelector((state) => state.ClassReducer.classes)
+  const [messageApi, contextHolder] = message.useMessage();
+  const dispatch = useDispatch();
+  const majors = useSelector((state) => state.MajorReducer.majors);
+  const classes = useSelector((state) => state.ClassReducer.classes);
 
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [editingRecord, setEditingRecord] = useState(null)
-  const [form] = Form.useForm()
-  const [searchText, setSearchText] = useState("")
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     name: true,
     major: true,
     start_year: true,
     end_year: true,
+    is_deleted: true,
     created_at: true,
     updated_at: true,
-  })
+  });
 
   useEffect(() => {
     const loadData = async () => {
-      await dispatch(getAllMajorAction())
-      await dispatch(getAllClassAction())
-    }
-    loadData()
-  }, [dispatch])
+      await dispatch(getAllMajorAction(statusFilter));
+      await dispatch(getAllClassAction(statusFilter));
+    };
+    loadData();
+  }, [dispatch, statusFilter]);
 
   const showAddModal = () => {
-    setEditingRecord(null)
-    form.resetFields()
-    setIsModalVisible(true)
-  }
+    setEditingRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
 
   const showEditModal = (record) => {
-    setEditingRecord(record)
+    setEditingRecord(record);
     form.setFieldsValue({
       name: record.name,
       major: record.major,
       start_year: record.start_year,
       end_year: record.end_year,
-    })
-    setIsModalVisible(true)
-  }
+    });
+    setIsModalVisible(true);
+  };
 
   const handleOk = async () => {
     try {
-      const values = await form.validateFields()
-      let res
+      const values = await form.validateFields();
+      let res;
       if (editingRecord) {
-        res = await dispatch(editClassAction(editingRecord.id, { ...editingRecord, ...values }))
+        res = await dispatch(
+          editClassAction(editingRecord.id, { ...editingRecord, ...values })
+        );
       } else {
-        console.log("Add class:", values)
-        res = await dispatch(addClassAction(values))
+        res = await dispatch(addClassAction(values));
       }
       if (res?.success) {
-        message.success(`${editingRecord ? "Update" : "Add"} class successfully!`)
-        dispatch(getAllClassAction())
-        setIsModalVisible(false)
+        messageApi.success(
+          `${editingRecord ? "Sửa" : "Thêm"} thành công!`
+        );
+        dispatch(getAllClassAction(statusFilter));
+        setIsModalVisible(false);
       } else {
-        message.error("Action failed!")
+        messageApi.error(res?.error?.response?.data?.message);
       }
     } catch (err) {
-      console.log("Validate Failed:", err)
+      console.log("Validate Failed:", err);
     }
-  }
+  };
 
   const filteredData = classes.filter((cls) => {
-    const searchLower = searchText.toLowerCase()
-    const major = majors.find((m) => String(m.id) === String(cls.major))
+    const searchLower = searchText.toLowerCase();
+    const major = majors.find((m) => String(m.id) === String(cls.major));
     return (
       cls.name?.toLowerCase().includes(searchLower) ||
       major?.name?.toLowerCase().includes(searchLower) ||
       cls.start_year?.toString().includes(searchLower) ||
       cls.end_year?.toString().includes(searchLower)
-    )
-  })
+    );
+  });
+
+  const handleStatus = (value) => {
+    if (value === "all") {
+      dispatch(getAllMajorAction({}));
+      dispatch(getAllClassAction({}));
+    } else if (value === "active") {
+      dispatch(getAllMajorAction(statusFilter));
+      dispatch(getAllClassAction(statusFilter));
+    } else {
+      dispatch(getAllMajorAction(statusFilter));
+      dispatch(getAllClassAction(statusFilter));
+    }
+    setStatusFilter(value);
+  };
 
   const toggleColumn = (columnKey) => {
     setVisibleColumns((prev) => ({
       ...prev,
       [columnKey]: !prev[columnKey],
-    }))
-  }
+    }));
+  };
 
-    const handleDelete = async (id) => {
-    const res = await dispatch(deleteClassAction(id))
+  const handleDelete = async (id) => {
+    const res = await dispatch(deleteClassAction(id));
     if (res.success) {
-      message.success("Xoá lớp sinh viên thành công!")
-      dispatch(getAllClassAction())
+      messageApi.success("Xoá lớp sinh viên thành công!");
+      dispatch(getAllClassAction(statusFilter));
     } else {
-      message.error("Xoá thất bại!")
+      messageApi.error("Xoá thất bại!");
     }
-  }
+  };
 
   const columnMenu = {
     items: [
       {
         key: "id",
         label: (
-          <Checkbox checked={visibleColumns.id} onChange={() => toggleColumn("id")}>
+          <Checkbox
+            checked={visibleColumns.id}
+            onChange={() => toggleColumn("id")}
+          >
             ID
           </Checkbox>
         ),
@@ -115,7 +164,10 @@ export default function Class() {
       {
         key: "name",
         label: (
-          <Checkbox checked={visibleColumns.name} onChange={() => toggleColumn("name")}>
+          <Checkbox
+            checked={visibleColumns.name}
+            onChange={() => toggleColumn("name")}
+          >
             Name
           </Checkbox>
         ),
@@ -123,7 +175,10 @@ export default function Class() {
       {
         key: "major",
         label: (
-          <Checkbox checked={visibleColumns.major} onChange={() => toggleColumn("major")}>
+          <Checkbox
+            checked={visibleColumns.major}
+            onChange={() => toggleColumn("major")}
+          >
             Major
           </Checkbox>
         ),
@@ -131,7 +186,10 @@ export default function Class() {
       {
         key: "start_year",
         label: (
-          <Checkbox checked={visibleColumns.start_year} onChange={() => toggleColumn("start_year")}>
+          <Checkbox
+            checked={visibleColumns.start_year}
+            onChange={() => toggleColumn("start_year")}
+          >
             Start Year
           </Checkbox>
         ),
@@ -139,7 +197,10 @@ export default function Class() {
       {
         key: "end_year",
         label: (
-          <Checkbox checked={visibleColumns.end_year} onChange={() => toggleColumn("end_year")}>
+          <Checkbox
+            checked={visibleColumns.end_year}
+            onChange={() => toggleColumn("end_year")}
+          >
             End Year
           </Checkbox>
         ),
@@ -147,7 +208,10 @@ export default function Class() {
       {
         key: "created_at",
         label: (
-          <Checkbox checked={visibleColumns.created_at} onChange={() => toggleColumn("created_at")}>
+          <Checkbox
+            checked={visibleColumns.created_at}
+            onChange={() => toggleColumn("created_at")}
+          >
             Created At
           </Checkbox>
         ),
@@ -155,31 +219,43 @@ export default function Class() {
       {
         key: "updated_at",
         label: (
-          <Checkbox checked={visibleColumns.updated_at} onChange={() => toggleColumn("updated_at")}>
+          <Checkbox
+            checked={visibleColumns.updated_at}
+            onChange={() => toggleColumn("updated_at")}
+          >
             Updated At
           </Checkbox>
         ),
       },
     ],
-  }
+  };
 
   const allColumns = [
-    { title: "ID", dataIndex: "id", key: "id", visible: visibleColumns.id, width: 70 },
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      visible: visibleColumns.id,
+      width: 70,
+    },
     {
       title: "Tên lớp",
       dataIndex: "name",
       key: "name",
       visible: visibleColumns.name,
-      render: (name) => <Tag color="blue">{name}</Tag>,
+      render: (name) => <Tag color='blue'>{name}</Tag>,
       width: 150,
     },
     {
       title: "Ngành",
       dataIndex: "major",
       key: "major",
-      render: (id) => {
-        const major = majors.find((m) => String(m.id) === String(id))
-        return major ? major.name : "N/A"
+      render: (major) => {
+        // Kiểm tra nếu major là object có chứa tên
+        if (major && major.major_name) {
+          return major.major_name;
+        }
+        return "N/A";
       },
       visible: visibleColumns.major,
       width: 200,
@@ -197,6 +273,20 @@ export default function Class() {
       key: "end_year",
       visible: visibleColumns.end_year,
       width: 110,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "is_deleted",
+      key: "is_deleted",
+      visible: visibleColumns.is_deleted,
+      render: (is_deleted) =>
+        is_deleted === undefined ? (
+          <Tag color='default'>N/A</Tag>
+        ) : is_deleted === false ? (
+          <Tag color='green'>Hoạt động</Tag>
+        ) : (
+          <Tag color='red'>Không hoạt động</Tag>
+        ),
     },
     {
       title: "Ngày tạo",
@@ -217,71 +307,108 @@ export default function Class() {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Space>
-          <Button type="link" icon={<EditOutlined />} onClick={() => showEditModal(record)} className="text-indigo-600">
-          {/* Edit */}
-        </Button>
-        <Popconfirm
-            title="Bạn có chắc muốn xoá lớp sinh viên này?"
-            okText="OK"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type="link" danger icon={<DeleteOutlined />}>
-              {/* Delete */}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
+     render: (_, record) =>
+        record.is_deleted === true ? (
+          <Button
+            type='link'
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
+            className='text-indigo-600'
+          />
+        ) : (
+          <Space>
+            <Button
+              type='link'
+              icon={<EditOutlined />}
+              onClick={() => showEditModal(record)}
+              className='text-indigo-600'
+            />
+            <Popconfirm
+              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Button type='link' danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 100,
     },
-  ]
+  ];
 
-  const columns = allColumns.filter((col) => col.visible)
+  const columns = allColumns.filter((col) => col.visible);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col h-full">
-        <div className="mb-6 flex-shrink-0">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-              <UsergroupAddOutlined className="text-indigo-600 text-lg" />
+    <div className='h-full flex flex-col'>
+      {contextHolder}
+      <div className='bg-white rounded-xl shadow-sm p-6 flex flex-col h-full'>
+        <div className='mb-6 flex-shrink-0'>
+          <div className='flex items-center gap-3 mb-2'>
+            <div className='w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center'>
+              <UsergroupAddOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Lớp sinh viên</h1>
-              <p className="text-sm text-gray-500">Manage class information and schedules</p>
+              <h1 className='text-2xl font-bold text-gray-900'>
+                Lớp sinh viên
+              </h1>
+              <p className='text-sm text-gray-500'>
+                Manage class information and schedules
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-6 gap-4 flex-shrink-0">
-          <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="shadow-sm">
+        <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
+          <Button
+            type='primary'
+            icon={<PlusOutlined />}
+            onClick={showAddModal}
+            size='large'
+            className='shadow-sm'
+          >
             Thêm mới
           </Button>
 
-          <Space size="middle">
+          <Space size='middle'>
             <Input
-              placeholder="Search classes..."
-              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder='Search classes...'
+              prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: 320 }}
-              size="large"
+              size='large'
               allowClear
-              className="rounded-lg"
+              className='rounded-lg'
             />
+
+            <Select
+              value={statusFilter}
+              onChange={handleStatus}
+              style={{ width: 180 }}
+              size='large'
+              options={[
+                { value: "all", label: "Tất cả" },
+                { value: "active", label: "Hoạt động" },
+                { value: "inactive", label: "Không hoạt động" },
+              ]}
+            />
+
             <Dropdown menu={columnMenu} trigger={["click"]}>
-              <Button icon={<SettingOutlined />} size="large" className="rounded-lg">
+              <Button
+                icon={<SettingOutlined />}
+                size='large'
+                className='rounded-lg'
+              >
                 Columns
               </Button>
             </Dropdown>
           </Space>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className='flex-1 overflow-hidden'>
           <Table
             columns={columns}
             dataSource={filteredData}
@@ -298,19 +425,31 @@ export default function Class() {
       </div>
 
       <Modal
-        title={editingRecord ? "Cập nhật thông tin lớp sinh viên" : "Thêm thông tin lớp sinh viên"}
+        title={
+          editingRecord
+            ? "Cập nhật thông tin lớp sinh viên"
+            : "Thêm thông tin lớp sinh viên"
+        }
         open={isModalVisible}
         onOk={handleOk}
         onCancel={() => setIsModalVisible(false)}
-        okText="Save"
+        okText='Save'
       >
-        <Form form={form} layout="vertical">
-          <Form.Item label="Tên lớp" name="name" rules={[{ required: true, message: "Vui lòng nhập tên lớp!" }]}>
+        <Form form={form} layout='vertical'>
+          <Form.Item
+            label='Tên lớp'
+            name='name'
+            rules={[{ required: true, message: "Vui lòng nhập tên lớp!" }]}
+          >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Ngành" name="major" rules={[{ required: true, message: "Vui lòng chọn ngành!" }]}>
-            <Select placeholder="Select major">
+          <Form.Item
+            label='Ngành'
+            name='major'
+            rules={[{ required: true, message: "Vui lòng chọn ngành!" }]}
+          >
+            <Select placeholder='Select major'>
               {majors?.map((m) => (
                 <Select.Option key={m.id} value={m.id}>
                   {m.name}
@@ -320,18 +459,22 @@ export default function Class() {
           </Form.Item>
 
           <Form.Item
-            label="Năm bắt đầu"
-            name="start_year"
+            label='Năm bắt đầu'
+            name='start_year'
             rules={[{ required: true, message: "Vui lòng nhập nắm bắt đầu!" }]}
           >
-            <Input type="number" />
+            <Input type='number' />
           </Form.Item>
 
-          <Form.Item label="Năm kết thúc" name="end_year" rules={[{ required: true, message: "Vui lòng nhập năm kết thúc!" }]}>
-            <Input type="number" />
+          <Form.Item
+            label='Năm kết thúc'
+            name='end_year'
+            rules={[{ required: true, message: "Vui lòng nhập năm kết thúc!" }]}
+          >
+            <Input type='number' />
           </Form.Item>
         </Form>
       </Modal>
     </div>
-  )
+  );
 }

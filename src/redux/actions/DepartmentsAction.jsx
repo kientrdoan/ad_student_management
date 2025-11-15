@@ -3,11 +3,16 @@
 import { departmentService } from "../../../service/DepartmentService";
 import { GET_ALL } from "../types/DepartmentType";
 
-
-export const getAllAction = () => {
+export const getAllAction = (statusFilter) => {
   return async (dispatch) => {
+    var payload = {};
     try {
-      const result = await departmentService.getAll();
+      if (statusFilter !== "all") {
+        payload = {
+          is_deleted: statusFilter === "active" ? 0 : 1,
+        };
+      } 
+      const result = await departmentService.getAll(payload);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL,
@@ -30,13 +35,15 @@ export const addDepartmentAction = (payload) => {
       if (result.status === 200) {
         return { success: true, data: result.data.data };
       }
+      // if (result.status=== 400) {
+      //   return { success: false, error: result.data.message };
+      // }
     } catch (error) {
       console.log("error", error);
       return { success: false, error };
     }
   };
 };
-
 
 export const editDepartmentAction = (id, payload) => {
   return async (dispatch) => {

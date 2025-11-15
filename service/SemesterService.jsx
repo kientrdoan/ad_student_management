@@ -5,8 +5,8 @@ export class SemesterService extends BaseService {
     super();
   }
 
-  getAllSemester = () => {
-    return this.get_token("/admins/semesters/");
+  getAllSemester = (payload) => {
+    return this.get_token(`/admins/semesters/`, payload);
   };
 
   getSemester = (id) => {

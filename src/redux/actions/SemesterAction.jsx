@@ -5,10 +5,16 @@ import Semester from "../../pages/Semester";
 import { GET_ALL_SEMESTER, GET_CURRENT_SEMESTER } from "../types/SemesterType";
 
 
-export const getAllSemesterAction = () => {
+export const getAllSemesterAction = (statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await semesterService.getAllSemester();
+      var payload = {}
+      if(statusFilter !== 'all'){
+        payload = {
+        is_deleted: statusFilter === "active" ? 0 : 1,
+      };
+      }
+      const result = await semesterService.getAllSemester(payload);
       console.log("result", result.data);
       if (result.status === 200) {
         dispatch({

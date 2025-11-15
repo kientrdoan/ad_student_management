@@ -5,8 +5,8 @@ export class TeacherService extends BaseService {
     super();
   }
 
-  getAllTeacher = () => {
-    return this.get_token("/admins/teachers/");
+  getAllTeacher = (payload) => {
+    return this.get_token(`/admins/teachers/`, payload);
   };
 
   getTeacher = (id) => {

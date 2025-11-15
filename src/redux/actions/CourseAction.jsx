@@ -53,6 +53,8 @@ export const setScheduleAction = (data) => async (dispatch) => {
     formData.append("semester_id", data.semester_id);
 
     if (data.excel_file) formData.append("excel_file", data.excel_file);
+
+    if (data.holiday_file) formData.append("holiday_file", data.holiday_file);
     
     if (data.population_size)
       formData.append("population_size", data.population_size);
@@ -94,10 +96,16 @@ export const resetScheduleAction = (semester_id) => {
 };
 
 
-export const getAllCourseBySemesterAction = (semester_id) => {
+export const getAllCourseBySemesterAction = (semester_id, statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await courseService.getAllCourseBySemester(semester_id);
+      var payload = {}
+      if(statusFilter !== "all"){
+        payload = {
+          is_deleted: statusFilter === "active"? 0: 1,
+        }
+      }
+      const result = await courseService.getAllCourseBySemester(semester_id, payload);
       console.log("result", result.data);
       if (result.status === 200) {
         dispatch({

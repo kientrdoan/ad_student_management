@@ -5,10 +5,16 @@ import { GET_ALL_STUDENT } from "../types/StudentType";
 
 
 
-export const getAllStudentAction = () => {
+export const getAllStudentAction = (statusFilter) => {
   return async (dispatch) => {
     try {
-      const result = await studentService.getAll();
+      var payload = {}
+      if (statusFilter !== "all"){
+         payload = {
+          is_deleted: statusFilter === "active"? 0: 1,
+        }
+      }
+      const result = await studentService.getAll(payload);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_STUDENT,

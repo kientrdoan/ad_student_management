@@ -5,8 +5,8 @@ export class ClassService extends BaseService {
     super();
   }
 
-  getAllClass = () => {
-    return this.get_token("/admins/classes/");
+  getAllClass = (payload) => {
+    return this.get_token(`/admins/classes/`, payload);
   };
 
   addClass = (payload) => {
