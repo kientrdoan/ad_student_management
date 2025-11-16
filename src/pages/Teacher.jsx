@@ -27,6 +27,7 @@ import {
 } from "../redux/actions/TeacherAction";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
+import { BiRecycle } from "react-icons/bi";
 
 export default function Teacher() {
   const dispatch = useDispatch();
@@ -35,6 +36,7 @@ export default function Teacher() {
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
+    teacher_code: true,
     last_name: true,
     first_name: true,
     email: true,
@@ -52,7 +54,7 @@ export default function Teacher() {
     const res = await dispatch(deleteTeacherAction(id));
     if (res.success) {
       message.success("Xoá teacher thành công!");
-      dispatch(getAllTeacherAction());
+      dispatch(getAllTeacherAction(statusFilter));
     } else {
       message.error("Xoá thất bại!");
     }
@@ -68,7 +70,7 @@ export default function Teacher() {
     );
   });
 
-    const handleStatus = (value) => {
+  const handleStatus = (value) => {
     if (value === "all") {
       dispatch(getAllTeacherAction({}));
     } else if (value === "active") {
@@ -96,6 +98,17 @@ export default function Teacher() {
             onChange={() => toggleColumn("id")}
           >
             ID
+          </Checkbox>
+        ),
+      },
+      {
+        key: "teacher_code",
+        label: (
+          <Checkbox
+            checked={visibleColumns.last_name}
+            onChange={() => toggleColumn("teacher_code")}
+          >
+            Teacher code
           </Checkbox>
         ),
       },
@@ -177,6 +190,13 @@ export default function Teacher() {
       width: 70,
     },
     {
+      title: "Mã giáo viên",
+      render: (_, r) => r.teacher_code || "N/A",
+      key: "teacher_code",
+      visible: visibleColumns.teacher_code,
+      width: 150,
+    },
+    {
       title: "Họ",
       render: (_, r) => r.user?.last_name || "N/A",
       key: "last_name",
@@ -212,7 +232,7 @@ export default function Teacher() {
       render: (is_deleted) =>
         is_deleted === undefined ? (
           <Tag color='default'>N/A</Tag>
-        ) : is_deleted === false? (
+        ) : is_deleted === false ? (
           <Tag color='green'>Hoạt động</Tag>
         ) : (
           <Tag color='red'>Không hoạt động</Tag>
@@ -236,29 +256,37 @@ export default function Teacher() {
     },
     {
       title: "Action",
-      render: (_, record) => (
-        <Space>
-          <Link to={`/teachers/detail/${record.id}`}>
-            <Button
-              type='link'
-              icon={<EditOutlined />}
-              className='text-indigo-600'
+      render: (_, record) =>
+        record.is_deleted === true ? (
+          <Button
+            type='link'
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
+            className='text-indigo-600'
+          />
+        ) : (
+          <Space>
+            <Link to={`/teachers/detail/${record.id}`}>
+              <Button
+                type='link'
+                icon={<EditOutlined />}
+                className='text-indigo-600'
+              >
+                {/* Edit */}
+              </Button>
+            </Link>
+            <Popconfirm
+              title='Bạn có chắc muốn xoá giáo viên này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
             >
-              {/* Edit */}
-            </Button>
-          </Link>
-          <Popconfirm
-            title='Bạn có chắc muốn xoá giáo viên này?'
-            okText='OK'
-            cancelText='Hủy'
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type='link' danger icon={<DeleteOutlined />}>
-              {/* Delete */}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
+              <Button type='link' danger icon={<DeleteOutlined />}>
+                {/* Delete */}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 180,

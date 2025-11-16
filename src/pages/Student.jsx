@@ -30,6 +30,7 @@ import {
 import { getAllClassAction } from "../redux/actions/ClassAction";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
+import { BiRecycle } from "react-icons/bi";
 
 export default function Student() {
   const dispatch = useDispatch();
@@ -58,7 +59,7 @@ export default function Student() {
     const res = await dispatch(deleteStudentAction(id));
     if (res.success) {
       message.success("Xoá student thành công!");
-      dispatch(getAllStudentAction());
+      dispatch(getAllStudentAction(statusFilter));
     } else {
       message.error("Xoá thất bại!");
     }
@@ -285,29 +286,37 @@ export default function Student() {
     },
     {
       title: "Action",
-      render: (_, record) => (
-        <Space>
-          <Link to={`/students/detail/${record.id}`}>
-            <Button
-              type='link'
-              icon={<EditOutlined />}
-              className='text-indigo-600'
+      render: (_, record) =>
+        record.is_deleted === true ? (
+          <Button
+            type='link'
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
+            className='text-indigo-600'
+          />
+        ) : (
+          <Space>
+            <Link to={`/students/detail/${record.id}`}>
+              <Button
+                type='link'
+                icon={<EditOutlined />}
+                className='text-indigo-600'
+              >
+                {/* Edit */}
+              </Button>
+            </Link>
+            <Popconfirm
+              title='Bạn có chắc muốn xoá sinh viên này?'
+              okText='OK'
+              cancelText='Hủy'
+              onConfirm={() => handleDelete(record.id)}
             >
-              {/* Edit */}
-            </Button>
-          </Link>
-          <Popconfirm
-            title='Bạn có chắc muốn xoá sinh viên này?'
-            okText='OK'
-            cancelText='Hủy'
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type='link' danger icon={<DeleteOutlined />}>
-              {/* Delete */}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
+              <Button type='link' danger icon={<DeleteOutlined />}>
+                {/* Delete */}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
       visible: true,
       fixed: "right",
       width: 180,

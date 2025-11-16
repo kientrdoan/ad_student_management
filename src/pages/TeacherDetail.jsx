@@ -143,7 +143,7 @@ export default function TeacherDetail() {
         messageApi.success(id ? "Cập nhật thành công!" : "Thêm thành công!");
         setTimeout(() => navigate("/teachers"), 1000);
       } else {
-        messageApi.error(res.message || "Thao tác thất bại!");
+        messageApi.error(res?.error?.response?.data?.message || "Thao tác thất bại!");
       }
     } catch (error) {
       messageApi.error("Lỗi hệ thống!");
