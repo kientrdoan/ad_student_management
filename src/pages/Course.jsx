@@ -45,7 +45,10 @@ import {
 } from "../redux/actions/SemesterAction";
 import { getAllClassAction } from "../redux/actions/ClassAction";
 import { getAllTeacherAction } from "../redux/actions/TeacherAction";
-import { getAllSubjectAction } from "../redux/actions/SubjectAction";
+import {
+  getAllSubjectAction,
+  getAllSubjectByMajorAction,
+} from "../redux/actions/SubjectAction";
 import { getAllRoomAction } from "../redux/actions/RoomAction";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
@@ -63,7 +66,10 @@ export default function Course() {
   );
   const classes = useSelector((state) => state.ClassReducer.classes);
   const teachers = useSelector((state) => state.TeacherReducer.teachers);
-  const subjects = useSelector((state) => state.SubjectReducer.subjects);
+  // const subjects = useSelector((state) => state.SubjectReducer.subjects);
+  const subjects_majors = useSelector(
+    (state) => state.SubjectReducer.subjects_majors
+  );
   const rooms = useSelector((state) => state.RoomReducer.rooms);
 
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
@@ -81,8 +87,6 @@ export default function Course() {
   const [statusFilter, setStatusFilter] = useState("active");
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
-
-  const PERIODS_PER_DAY = 5; // cố định 5 tiết/ngày
 
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
@@ -129,16 +133,21 @@ export default function Course() {
     setSelectedSubject(null);
     setIsModalVisible(true);
   };
-
   const showEditModal = (record) => {
     setEditingRecord(record);
-    setSelectedSemester(record.semester);
-    setSelectedSubject(record.subject);
+    setIsModalVisible(true);
 
+    // // Load môn học theo ngành
+    console.log(record)
+    if (record.class_st) {
+      dispatch(getAllSubjectByMajorAction(record.class_st.major_id));
+    }
+
+    // Set các field vào form, bao gồm subject
     form.setFieldsValue({
       semester: record.semester?.id,
       class_st: record.class_st?.id,
-      subject: record.subject?.id,
+      subject: record.subject?.id, // <-- quan trọng
       start_date: record.start_date ? dayjs(record.start_date) : null,
       end_date: record.end_date ? dayjs(record.end_date) : null,
       max_capacity: record.max_capacity,
@@ -147,8 +156,6 @@ export default function Course() {
       room: record.room?.id,
       teacher: record.teacher?.id,
     });
-
-    setIsModalVisible(true);
   };
 
   const handleOk = async () => {
@@ -365,10 +372,10 @@ export default function Course() {
       render: (_, record) =>
         record.is_deleted === true ? (
           <Button
-              type='link'
-              icon={<BiRecycle />}
-              onClick={() => handleDelete(record.id)}
-              className='text-indigo-600'
+            type='link'
+            icon={<BiRecycle />}
+            onClick={() => handleDelete(record.id)}
+            className='text-indigo-600'
           />
         ) : (
           <Space>
@@ -731,7 +738,21 @@ export default function Course() {
                   { required: true, message: "Vui lòng chọn lớp sinh viên!" },
                 ]}
               >
-                <Select placeholder='Vui lòng chọn lớp sinh viên'>
+                <Select
+                  placeholder='Vui lòng chọn lớp sinh viên'
+                  onChange={(value) => {
+                    const selectedClass = classes.find((c) => c.id === value);
+                    setSelectedSemester(selectedClass.semester); // nếu cần
+                    form.setFieldsValue({ start_date: null, end_date: null });
+
+                    // load môn học theo ngành
+                    if (selectedClass.major) {
+                      dispatch(
+                        getAllSubjectByMajorAction(selectedClass.major.major_id)
+                      );
+                    }
+                  }}
+                >
                   {classes?.map((c) => (
                     <Select.Option key={c.id} value={c.id}>
                       {c.name}
@@ -752,13 +773,14 @@ export default function Course() {
               >
                 <Select
                   placeholder='Vui lòng chọn môn học'
+                  value={selectedSubject?.id} // quan trọng để hiển thị đúng môn học hiện tại
                   onChange={(value) => {
-                    const subject = subjects.find((s) => s.id === value);
+                    const subject = subjects_majors.find((s) => s.id === value);
                     setSelectedSubject(subject);
                     form.setFieldsValue({ start_date: null, end_date: null });
                   }}
                 >
-                  {subjects?.map((s) => (
+                  {subjects_majors?.map((s) => (
                     <Select.Option key={s.id} value={s.id}>
                       {s.name} ({s.credit} tín chỉ)
                     </Select.Option>
@@ -978,7 +1000,7 @@ export default function Course() {
                     <Select placeholder='Chọn giáo viên'>
                       {teachers?.map((t) => (
                         <Select.Option key={t.id} value={t.id}>
-                          {t.name}
+                          {t.user.last_name} {t.user.first_name}
                         </Select.Option>
                       ))}
                     </Select>

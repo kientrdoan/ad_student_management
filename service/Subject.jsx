@@ -13,6 +13,10 @@ export class SubjectService extends BaseService {
     return this.get_token(`/admins/subjects/${id}`);
   };
 
+  getSubjectByMajor = (major_id) => {
+    return this.get_token(`/admins/majors/subjects/${major_id}`);
+  };
+
   addSubject = (payload) => {
     return this.post_token(`/admins/subjects/`, payload)
   }

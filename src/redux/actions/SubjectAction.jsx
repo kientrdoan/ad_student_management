@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { subjectService } from "../../../service/Subject";
-import { GET_ALL_SUBJECT } from "../types/SubjectType";
+import { GET_ALL_SUBJECT, GET_ALL_SUBJECT_BY_MAJOR } from "../types/SubjectType";
 
 
 
@@ -28,6 +28,27 @@ export const getAllSubjectAction = (statusFilter) => {
     }
   };
 };
+
+
+export const getAllSubjectByMajorAction = (major_id) => {
+  return async (dispatch) => {
+    try {
+      const result = await subjectService.getSubjectByMajor(major_id);
+      console.log("major subject", result.data.data)
+      if (result.status === 200) {
+        dispatch({
+          type: GET_ALL_SUBJECT_BY_MAJOR,
+          subjects_majors: result.data.data,
+        });
+        return { success: true, data: result.data.data };
+      }
+    } catch (error) {
+      console.log("error", error);
+      return { success: false, error };
+    }
+  };
+};
+
 
 export const getSubjectAction = (id) => {
   return async (dispatch) => {
