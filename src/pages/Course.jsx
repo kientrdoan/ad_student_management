@@ -44,7 +44,10 @@ import {
   getCurrentSemesterAction,
 } from "../redux/actions/SemesterAction";
 import { getAllClassAction } from "../redux/actions/ClassAction";
-import { getAllTeacherAction } from "../redux/actions/TeacherAction";
+import {
+  getAllTeacherAction,
+  getTeacherByDepartmentAction,
+} from "../redux/actions/TeacherAction";
 import {
   getAllSubjectAction,
   getAllSubjectByMajorAction,
@@ -65,7 +68,10 @@ export default function Course() {
     (state) => state.SemesterReducer.current_semester
   );
   const classes = useSelector((state) => state.ClassReducer.classes);
-  const teachers = useSelector((state) => state.TeacherReducer.teachers);
+  // const teachers = useSelector((state) => state.TeacherReducer.teachers);
+  const teacher_departments = useSelector(
+    (state) => state.TeacherReducer.teacher_departments
+  );
   // const subjects = useSelector((state) => state.SubjectReducer.subjects);
   const subjects_majors = useSelector(
     (state) => state.SubjectReducer.subjects_majors
@@ -138,9 +144,13 @@ export default function Course() {
     setIsModalVisible(true);
 
     // // Load môn học theo ngành
-    console.log(record)
+    console.log("record", record);
     if (record.class_st) {
       dispatch(getAllSubjectByMajorAction(record.class_st.major_id));
+    }
+
+    if (record.class_st) {
+      dispatch(getTeacherByDepartmentAction(record.class_st.department_id));
     }
 
     // Set các field vào form, bao gồm subject
@@ -744,11 +754,20 @@ export default function Course() {
                     const selectedClass = classes.find((c) => c.id === value);
                     setSelectedSemester(selectedClass.semester); // nếu cần
                     form.setFieldsValue({ start_date: null, end_date: null });
+                    form.setFieldsValue({ teacher: undefined });
 
                     // load môn học theo ngành
                     if (selectedClass.major) {
                       dispatch(
                         getAllSubjectByMajorAction(selectedClass.major.major_id)
+                      );
+                    }
+
+                    if (selectedClass.major) {
+                      dispatch(
+                        getTeacherByDepartmentAction(
+                          selectedClass.major.department_id
+                        )
                       );
                     }
                   }}
@@ -947,11 +966,16 @@ export default function Course() {
                   <Form.Item
                     label='Thứ'
                     name='weekday'
-                    rules={[
-                      { required: true, message: "Vui lòng nhập thứ học!" },
-                    ]}
+                    rules={[{ required: true, message: "Vui lòng chọn thứ!" }]}
                   >
-                    <Input placeholder='Ví dụ: 2, 3, 4, ...' />
+                    <Select placeholder='Chọn thứ học'>
+                      <Select.Option value="Monday">Thứ Hai</Select.Option>
+                      <Select.Option value="Tuesday">Thứ Ba</Select.Option>
+                      <Select.Option value="Wednesday">Thứ Tư</Select.Option>
+                      <Select.Option value="Thursday">Thứ Năm</Select.Option>
+                      <Select.Option value="Friday">Thứ Sáu</Select.Option>
+                      <Select.Option value="Friday">Thứ Bảy</Select.Option>
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -998,7 +1022,7 @@ export default function Course() {
                     ]}
                   >
                     <Select placeholder='Chọn giáo viên'>
-                      {teachers?.map((t) => (
+                      {teacher_departments?.map((t) => (
                         <Select.Option key={t.id} value={t.id}>
                           {t.user.last_name} {t.user.first_name}
                         </Select.Option>

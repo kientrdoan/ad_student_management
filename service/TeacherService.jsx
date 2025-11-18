@@ -13,6 +13,10 @@ export class TeacherService extends BaseService {
     return this.get_token(`/admins/teachers/${id}`);
   };
 
+  getTeacherByDepartment = (department_id) => {
+    return this.get_token(`/admins/departments/teachers/${department_id}`)
+  }
+
   addTeacher = (payload) => {
     return this.post_token(`/admins/teachers/`, payload)
   }
