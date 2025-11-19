@@ -12,7 +12,8 @@ export const loginAction = (thongTinDangNhap) => {
         const accessToken = result.data.data.access;
         const payload = jwtDecode(accessToken);
         console.log("Payload JWT:", payload);
-        dispatch({
+        if(payload.role === "ADMIN"){
+          dispatch({
           type: LOGIN_ACTION,
           access_token: result.data.data.access,
           user: {
@@ -22,6 +23,9 @@ export const loginAction = (thongTinDangNhap) => {
           }
         });
         return { success: true, data: result.data.data };
+        }else{
+          return { success: false, error: "Đăng nhập thất bại" };
+        }
       }
     } catch (error) {
       console.log("error", error);
