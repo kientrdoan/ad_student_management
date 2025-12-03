@@ -187,7 +187,7 @@ export default function Course() {
       }
 
       if (res.success) {
-        message.success(
+        messageApi.success(
           editingRecord
             ? "Edit course successfully!"
             : "Add course successfully!"
@@ -196,7 +196,7 @@ export default function Course() {
         setIsModalVisible(false);
         form.resetFields();
       } else {
-        message.error("Failed to save course!");
+        messageApi.error("Failed to save course!");
       }
     } catch (err) {
       console.log("Validate Failed:", err);
@@ -423,19 +423,19 @@ export default function Course() {
 
   const resetSchedule = async () => {
     if (!semester) {
-      message.warning("Vui lòng chọn học kỳ trước khi khôi phục!");
+      messageApi.warning("Vui lòng chọn học kỳ trước khi khôi phục!");
       return;
     }
     const resutl = await dispatch(resetScheduleAction(semester));
     if (resutl.success) {
-      message.success("Khôi phục lịch học thành công!");
+      messageApi.success("Khôi phục lịch học thành công!");
       dispatch(getAllCourseBySemesterAction(semester, "active"));
     }
   };
 
   const handleScheduleOk = async () => {
     if (!semester) {
-      message.warning("Vui lòng chọn học kỳ trước khi xếp lịch!");
+      messageApi.warning("Vui lòng chọn học kỳ trước khi xếp lịch!");
       return;
     }
 
@@ -469,11 +469,11 @@ export default function Course() {
         dispatch(getAllCourseBySemesterAction(semester, "active"));
         setIsScheduleModalVisible(false);
       } else {
-        message.error("Xếp lịch thất bại!");
+        messageApi.error("Xếp lịch thất bại!");
       }
     } catch (err) {
       console.error(err);
-      message.error("Đã có lỗi xảy ra khi xếp lịch!");
+      messageApi.error("Đã có lỗi xảy ra khi xếp lịch!");
     } finally {
       setLoadingSchedule(false);
     }
@@ -497,78 +497,46 @@ export default function Course() {
     setIsScheduleModalVisible(true);
   };
 
-  const parseExcel = async (file) => {
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  // const parseExcel = async (file) => {
+  //   const data = await file.arrayBuffer();
+  //   const workbook = XLSX.read(data);
+  //   const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    // Trả về danh sách JSON từ Excel
-    return XLSX.utils.sheet_to_json(sheet);
-  };
+  //   // Trả về danh sách JSON từ Excel
+  //   return XLSX.utils.sheet_to_json(sheet);
+  // };
 
   const handleImportOk = async () => {
     if (!importFile) {
-      message.warning("Vui lòng chọn file Excel!");
+      messageApi.warning("Vui lòng chọn file Excel!");
       return;
     }
 
     try {
-      // 1. Parse file Excel
-      const excelData = await parseExcel(importFile);
+      const formData = new FormData();
+      formData.append("file", importFile);
+      formData.append("semester_id", semester);
 
-      if (excelData.length === 0) {
-        message.error("Excel không có dòng dữ liệu!");
-        return;
-      }
+      // Gọi API upload file
+      const res = await dispatch(addCourseAction(formData));
 
-      let success = 0;
-      let errors = [];
-
-      // 2. Loop từng dòng và gọi API tuần tự
-      for (let i = 0; i < excelData.length; i++) {
-        const row = excelData[i];
-
-        // Tạo payload phù hợp API bên Kien
-        const payload = {
-          subject: row.subject,
-          class_st: row.class_st,
-          max_capacity: row.max_capacity,
-          semester: semester,
-        };
-
-        const res = await dispatch(addCourseAction(payload));
-
-        if (res?.success) {
-          success++;
-        } else {
-          errors.push({
-            row: i + 2,
-            error: res?.message || "Lỗi không xác định",
-          });
-        }
-      }
-
-      // 3. Thông báo kết quả
-      if (success > 0) {
-        message.success(
-          `Import thành công ${success}/${excelData.length} dòng!`
+      if (res?.success) {
+        messageApi.success(
+          `Thêm thành công: ${res.data} lớp tín chỉ`
         );
+      } else {
+        messageApi.error("Thêm thất bại. Vui lòng kiểm tra lại dữ liệu đầu vào!");
       }
 
-      if (errors.length > 0) {
-        console.warn("Lỗi import:", errors);
-        message.error(`${errors.length} dòng bị lỗi (check console).`);
-      }
-
-      // 4. Refresh danh sách
+      // Refresh danh sách
       dispatch(getAllCourseBySemesterAction(semester, statusFilter));
 
-      // 5. Reset UI
+      // Reset UI
       setIsImportModalVisible(false);
       setImportFile(null);
     } catch (err) {
       console.error(err);
-      message.error("Import thất bại, vui lòng kiểm tra file Excel!");
+      messageApi.error("Lỗi upload file!");
     }
   };
 
@@ -891,7 +859,7 @@ export default function Course() {
                           date.isBefore(semesterStart) ||
                           date.isAfter(semesterEnd)
                         ) {
-                          message.error(
+                          messageApi.error(
                             "Ngày bắt đầu không phù hợp với học kỳ đã chọn!"
                           );
                           form.setFieldsValue({
@@ -917,7 +885,7 @@ export default function Course() {
                           // Nếu vượt học kỳ thì fix bằng ngày kết thúc học kỳ
                           if (endDate.isAfter(semesterEnd)) {
                             endDate = semesterEnd;
-                            message.warning(
+                            messageApi.warning(
                               `Ngày kết thúc dự kiến đã vượt học kỳ, tự động set bằng ${semesterEnd.format(
                                 "YYYY-MM-DD"
                               )}`
@@ -969,12 +937,12 @@ export default function Course() {
                     rules={[{ required: true, message: "Vui lòng chọn thứ!" }]}
                   >
                     <Select placeholder='Chọn thứ học'>
-                      <Select.Option value="Monday">Thứ Hai</Select.Option>
-                      <Select.Option value="Tuesday">Thứ Ba</Select.Option>
-                      <Select.Option value="Wednesday">Thứ Tư</Select.Option>
-                      <Select.Option value="Thursday">Thứ Năm</Select.Option>
-                      <Select.Option value="Friday">Thứ Sáu</Select.Option>
-                      <Select.Option value="Friday">Thứ Bảy</Select.Option>
+                      <Select.Option value='Monday'>Thứ Hai</Select.Option>
+                      <Select.Option value='Tuesday'>Thứ Ba</Select.Option>
+                      <Select.Option value='Wednesday'>Thứ Tư</Select.Option>
+                      <Select.Option value='Thursday'>Thứ Năm</Select.Option>
+                      <Select.Option value='Friday'>Thứ Sáu</Select.Option>
+                      <Select.Option value='Friday'>Thứ Bảy</Select.Option>
                     </Select>
                   </Form.Item>
                 </Col>
