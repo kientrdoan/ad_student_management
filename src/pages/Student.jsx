@@ -50,16 +50,19 @@ export default function Student() {
     updated_at: false,
   });
 
+  const classes = useSelector((state) => state.ClassReducer.classes);
+  const [selectedClassId, setSelectedClassId] = useState(undefined);
+
   useEffect(() => {
-    dispatch(getAllStudentAction(statusFilter));
+    dispatch(getAllStudentAction(statusFilter, selectedClassId));
     dispatch(getAllClassAction(statusFilter));
-  }, [dispatch, statusFilter]);
+  }, [dispatch, statusFilter, selectedClassId]);
 
   const handleDelete = async (id) => {
     const res = await dispatch(deleteStudentAction(id));
     if (res.success) {
       message.success("Xoá student thành công!");
-      dispatch(getAllStudentAction(statusFilter));
+      dispatch(getAllStudentAction(statusFilter, selectedClassId));
     } else {
       message.error("Xoá thất bại!");
     }
@@ -82,11 +85,11 @@ export default function Student() {
       is_deleted: value === "active" ? 1 : 0,
     };
     if (value === "all") {
-      dispatch(getAllStudentAction({}));
+      dispatch(getAllStudentAction({}, selectedClassId));
     } else if (value === "active") {
-      dispatch(getAllStudentAction(payload));
+      dispatch(getAllStudentAction(payload, selectedClassId));
     } else {
-      dispatch(getAllStudentAction(payload));
+      dispatch(getAllStudentAction(payload, selectedClassId));
     }
     setStatusFilter(value);
   };
@@ -350,6 +353,18 @@ export default function Student() {
               Thêm mới
             </Button>
           </Link>
+
+          <Select style={{width: 250}}
+                placeholder='Chọn lớp' 
+                size='large' loading={!classes}
+                onChange={(value) => setSelectedClassId(value)}
+            >
+            {classes?.map((c) => (
+              <Select.Option key={c.id} value={c.id}>
+                {c.name}
+              </Select.Option>
+            ))}
+          </Select>
 
           <Space size='middle'>
             <Input

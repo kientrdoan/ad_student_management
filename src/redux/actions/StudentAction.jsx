@@ -5,7 +5,7 @@ import { GET_ALL_STUDENT } from "../types/StudentType";
 
 
 
-export const getAllStudentAction = (statusFilter) => {
+export const getAllStudentAction = (statusFilter, selectedClassId) => {
   return async (dispatch) => {
     try {
       var payload = {}
@@ -14,7 +14,7 @@ export const getAllStudentAction = (statusFilter) => {
           is_deleted: statusFilter === "active"? 0: 1,
         }
       }
-      const result = await studentService.getAll(payload);
+      const result = await studentService.getAll(payload, selectedClassId);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_STUDENT,
