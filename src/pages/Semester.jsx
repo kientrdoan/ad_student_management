@@ -103,7 +103,7 @@ export default function Semester() {
         );
         if (res.success) {
           messageApi.success("Sửa thành công!");
-          dispatch(getAllSemesterAction());
+          dispatch(getAllSemesterAction(statusFilter));
         } else {
           messageApi.error("Sửa thật bại!");
         }
@@ -111,7 +111,7 @@ export default function Semester() {
         const res = await dispatch(addSemesterAction(formattedValues));
         if (res.success) {
           messageApi.success("Thêm thành công!");
-          dispatch(getAllSemesterAction());
+          dispatch(getAllSemesterAction(statusFilter));
         } else {
           messageApi.error(res?.error?.response?.data?.message);
         }
@@ -126,7 +126,7 @@ export default function Semester() {
     const res = await dispatch(deleteSemesterAction(id));
     if (res.success) {
       messageApi.success("Xoá semester thành công!");
-      dispatch(getAllSemesterAction());
+      dispatch(getAllSemesterAction(statusFilter));
     } else {
       messageApi.error("Xoá thất bại!");
     }
@@ -143,6 +143,7 @@ export default function Semester() {
   });
 
   const handleStatus = (value) => {
+    setStatusFilter(value);
     if (value === "all") {
       dispatch(getAllSemesterAction({}));
     } else if (value === "active") {
@@ -150,7 +151,6 @@ export default function Semester() {
     } else {
       dispatch(getAllSemesterAction(statusFilter));
     }
-    setStatusFilter(value);
   };
 
   const toggleColumn = (columnKey) => {

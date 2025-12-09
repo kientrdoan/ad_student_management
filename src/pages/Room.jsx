@@ -108,16 +108,16 @@ export default function Room() {
   });
 
   const handleStatus = (value) => {
-    const payload = {
-      is_deleted: value === "active" ? 1 : 0,
-    };
-    if (value === "all") {
-      dispatch(getAllRoomAction({}));
-    } else if (value === "active") {
-      dispatch(getAllRoomAction(payload));
-    } else {
-      dispatch(getAllRoomAction(payload));
-    }
+    // const payload = {
+    //   is_deleted: value === "active" ? 1 : 0,
+    // };
+    // if (value === "all") {
+    //   dispatch(getAllRoomAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllRoomAction(payload));
+    // } else {
+    //   dispatch(getAllRoomAction(payload));
+    // }
     setStatusFilter(value);
   };
 

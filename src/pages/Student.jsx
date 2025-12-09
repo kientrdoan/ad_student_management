@@ -55,8 +55,11 @@ export default function Student() {
 
   useEffect(() => {
     dispatch(getAllStudentAction(statusFilter, selectedClassId));
-    dispatch(getAllClassAction(statusFilter));
   }, [dispatch, statusFilter, selectedClassId]);
+
+  useEffect(() => {
+    dispatch(getAllClassAction("active"));
+  }, []);
 
   const handleDelete = async (id) => {
     const res = await dispatch(deleteStudentAction(id));
@@ -81,17 +84,14 @@ export default function Student() {
   });
 
   const handleStatus = (value) => {
-    const payload = {
-      is_deleted: value === "active" ? 1 : 0,
-    };
-    if (value === "all") {
-      dispatch(getAllStudentAction({}, selectedClassId));
-    } else if (value === "active") {
-      dispatch(getAllStudentAction(payload, selectedClassId));
-    } else {
-      dispatch(getAllStudentAction(payload, selectedClassId));
-    }
     setStatusFilter(value);
+    // if (value === "all") {
+    //   dispatch(getAllStudentAction({}, selectedClassId));
+    // } else if (value === "active") {
+    //   dispatch(getAllStudentAction(statusFilter, selectedClassId));
+    // } else {
+    //   dispatch(getAllStudentAction(statusFilter, selectedClassId));
+    // }
   };
 
   const toggleColumn = (columnKey) => {
@@ -354,11 +354,14 @@ export default function Student() {
             </Button>
           </Link>
 
-          <Select style={{width: 250}}
-                placeholder='Chọn lớp' 
-                size='large' loading={!classes}
-                onChange={(value) => setSelectedClassId(value)}
-            >
+          <Select
+            style={{ width: 250 }}
+            placeholder='Chọn lớp'
+            size='large'
+            loading={!classes}
+            allowClear={true}
+            onChange={(value) => setSelectedClassId(value)}
+          >
             {classes?.map((c) => (
               <Select.Option key={c.id} value={c.id}>
                 {c.name}

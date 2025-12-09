@@ -58,7 +58,7 @@ export default function Major() {
 
   useEffect(() => {
     const loadData = async () => {
-      await dispatch(getAllAction(statusFilter));
+      await dispatch(getAllAction("active"));
       await dispatch(getAllMajorAction(statusFilter));
     };
     loadData();
@@ -124,19 +124,19 @@ export default function Major() {
   };
 
   const handleStatus = (value) => {
-    const payload = {
-      is_deleted: value === "active" ? 1 : 0,
-    };
-    if (value === "all") {
-      dispatch(getAllAction({}));
-      dispatch(getAllMajorAction({}));
-    } else if (value === "active") {
-      dispatch(getAllAction(payload));
-      dispatch(getAllMajorAction(payload));
-    } else {
-      dispatch(getAllAction(payload));
-      dispatch(getAllMajorAction(payload));
-    }
+    // const payload = {
+    //   is_deleted: value === "active" ? 1 : 0,
+    // };
+    // if (value === "all") {
+    //   dispatch(getAllAction({}));
+    //   dispatch(getAllMajorAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllAction(payload));
+    //   dispatch(getAllMajorAction(payload));
+    // } else {
+    //   dispatch(getAllAction(payload));
+    //   dispatch(getAllMajorAction(payload));
+    // }
     setStatusFilter(value);
   };
 

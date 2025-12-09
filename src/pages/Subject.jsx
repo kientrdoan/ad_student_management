@@ -52,7 +52,7 @@ export default function Subject() {
 
   useEffect(() => {
     const loadData = async () => {
-      await dispatch(getAllMajorAction(statusFilter));
+      await dispatch(getAllMajorAction("active"));
       await dispatch(getAllSubjectAction(statusFilter));
     };
     loadData();
@@ -77,19 +77,19 @@ export default function Subject() {
   };
 
   const handleStatus = (value) => {
-    const payload = {
-      is_deleted: value === "active" ? 1 : 0,
-    };
-    if (value === "all") {
-      dispatch(getAllMajorAction({}));
-      dispatch(getAllSubjectAction({}));
-    } else if (value === "active") {
-      dispatch(getAllMajorAction(payload));
-      dispatch(getAllSubjectAction(payload));
-    } else {
-      dispatch(getAllMajorAction(payload));
-      dispatch(getAllSubjectAction(payload));
-    }
+    // const payload = {
+    //   is_deleted: value === "active" ? 1 : 0,
+    // };
+    // if (value === "all") {
+    //   dispatch(getAllMajorAction({}));
+    //   dispatch(getAllSubjectAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllMajorAction(payload));
+    //   dispatch(getAllSubjectAction(payload));
+    // } else {
+    //   dispatch(getAllMajorAction(payload));
+    //   dispatch(getAllSubjectAction(payload));
+    // }
     setStatusFilter(value);
   };
 

@@ -112,11 +112,11 @@ export default function Course() {
   });
 
   useEffect(() => {
-    dispatch(getAllSemesterAction(statusFilter));
+    dispatch(getAllSemesterAction("active"));
     dispatch(getCurrentSemesterAction(statusFilter));
-    dispatch(getAllClassAction(statusFilter));
+    dispatch(getAllClassAction("active"));
     dispatch(getAllTeacherAction(statusFilter));
-    dispatch(getAllSubjectAction(statusFilter));
+    dispatch(getAllSubjectAction("active"));
     dispatch(getAllRoomAction(statusFilter));
   }, [dispatch, statusFilter]);
 
@@ -166,6 +166,14 @@ export default function Course() {
       room: record.room?.id,
       teacher: record.teacher?.id,
     });
+
+    // Khi mở Edit Modal
+    if (record.class_st?.major?.major_id) {
+      dispatch(getAllSubjectByMajorAction(record.class_st.major.major_id));
+    }
+
+    // Set selected subject = môn của record
+    setSelectedSubject(record.subject);
   };
 
   const handleOk = async () => {
@@ -222,28 +230,28 @@ export default function Course() {
   });
 
   const handleStatus = (value) => {
-    if (value === "all") {
-      dispatch(getAllSemesterAction({}));
-      dispatch(getCurrentSemesterAction({}));
-      dispatch(getAllClassAction({}));
-      dispatch(getAllTeacherAction({}));
-      dispatch(getAllSubjectAction({}));
-      dispatch(getAllRoomAction({}));
-    } else if (value === "active") {
-      dispatch(getAllSemesterAction(statusFilter));
-      dispatch(getCurrentSemesterAction(statusFilter));
-      dispatch(getAllClassAction(statusFilter));
-      dispatch(getAllTeacherAction(statusFilter));
-      dispatch(getAllSubjectAction(statusFilter));
-      dispatch(getAllRoomAction(statusFilter));
-    } else {
-      dispatch(getAllSemesterAction(statusFilter));
-      dispatch(getCurrentSemesterAction(statusFilter));
-      dispatch(getAllClassAction(statusFilter));
-      dispatch(getAllTeacherAction(statusFilter));
-      dispatch(getAllSubjectAction(statusFilter));
-      dispatch(getAllRoomAction(statusFilter));
-    }
+    // if (value === "all") {
+    //   dispatch(getAllSemesterAction({}));
+    //   dispatch(getCurrentSemesterAction({}));
+    //   dispatch(getAllClassAction({}));
+    //   dispatch(getAllTeacherAction({}));
+    //   dispatch(getAllSubjectAction({}));
+    //   dispatch(getAllRoomAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllSemesterAction(statusFilter));
+    //   dispatch(getCurrentSemesterAction(statusFilter));
+    //   dispatch(getAllClassAction(statusFilter));
+    //   dispatch(getAllTeacherAction(statusFilter));
+    //   dispatch(getAllSubjectAction(statusFilter));
+    //   dispatch(getAllRoomAction(statusFilter));
+    // } else {
+    //   dispatch(getAllSemesterAction(statusFilter));
+    //   dispatch(getCurrentSemesterAction(statusFilter));
+    //   dispatch(getAllClassAction(statusFilter));
+    //   dispatch(getAllTeacherAction(statusFilter));
+    //   dispatch(getAllSubjectAction(statusFilter));
+    //   dispatch(getAllRoomAction(statusFilter));
+    // }
     setStatusFilter(value);
   };
 
@@ -764,7 +772,7 @@ export default function Course() {
                   onChange={(value) => {
                     const subject = subjects_majors.find((s) => s.id === value);
                     setSelectedSubject(subject);
-                    form.setFieldsValue({ start_date: null, end_date: null });
+                    // form.setFieldsValue({ start_date: null, end_date: null });
                   }}
                 >
                   {subjects_majors?.map((s) => (

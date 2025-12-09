@@ -71,13 +71,13 @@ export default function Teacher() {
   });
 
   const handleStatus = (value) => {
-    if (value === "all") {
-      dispatch(getAllTeacherAction({}));
-    } else if (value === "active") {
-      dispatch(getAllTeacherAction(statusFilter));
-    } else {
-      dispatch(getAllTeacherAction(statusFilter));
-    }
+    // if (value === "all") {
+    //   dispatch(getAllTeacherAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllTeacherAction(statusFilter));
+    // } else {
+    //   dispatch(getAllTeacherAction(statusFilter));
+    // }
     setStatusFilter(value);
   };
 

@@ -5,8 +5,8 @@ export class StudentService extends BaseService {
     super();
   }
 
-  getAll = (paylpad, class_id) => {
-    return this.get_token(`/admins/students?class_id=${class_id}`, paylpad);
+  getAll = (paylpad) => {
+    return this.get_token(`/admins/students`, paylpad);
   };
 
   getStudent = (id) => {
@@ -14,7 +14,7 @@ export class StudentService extends BaseService {
   };
 
   addStudent = (payload) => {
-    return this.post_token(`/admins/students`, payload)
+    return this.post_token(`/admins/students/`, payload)
   }
 
   editStudent = (id, payload) => {

@@ -12,9 +12,14 @@ export const getAllStudentAction = (statusFilter, selectedClassId) => {
       if (statusFilter !== "all"){
          payload = {
           is_deleted: statusFilter === "active"? 0: 1,
+          class_id: selectedClassId,
+        }
+      }else{
+         payload = {
+          class_id: selectedClassId,
         }
       }
-      const result = await studentService.getAll(payload, selectedClassId);
+      const result = await studentService.getAll(payload);
       if (result.status === 200) {
         dispatch({
           type: GET_ALL_STUDENT,

@@ -74,7 +74,7 @@ export default function Class() {
     setEditingRecord(record);
     form.setFieldsValue({
       name: record.name,
-      major: record.major,
+      major: record.major.major_id,
       start_year: record.start_year,
       end_year: record.end_year,
     });
@@ -118,16 +118,16 @@ export default function Class() {
   });
 
   const handleStatus = (value) => {
-    if (value === "all") {
-      dispatch(getAllMajorAction({}));
-      dispatch(getAllClassAction({}));
-    } else if (value === "active") {
-      dispatch(getAllMajorAction(statusFilter));
-      dispatch(getAllClassAction(statusFilter));
-    } else {
-      dispatch(getAllMajorAction(statusFilter));
-      dispatch(getAllClassAction(statusFilter));
-    }
+    // if (value === "all") {
+    //   dispatch(getAllMajorAction({}));
+    //   dispatch(getAllClassAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllMajorAction(statusFilter));
+    //   dispatch(getAllClassAction(statusFilter));
+    // } else {
+    //   dispatch(getAllMajorAction(statusFilter));
+    //   dispatch(getAllClassAction(statusFilter));
+    // }
     setStatusFilter(value);
   };
 

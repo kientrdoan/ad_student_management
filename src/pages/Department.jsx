@@ -83,7 +83,7 @@ export default function Department() {
         );
         if (res.success) {
           messageApi.success("Thay đổi thông tin khoa thành công!");
-          dispatch(getAllAction());
+          dispatch(getAllAction(statusFilter));
         } else {
           messageApi.error("Thay đổi thông tin khoa thất bại!");
         }
@@ -93,7 +93,7 @@ export default function Department() {
         const res = await dispatch(addDepartmentAction(newDept));
         if (res.success) {
           messageApi.success("Thêm khoa thành công!");
-          dispatch(getAllAction());
+          dispatch(getAllAction(statusFilter));
         } else {
           messageApi.error(
             res.error?.response?.data?.message || "Thêm khoa thất bại!"
@@ -111,7 +111,7 @@ export default function Department() {
     const res = await dispatch(deleteDepartmentAction(id));
     if (res.success) {
       messageApi.success("Xoá khoa thành công!");
-      dispatch(getAllAction());
+      dispatch(getAllAction(statusFilter));
     } else {
       messageApi.error("Xoá khoa thất bại!");
     }
@@ -136,14 +136,14 @@ export default function Department() {
   });
 
   const handleStatus = (value) => {
-    if (value === "all") {
-      dispatch(getAllAction({}));
-    } else if (value === "active") {
-      dispatch(getAllAction(statusFilter));
-    } else {
-      dispatch(getAllAction(statusFilter));
-    }
     setStatusFilter(value);
+    // if (value === "all") {
+    //   dispatch(getAllAction({}));
+    // } else if (value === "active") {
+    //   dispatch(getAllAction(statusFilter));
+    // } else {
+    //   dispatch(getAllAction(statusFilter));
+    // }
   };
 
   const toggleColumn = (columnKey) => {
