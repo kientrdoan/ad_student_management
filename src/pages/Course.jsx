@@ -143,21 +143,29 @@ export default function Course() {
     setEditingRecord(record);
     setIsModalVisible(true);
 
-    // // Load môn học theo ngành
-    console.log("record", record);
-    if (record.class_st) {
-      dispatch(getAllSubjectByMajorAction(record.class_st.major_id));
+    const majorId =
+      record?.class_st?.major_id ??
+      record?.class_st?.major?.major_id ??
+      record?.class_st?.major?.id ??
+      null;
+
+    if (majorId) {
+      dispatch(getAllSubjectByMajorAction(majorId));
     }
 
-    if (record.class_st) {
-      dispatch(getTeacherByDepartmentAction(record.class_st.department_id));
+    const departmentId =
+      record?.class_st?.department_id ??
+      record?.class_st?.major?.department_id ??
+      null;
+    if (departmentId) {
+      dispatch(getTeacherByDepartmentAction(departmentId));
     }
 
-    // Set các field vào form, bao gồm subject
+    // Set các field vào form, bao gồm subject (set id để Form quản lý)
     form.setFieldsValue({
       semester: record.semester?.id,
       class_st: record.class_st?.id,
-      subject: record.subject?.id, // <-- quan trọng
+      subject: record.subject?.id,
       start_date: record.start_date ? dayjs(record.start_date) : null,
       end_date: record.end_date ? dayjs(record.end_date) : null,
       max_capacity: record.max_capacity,
@@ -167,12 +175,7 @@ export default function Course() {
       teacher: record.teacher?.id,
     });
 
-    // Khi mở Edit Modal
-    if (record.class_st?.major?.major_id) {
-      dispatch(getAllSubjectByMajorAction(record.class_st.major.major_id));
-    }
-
-    // Set selected subject = môn của record
+    // Lưu subject object để hiển thị fallback nếu options chưa có
     setSelectedSubject(record.subject);
   };
 
@@ -529,11 +532,11 @@ export default function Course() {
       const res = await dispatch(addCourseAction(formData));
 
       if (res?.success) {
-        messageApi.success(
-          `Thêm thành công: ${res.data} lớp tín chỉ`
-        );
+        messageApi.success(`Thêm thành công: ${res.data} lớp tín chỉ`);
       } else {
-        messageApi.error("Thêm thất bại. Vui lòng kiểm tra lại dữ liệu đầu vào!");
+        messageApi.error(
+          "Thêm thất bại. Vui lòng kiểm tra lại dữ liệu đầu vào!"
+        );
       }
 
       // Refresh danh sách
@@ -768,18 +771,34 @@ export default function Course() {
               >
                 <Select
                   placeholder='Vui lòng chọn môn học'
-                  value={selectedSubject?.id} // quan trọng để hiển thị đúng môn học hiện tại
                   onChange={(value) => {
                     const subject = subjects_majors.find((s) => s.id === value);
                     setSelectedSubject(subject);
                     // form.setFieldsValue({ start_date: null, end_date: null });
                   }}
                 >
+                  {/* Render options chính */}
                   {subjects_majors?.map((s) => (
                     <Select.Option key={s.id} value={s.id}>
                       {s.name} ({s.credit} tín chỉ)
                     </Select.Option>
                   ))}
+
+                  {/* Nếu đang edit và môn hiện tại chưa có trong subjects_majors, thêm fallback Option để hiển thị tên */}
+                  {selectedSubject &&
+                    !subjects_majors?.some(
+                      (s) => s.id === selectedSubject.id
+                    ) && (
+                      <Select.Option
+                        key={selectedSubject.id}
+                        value={selectedSubject.id}
+                      >
+                        {selectedSubject.name}{" "}
+                        {selectedSubject.credit
+                          ? `(${selectedSubject.credit} tín chỉ)`
+                          : ""}
+                      </Select.Option>
+                    )}
                 </Select>
               </Form.Item>
             </Col>
