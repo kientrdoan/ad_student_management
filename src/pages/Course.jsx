@@ -56,6 +56,7 @@ import { getAllRoomAction } from "../redux/actions/RoomAction";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
 import { BiRecycle } from "react-icons/bi";
+import { Link } from "react-router-dom";
 
 export default function Course() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -288,6 +289,25 @@ export default function Course() {
       visible: visibleColumns.id,
     },
     {
+      title: "Môn học",
+      dataIndex: "subject",
+      key: "subject",
+      render: (subject, record) => {
+        if (!subject) return "N/A";
+        console.log(record)
+
+        return (
+          <Link
+            to={`/time-slot/${record.id}`}
+            className='text-blue-600 hover:underline'
+          >
+            {subject.name}
+          </Link>
+        );
+      },
+      visible: visibleColumns.subject,
+    },
+    {
       title: "Học kỳ",
       dataIndex: "semester",
       key: "semester",
@@ -313,13 +333,6 @@ export default function Course() {
       key: "teacher",
       render: (instructor) => instructor?.name || "N/A",
       visible: visibleColumns.teacher,
-    },
-    {
-      title: "Môn học",
-      dataIndex: "subject",
-      key: "subject",
-      render: (subject) => subject?.name || "N/A",
-      visible: visibleColumns.subject,
     },
     {
       title: "Phòng",

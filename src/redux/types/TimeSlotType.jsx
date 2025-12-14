@@ -1,0 +1,1 @@
+export const GET_ALL_TIME_SLOT = "GET_ALL_TIME_SLOT"

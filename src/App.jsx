@@ -25,6 +25,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { LOGIN_ACTION } from "./redux/types/UserType";
+import TimeSlot from "./pages/time_slot";
 
 function App() {
   const dispatch = useDispatch();
@@ -84,6 +85,8 @@ function App() {
             <Route path='subjects/detail' element={<SubjectDetail />} />
             <Route path='subjects/detail/:id' element={<SubjectDetail />} />
             <Route path='rooms' element={<Room />} />
+
+            <Route path='time-slot/:id' element={<TimeSlot />} />
           </Route>
         </Route>
 
