@@ -53,10 +53,10 @@ export default function Teacher() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteTeacherAction(id));
     if (res.success) {
-      message.success("Xoá teacher thành công!");
+      message.success("Thành công!");
       dispatch(getAllTeacherAction(statusFilter));
     } else {
-      message.error("Xoá thất bại!");
+      message.error("Thất bại!");
     }
   };
 

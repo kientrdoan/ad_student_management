@@ -22,11 +22,11 @@ export class SemesterService extends BaseService {
   }
 
   editSemester = (id, payload) => {
-    return this.put(`/admins/semesters/${id}`, payload)
+    return this.put_token(`/admins/semesters/${id}`, payload)
   }
 
   deleteSemester = (id) => {
-    return this.delete(`/admins/semesters/${id}`)
+    return this.delete_token(`/admins/semesters/${id}`)
   }
 }
 

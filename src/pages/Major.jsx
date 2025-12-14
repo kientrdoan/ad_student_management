@@ -74,7 +74,7 @@ export default function Major() {
     setEditingRecord(record);
     form.setFieldsValue({
       name: record.name,
-      department: record.department,
+      department: record.department?.department_id,
     });
     setIsModalVisible(true);
   };
@@ -82,14 +82,15 @@ export default function Major() {
   const handleOk = async () => {
     const values = await form.validateFields();
     if (editingRecord) {
+      console.log(editingRecord)
       const res = await dispatch(
-        editMajorAction({ ...editingRecord, ...values })
+        editMajorAction(editingRecord.id, { ...editingRecord.id, ...values })
       );
       if (res.success) {
-        messageApi.success("edit major successfully!");
+        messageApi.success("Cập nhật thông tin ngành thành công!");
         dispatch(getAllMajorAction(statusFilter));
       } else {
-        messageApi.error("Failed to edit major!");
+        messageApi.error("Cập nhật thông tin ngành thất bại!");
       }
     } else {
       const res = await dispatch(addMajorAction(values));

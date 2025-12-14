@@ -22,11 +22,11 @@ export class TeacherService extends BaseService {
   }
 
   editTeacher = (id, payload) => {
-    return this.put(`/admins/teachers/${id}`, payload)
+    return this.put_token(`/admins/teachers/${id}`, payload)
   }
 
   deleteTeacher = (id) => {
-    return this.delete(`/admins/teachers/${id}`)
+    return this.delete_token(`/admins/teachers/${id}`)
   }
 }
 

@@ -125,10 +125,10 @@ export default function Semester() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteSemesterAction(id));
     if (res.success) {
-      messageApi.success("Xoá semester thành công!");
+      messageApi.success("Thành công!");
       dispatch(getAllSemesterAction(statusFilter));
     } else {
-      messageApi.error("Xoá thất bại!");
+      messageApi.error("Thất bại!");
     }
   };
 

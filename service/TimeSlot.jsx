@@ -10,7 +10,7 @@ export class TimeSlotService extends BaseService {
   };
 
   updateDateTimeSlotByCourse = (course_id, payload) => {
-    return this.put(`/admins/time-slot/${course_id}`, payload);
+    return this.put_token(`/admins/time-slot/${course_id}`, payload);
   };
 }
 

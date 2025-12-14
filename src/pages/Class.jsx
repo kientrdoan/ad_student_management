@@ -141,10 +141,10 @@ export default function Class() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteClassAction(id));
     if (res.success) {
-      messageApi.success("Xoá lớp sinh viên thành công!");
+      messageApi.success("Thành công!");
       dispatch(getAllClassAction(statusFilter));
     } else {
-      messageApi.error("Xoá thất bại!");
+      messageApi.error("Thất bại!");
     }
   };
 

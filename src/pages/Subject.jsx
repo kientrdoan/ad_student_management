@@ -96,10 +96,10 @@ export default function Subject() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteSubjectAction(id));
     if (res.success) {
-      message.success("Xoá môn học thành công!");
+      message.success("Thành công!");
       dispatch(getAllSubjectAction(statusFilter));
     } else {
-      message.error("Xoá thất bại!");
+      message.error("Thất bại!");
     }
   };
 

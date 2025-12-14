@@ -87,7 +87,7 @@ export default function Room() {
         const res = await dispatch(addRoomAction(values));
         if (res.success) {
           messageApi.success("Thêm thành công!");
-          dispatch(getAllRoomAction());
+          dispatch(getAllRoomAction("active"));
         } else {
           messageApi.error(res?.error?.response?.data?.message);
         }
@@ -131,10 +131,10 @@ export default function Room() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteRoomAction(id));
     if (res.success) {
-      messageApi.success("Xoá phòng thành công!");
+      messageApi.success("Thành công!");
       dispatch(getAllRoomAction(statusFilter));
     } else {
-      messageApi.error("Xoá thất bại!");
+      messageApi.error("Thất bại!");
     }
   };
 

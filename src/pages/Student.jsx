@@ -64,10 +64,10 @@ export default function Student() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteStudentAction(id));
     if (res.success) {
-      message.success("Xoá student thành công!");
+      message.success("Thành công!");
       dispatch(getAllStudentAction(statusFilter, selectedClassId));
     } else {
-      message.error("Xoá thất bại!");
+      message.error("Thất bại!");
     }
   };
 

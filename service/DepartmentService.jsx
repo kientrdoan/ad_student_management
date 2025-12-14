@@ -14,11 +14,11 @@ export class DepartmentService extends BaseService {
   }
 
   editDepartment = (id, payload) => {
-    return this.put(`/admins/departments/${id}`, payload)
+    return this.put_token(`/admins/departments/${id}`, payload)
   }
 
   deleteDepartment = (id) => {
-    return this.delete(`/admins/departments/${id}`)
+    return this.delete_token(`/admins/departments/${id}`)
   }
 }
 

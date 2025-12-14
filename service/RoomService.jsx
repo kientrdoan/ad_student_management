@@ -18,11 +18,11 @@ export class RoomService extends BaseService {
   }
 
   editRoom = (id, payload) => {
-    return this.put(`/admins/rooms/${id}`, payload)
+    return this.put_token(`/admins/rooms/${id}`, payload)
   }
 
   deleteRoom = (id) => {
-    return this.delete(`/admins/rooms/${id}`)
+    return this.delete_token(`/admins/rooms/${id}`)
   }
 }
 

@@ -18,11 +18,11 @@ export class StudentService extends BaseService {
   }
 
   editStudent = (id, payload) => {
-    return this.put(`/admins/students/${id}`, payload)
+    return this.put_token(`/admins/students/${id}`, payload)
   }
 
   deleteStudent = (id) => {
-    return this.delete(`/admins/students/${id}`)
+    return this.delete_token(`/admins/students/${id}`)
   }
 }
 

@@ -21,12 +21,16 @@ export class CourseService extends BaseService {
     return this.post_token(`/admins/courses/`, payload)
   }
 
+  addCourseFromFile = (payload) => {
+    return this.post_token(`/admins/courses/file`, payload)
+  }
+
   editCourse = (id, payload) => {
-    return this.put(`/admins/course/${id}`, payload)
+    return this.put_token(`/admins/course/${id}`, payload)
   }
 
   deleteCourse = (id) => {
-    return this.delete(`/admins/course/${id}`)
+    return this.delete_token(`/admins/course/${id}`)
   }
 
   setSchedule = (payload) => {

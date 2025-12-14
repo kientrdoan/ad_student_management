@@ -110,10 +110,10 @@ export default function Department() {
   const handleDelete = async (id) => {
     const res = await dispatch(deleteDepartmentAction(id));
     if (res.success) {
-      messageApi.success("Xoá khoa thành công!");
+      messageApi.success("Thành công!");
       dispatch(getAllAction(statusFilter));
     } else {
-      messageApi.error("Xoá khoa thất bại!");
+      messageApi.error("Thất bại!");
     }
   };
 

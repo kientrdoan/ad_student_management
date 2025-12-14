@@ -151,6 +151,21 @@ export const addCourseAction = (payload) => {
   };
 };
 
+export const addCourseFromFileAction = (payload) => {
+  return async (dispatch) => {
+    try {
+      const result = await courseService.addCourseFromFile(payload);
+      console.log("result", result)
+      if (result.status === 200) {
+        return { success: true, data: result.data.data };
+      }
+    } catch (error) {
+      console.log("error", error);
+      return { success: false, error };
+    }
+  };
+};
+
 
 export const editCourseAction = (id, payload) => {
   return async (dispatch) => {

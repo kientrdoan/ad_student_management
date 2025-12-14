@@ -42,10 +42,10 @@ export const addMajorAction = (payload) => {
   };
 };
 
-export const editMajorAction = (payload) => {
+export const editMajorAction = (id, payload) => {
   return async (dispatch) => {
     try {
-      const result = await majorService.editMajor(payload);
+      const result = await majorService.editMajor(id, payload);
       console.log("result", result.data);
       if (result.status === 200) {
         return { success: true, data: result.data.data };

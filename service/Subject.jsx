@@ -22,11 +22,11 @@ export class SubjectService extends BaseService {
   }
 
   editSubject = (id, payload) => {
-    return this.put(`/admins/subjects/${id}`, payload)
+    return this.put_token(`/admins/subjects/${id}`, payload)
   }
 
   deleteSubject = (id) => {
-    return this.delete(`/admins/subjects/${id}`)
+    return this.delete_token(`/admins/subjects/${id}`)
   }
 }
 

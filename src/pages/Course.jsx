@@ -32,6 +32,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   addCourseAction,
+  addCourseFromFileAction,
   deleteCourseAction,
   editCourseAction,
   // getAllCourseAction,
@@ -542,7 +543,7 @@ export default function Course() {
       formData.append("semester_id", semester);
 
       // Gọi API upload file
-      const res = await dispatch(addCourseAction(formData));
+      const res = await dispatch(addCourseFromFileAction(formData));
 
       if (res?.success) {
         messageApi.success(`Thêm thành công: ${res.data} lớp tín chỉ`);
