@@ -46,7 +46,8 @@ export default function Class() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     name: true,
     major: true,
     start_year: true,
@@ -93,9 +94,7 @@ export default function Class() {
         res = await dispatch(addClassAction(values));
       }
       if (res?.success) {
-        messageApi.success(
-          `${editingRecord ? "Sửa" : "Thêm"} thành công!`
-        );
+        messageApi.success(`${editingRecord ? "Sửa" : "Thêm"} thành công!`);
         dispatch(getAllClassAction(statusFilter));
         setIsModalVisible(false);
       } else {
@@ -150,14 +149,25 @@ export default function Class() {
 
   const columnMenu = {
     items: [
-      {
-        key: "id",
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
+       {
+        key: "stt",
         label: (
           <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
           >
-            ID
+            stt
           </Checkbox>
         ),
       },
@@ -168,7 +178,7 @@ export default function Class() {
             checked={visibleColumns.name}
             onChange={() => toggleColumn("name")}
           >
-            Name
+            Tên lớp
           </Checkbox>
         ),
       },
@@ -179,7 +189,7 @@ export default function Class() {
             checked={visibleColumns.major}
             onChange={() => toggleColumn("major")}
           >
-            Major
+            Ngành
           </Checkbox>
         ),
       },
@@ -190,7 +200,7 @@ export default function Class() {
             checked={visibleColumns.start_year}
             onChange={() => toggleColumn("start_year")}
           >
-            Start Year
+            Năm bắt đầu
           </Checkbox>
         ),
       },
@@ -201,7 +211,7 @@ export default function Class() {
             checked={visibleColumns.end_year}
             onChange={() => toggleColumn("end_year")}
           >
-            End Year
+            Năm kết thúc
           </Checkbox>
         ),
       },
@@ -212,7 +222,7 @@ export default function Class() {
             checked={visibleColumns.created_at}
             onChange={() => toggleColumn("created_at")}
           >
-            Created At
+            Ngày tạo
           </Checkbox>
         ),
       },
@@ -223,7 +233,7 @@ export default function Class() {
             checked={visibleColumns.updated_at}
             onChange={() => toggleColumn("updated_at")}
           >
-            Updated At
+            Cập nhật gần nhất
           </Checkbox>
         ),
       },
@@ -231,12 +241,20 @@ export default function Class() {
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   visible: visibleColumns.id,
+    //   width: 70,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      visible: visibleColumns.id,
+      title: "STT",
+      key: "stt",
       width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Tên lớp",
@@ -307,7 +325,7 @@ export default function Class() {
     {
       title: "Action",
       key: "action",
-     render: (_, record) =>
+      render: (_, record) =>
         record.is_deleted === true ? (
           <Button
             type='link'
@@ -324,7 +342,7 @@ export default function Class() {
               className='text-indigo-600'
             />
             <Popconfirm
-              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              title='Bạn có chắc muốn xoá thông tin lớp sinh viên này?'
               okText='OK'
               cancelText='Hủy'
               onConfirm={() => handleDelete(record.id)}

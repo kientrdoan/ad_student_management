@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ad_student_management:latest
+    container_name: ad_student_management
+    ports:
+      - "5173:80"
+    restart: unless-stopped

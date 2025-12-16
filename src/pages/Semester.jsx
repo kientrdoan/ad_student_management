@@ -45,7 +45,8 @@ export default function Semester() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     year: true,
     semesters: true,
     start_date: true,
@@ -160,27 +161,161 @@ export default function Semester() {
     }));
   };
 
+  // const columnMenu = {
+  //   items: Object.keys(visibleColumns).map((key) => ({
+  //     key,
+  //     label: (
+  //       <Checkbox
+  //         checked={visibleColumns[key]}
+  //         onChange={() => toggleColumn(key)}
+  //       >
+  //         {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+  //       </Checkbox>
+  //     ),
+  //   })),
+  // };
+
   const columnMenu = {
-    items: Object.keys(visibleColumns).map((key) => ({
-      key,
-      label: (
-        <Checkbox
-          checked={visibleColumns[key]}
-          onChange={() => toggleColumn(key)}
-        >
-          {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-        </Checkbox>
-      ),
-    })),
+    items: [
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
+      {
+        key: "stt",
+        label: (
+          <Checkbox
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
+          >
+            stt
+          </Checkbox>
+        ),
+      },
+      {
+        key: "year",
+        label: (
+          <Checkbox
+            checked={visibleColumns.year}
+            onChange={() => toggleColumn("year")}
+          >
+            Năm học
+          </Checkbox>
+        ),
+      },
+      {
+        key: "semesters",
+        label: (
+          <Checkbox
+            checked={visibleColumns.semesters}
+            onChange={() => toggleColumn("semesters")}
+          >
+            Học kỳ
+          </Checkbox>
+        ),
+      },
+      {
+        key: "start_date",
+        label: (
+          <Checkbox
+            checked={visibleColumns.start_date}
+            onChange={() => toggleColumn("start_date")}
+          >
+            Ngày bắt đầu
+          </Checkbox>
+        ),
+      },
+      {
+        key: "end_date",
+        label: (
+          <Checkbox
+            checked={visibleColumns.end_date}
+            onChange={() => toggleColumn("end_date")}
+          >
+            Ngày kết thúc
+          </Checkbox>
+        ),
+      },
+      {
+        key: "open_date",
+        label: (
+          <Checkbox
+            checked={visibleColumns.open_date}
+            onChange={() => toggleColumn("open_date")}
+          >
+            Ngày mở
+          </Checkbox>
+        ),
+      },
+      {
+        key: "close_date",
+        label: (
+          <Checkbox
+            checked={visibleColumns.close_date}
+            onChange={() => toggleColumn("close_date")}
+          >
+            Ngày đóng
+          </Checkbox>
+        ),
+      },
+      {
+        key: "is_deleted",
+        label: (
+          <Checkbox
+            checked={visibleColumns.is_deleted}
+            onChange={() => toggleColumn("is_deleted")}
+          >
+            Trạng thái
+          </Checkbox>
+        ),
+      },
+      {
+        key: "created_at",
+        label: (
+          <Checkbox
+            checked={visibleColumns.created_at}
+            onChange={() => toggleColumn("created_at")}
+          >
+            Ngày tạo
+          </Checkbox>
+        ),
+      },
+      {
+        key: "updated_at",
+        label: (
+          <Checkbox
+            checked={visibleColumns.updated_at}
+            onChange={() => toggleColumn("updated_at")}
+          >
+            Cập nhật gần nhất
+          </Checkbox>
+        ),
+      },
+    ],
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   visible: visibleColumns.id,
+    //   width: 80,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      visible: visibleColumns.id,
-      width: 80,
+      title: "STT",
+      key: "stt",
+      width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Năm học",
@@ -267,7 +402,7 @@ export default function Semester() {
               className='text-indigo-600'
             />
             <Popconfirm
-              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              title='Bạn có chắc muốn xoá thông tin học kỳ này?'
               okText='OK'
               cancelText='Hủy'
               onConfirm={() => handleDelete(record.id)}
@@ -294,7 +429,7 @@ export default function Semester() {
               <CalendarOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className='text-2xl font-bold text-gray-900'>Semesters</h1>
+              <h1 className='text-2xl font-bold text-gray-900'>Học kỳ</h1>
               <p className='text-sm text-gray-500'>
                 Manage academic semester periods
               </p>

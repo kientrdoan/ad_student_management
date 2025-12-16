@@ -59,6 +59,33 @@ import * as XLSX from "xlsx";
 import { BiRecycle } from "react-icons/bi";
 import { Link } from "react-router-dom";
 
+const columnLabels = {
+  stt: "STT",
+  subject: "Môn học",
+  semester: "Học kỳ",
+  class_st: "Lớp sinh viên",
+  teacher: "Giáo viên",
+  room: "Phòng",
+  max_capacity: "Số lượng tối đa",
+  start_date: "Ngày bắt đầu",
+  end_date: "Ngày kết thúc",
+  weekday: "Thứ",
+  start_period: "Tiết bắt đầu",
+  is_deleted: "Trạng thái",
+  created_at: "Ngày tạo",
+  updated_at: "Cập nhật gần nhất",
+};
+
+const weekdayLabels = {
+  Monday: "Thứ 2",
+  Tuesday: "Thứ 3",
+  Wednesday: "Thứ 4",
+  Thursday: "Thứ 5",
+  Friday: "Thứ 6",
+  Saturday: "Thứ 7",
+  Sunday: "Chủ nhật",
+};
+
 export default function Course() {
   const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
@@ -97,7 +124,8 @@ export default function Course() {
   const [selectedSubject, setSelectedSubject] = useState(null);
 
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     semester: true,
     class_st: true,
     teacher: true,
@@ -202,8 +230,8 @@ export default function Course() {
       if (res.success) {
         messageApi.success(
           editingRecord
-            ? "Edit course successfully!"
-            : "Add course successfully!"
+            ? "Cập nhật thành công!"
+            : "Thêm thành công!"
         );
         dispatch(getAllCourseBySemesterAction(semester, statusFilter));
         setIsModalVisible(false);
@@ -275,19 +303,27 @@ export default function Course() {
           checked={visibleColumns[key]}
           onChange={() => toggleColumn(key)}
         >
-          {key}
+          {columnLabels[key] || key}
         </Checkbox>
       ),
     })),
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   width: 80,
+    //   visible: visibleColumns.id,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      width: 80,
-      visible: visibleColumns.id,
+      title: "STT",
+      key: "stt",
+      width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Môn học",
@@ -295,7 +331,7 @@ export default function Course() {
       key: "subject",
       render: (subject, record) => {
         if (!subject) return "N/A";
-        console.log(record)
+        console.log(record);
 
         return (
           <Link
@@ -366,6 +402,10 @@ export default function Course() {
       dataIndex: "weekday",
       key: "weekday",
       visible: visibleColumns.weekday,
+      render: (weekday) => {
+        const key = weekday;
+        return weekdayLabels[key] || "N/A";
+      },
     },
     {
       title: "Tiết bắt đầu",
@@ -421,7 +461,7 @@ export default function Course() {
               className='text-indigo-600'
             />
             <Popconfirm
-              title='Bạn có chắc muốn xoá thông tin lop này?'
+              title='Bạn có chắc muốn xoá thông tin lớp tín chỉ này này?'
               okText='OK'
               cancelText='Hủy'
               onConfirm={() => handleDelete(record.id)}

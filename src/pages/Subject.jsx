@@ -39,7 +39,8 @@ export default function Subject() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     code: true,
     name: true,
     credit: true,
@@ -105,14 +106,25 @@ export default function Subject() {
 
   const columnMenu = {
     items: [
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
       {
-        key: "id",
+        key: "stt",
         label: (
           <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
           >
-            ID
+            STT
           </Checkbox>
         ),
       },
@@ -123,7 +135,7 @@ export default function Subject() {
             checked={visibleColumns.code}
             onChange={() => toggleColumn("code")}
           >
-            Code
+            Mã môn
           </Checkbox>
         ),
       },
@@ -134,7 +146,7 @@ export default function Subject() {
             checked={visibleColumns.name}
             onChange={() => toggleColumn("name")}
           >
-            Name
+            Tên môn
           </Checkbox>
         ),
       },
@@ -145,7 +157,7 @@ export default function Subject() {
             checked={visibleColumns.credit}
             onChange={() => toggleColumn("credit")}
           >
-            Credit
+            Số tín chỉ
           </Checkbox>
         ),
       },
@@ -156,7 +168,7 @@ export default function Subject() {
             checked={visibleColumns.total_period}
             onChange={() => toggleColumn("total_period")}
           >
-            Total Period
+            Tổng số tiết
           </Checkbox>
         ),
       },
@@ -167,11 +179,21 @@ export default function Subject() {
             checked={visibleColumns.major}
             onChange={() => toggleColumn("major")}
           >
-            Major
+            Ngành
           </Checkbox>
         ),
       },
-
+      {
+        key: "is_deleted",
+        label: (
+          <Checkbox
+            checked={visibleColumns.is_deleted}
+            onChange={() => toggleColumn("is_deleted")}
+          >
+            Trạng thái
+          </Checkbox>
+        ),
+      },
       {
         key: "created_at",
         label: (
@@ -179,7 +201,7 @@ export default function Subject() {
             checked={visibleColumns.created_at}
             onChange={() => toggleColumn("created_at")}
           >
-            Created At
+            Ngày tạo
           </Checkbox>
         ),
       },
@@ -190,7 +212,7 @@ export default function Subject() {
             checked={visibleColumns.updated_at}
             onChange={() => toggleColumn("updated_at")}
           >
-            Updated At
+            Cập nhật gần nhất
           </Checkbox>
         ),
       },
@@ -198,12 +220,20 @@ export default function Subject() {
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   width: 70,
+    //   visible: visibleColumns.id,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "STT",
+      key: "stt",
       width: 70,
-      visible: visibleColumns.id,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Mã môn",

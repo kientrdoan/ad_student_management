@@ -47,7 +47,8 @@ export default function Department() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     code: true,
     name: true,
     is_deleted: true,
@@ -153,27 +154,117 @@ export default function Department() {
     }));
   };
 
+  // const columnMenu = {
+  //   items: Object.keys(visibleColumns).map((key) => ({
+  //     key,
+  //     label: (
+  //       <Checkbox
+  //         checked={visibleColumns[key]}
+  //         onChange={() => toggleColumn(key)}
+  //       >
+  //         {key}
+  //       </Checkbox>
+  //     ),
+  //   })),
+  // };
+
   const columnMenu = {
-    items: Object.keys(visibleColumns).map((key) => ({
-      key,
-      label: (
-        <Checkbox
-          checked={visibleColumns[key]}
-          onChange={() => toggleColumn(key)}
-        >
-          {key}
-        </Checkbox>
-      ),
-    })),
+    items: [
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
+      {
+        key: "stt",
+        label: (
+          <Checkbox
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
+          >
+            stt
+          </Checkbox>
+        ),
+      },
+      {
+        key: "code",
+        label: (
+          <Checkbox
+            checked={visibleColumns.code}
+            onChange={() => toggleColumn("code")}
+          >
+            Mã khoa
+          </Checkbox>
+        ),
+      },
+      {
+        key: "name",
+        label: (
+          <Checkbox
+            checked={visibleColumns.name}
+            onChange={() => toggleColumn("name")}
+          >
+            Tên khoa
+          </Checkbox>
+        ),
+      },
+        {
+        key: "is_deleted",
+        label: (
+          <Checkbox
+            checked={visibleColumns.is_deleted}
+            onChange={() => toggleColumn("is_deleted")}
+          >
+            Trạng thái
+          </Checkbox>
+        ),
+      },
+      {
+        key: "created_at",
+        label: (
+          <Checkbox
+            checked={visibleColumns.created_at}
+            onChange={() => toggleColumn("created_at")}
+          >
+            Ngày tạo
+          </Checkbox>
+        ),
+      },
+      {
+        key: "updated_at",
+        label: (
+          <Checkbox
+            checked={visibleColumns.updated_at}
+            onChange={() => toggleColumn("updated_at")}
+          >
+            Cập nhật gần nhất
+          </Checkbox>
+        ),
+      },
+    ],
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   visible: visibleColumns.id,
+    //   width: 80,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      visible: visibleColumns.id,
-      width: 80,
+      title: "STT",
+      key: "stt",
+      width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Mã khoa",
@@ -263,7 +354,7 @@ export default function Department() {
               <ApartmentOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className='text-2xl font-bold text-gray-900'>Departments</h1>
+              <h1 className='text-2xl font-bold text-gray-900'>Khoa</h1>
               <p className='text-sm text-gray-500'>
                 Manage department information and structure
               </p>

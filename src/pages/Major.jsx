@@ -48,7 +48,8 @@ export default function Major() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     name: true,
     department: true,
     created_at: true,
@@ -82,7 +83,7 @@ export default function Major() {
   const handleOk = async () => {
     const values = await form.validateFields();
     if (editingRecord) {
-      console.log(editingRecord)
+      console.log(editingRecord);
       const res = await dispatch(
         editMajorAction(editingRecord.id, { ...editingRecord.id, ...values })
       );
@@ -98,9 +99,9 @@ export default function Major() {
         messageApi.success("Thêm ngành thành công!");
         dispatch(getAllMajorAction(statusFilter));
       } else {
-         messageApi.error(
-            res.error?.response?.data?.message || "Thêm ngành thất bại!"
-          );
+        messageApi.error(
+          res.error?.response?.data?.message || "Thêm ngành thất bại!"
+        );
       }
     }
     setIsModalVisible(false);
@@ -153,14 +154,25 @@ export default function Major() {
 
   const columnMenu = {
     items: [
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
       {
-        key: "id",
+        key: "stt",
         label: (
           <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
           >
-            ID
+            stt
           </Checkbox>
         ),
       },
@@ -171,7 +183,7 @@ export default function Major() {
             checked={visibleColumns.name}
             onChange={() => toggleColumn("name")}
           >
-            Name
+            Tên ngành
           </Checkbox>
         ),
       },
@@ -182,7 +194,18 @@ export default function Major() {
             checked={visibleColumns.department}
             onChange={() => toggleColumn("department")}
           >
-            Department
+            Khoa
+          </Checkbox>
+        ),
+      },
+      {
+        key: "is_deleted",
+        label: (
+          <Checkbox
+            checked={visibleColumns.is_deleted}
+            onChange={() => toggleColumn("is_deleted")}
+          >
+            Trạng thái
           </Checkbox>
         ),
       },
@@ -193,7 +216,7 @@ export default function Major() {
             checked={visibleColumns.created_at}
             onChange={() => toggleColumn("created_at")}
           >
-            Created At
+            Ngày tạo
           </Checkbox>
         ),
       },
@@ -204,7 +227,7 @@ export default function Major() {
             checked={visibleColumns.updated_at}
             onChange={() => toggleColumn("updated_at")}
           >
-            Updated At
+            Cập nhật gần nhất
           </Checkbox>
         ),
       },
@@ -212,13 +235,22 @@ export default function Major() {
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   visible: visibleColumns.id,
+    //   width: 80,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      visible: visibleColumns.id,
-      width: 80,
+      title: "STT",
+      key: "stt",
+      width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
+
     {
       title: "Tên ngành",
       dataIndex: "name",
@@ -287,7 +319,7 @@ export default function Major() {
               className='text-indigo-600'
             />
             <Popconfirm
-              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              title='Bạn có chắc muốn xoá thông tin ngành học này?'
               okText='OK'
               cancelText='Hủy'
               onConfirm={() => handleDelete(record.id)}
@@ -314,7 +346,7 @@ export default function Major() {
               <FundOutlined className='text-indigo-600 text-lg' />
             </div>
             <div>
-              <h1 className='text-2xl font-bold text-gray-900'>Majors</h1>
+              <h1 className='text-2xl font-bold text-gray-900'>Ngành</h1>
               <p className='text-sm text-gray-500'>
                 Manage major programs and specializations
               </p>

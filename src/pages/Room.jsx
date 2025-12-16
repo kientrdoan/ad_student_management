@@ -44,7 +44,8 @@ export default function Room() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     room_code: true,
     building: true,
     max_capacity: true,
@@ -140,14 +141,25 @@ export default function Room() {
 
   const columnMenu = {
     items: [
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
       {
-        key: "id",
+        key: "stt",
         label: (
           <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
           >
-            ID
+            STT
           </Checkbox>
         ),
       },
@@ -158,7 +170,7 @@ export default function Room() {
             checked={visibleColumns.room_code}
             onChange={() => toggleColumn("room_code")}
           >
-            Room Code
+            Mã phòng
           </Checkbox>
         ),
       },
@@ -169,7 +181,7 @@ export default function Room() {
             checked={visibleColumns.building}
             onChange={() => toggleColumn("building")}
           >
-            Building
+            Toà
           </Checkbox>
         ),
       },
@@ -180,7 +192,18 @@ export default function Room() {
             checked={visibleColumns.max_capacity}
             onChange={() => toggleColumn("max_capacity")}
           >
-            Max Capacity
+            Số lượng tối đa
+          </Checkbox>
+        ),
+      },
+      {
+        key: "is_active",
+        label: (
+          <Checkbox
+            checked={visibleColumns.is_active}
+            onChange={() => toggleColumn("is_active")}
+          >
+            Trạng thái
           </Checkbox>
         ),
       },
@@ -191,7 +214,7 @@ export default function Room() {
             checked={visibleColumns.created_at}
             onChange={() => toggleColumn("created_at")}
           >
-            Created At
+            Ngày tạo
           </Checkbox>
         ),
       },
@@ -202,7 +225,7 @@ export default function Room() {
             checked={visibleColumns.updated_at}
             onChange={() => toggleColumn("updated_at")}
           >
-            Updated At
+            Cập nhật gần nhất
           </Checkbox>
         ),
       },
@@ -210,12 +233,20 @@ export default function Room() {
   };
 
   const allColumns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      visible: visibleColumns.id,
-      width: 80,
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   visible: visibleColumns.id,
+    //   width: 80,
+    // },
+     {
+      title: "STT",
+      key: "stt",
+      width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Mã phòng",
@@ -284,7 +315,7 @@ export default function Room() {
               className='text-indigo-600'
             />
             <Popconfirm
-              title='Bạn có chắc muốn xoá thông tin khoa này?'
+              title='Bạn có chắc muốn xoá thông tin phòng học này?'
               okText='OK'
               cancelText='Hủy'
               onConfirm={() => handleDelete(record.id)}

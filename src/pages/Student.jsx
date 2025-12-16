@@ -38,7 +38,8 @@ export default function Student() {
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    // id: true,
+    stt: true,
     student_code: true,
     last_name: true,
     first_name: true,
@@ -103,14 +104,25 @@ export default function Student() {
 
   const columnMenu = {
     items: [
-      {
-        key: "id",
+      // {
+      //   key: "id",
+      //   label: (
+      //     <Checkbox
+      //       checked={visibleColumns.id}
+      //       onChange={() => toggleColumn("id")}
+      //     >
+      //       ID
+      //     </Checkbox>
+      //   ),
+      // },
+       {
+        key: "stt",
         label: (
           <Checkbox
-            checked={visibleColumns.id}
-            onChange={() => toggleColumn("id")}
+            checked={visibleColumns.stt}
+            onChange={() => toggleColumn("stt")}
           >
-            ID
+            STT
           </Checkbox>
         ),
       },
@@ -121,7 +133,7 @@ export default function Student() {
             checked={visibleColumns.student_code}
             onChange={() => toggleColumn("student_code")}
           >
-            Student Code
+            Mã sinh viên
           </Checkbox>
         ),
       },
@@ -132,7 +144,7 @@ export default function Student() {
             checked={visibleColumns.last_name}
             onChange={() => toggleColumn("last_name")}
           >
-            Last Name
+            Họ
           </Checkbox>
         ),
       },
@@ -143,7 +155,7 @@ export default function Student() {
             checked={visibleColumns.first_name}
             onChange={() => toggleColumn("first_name")}
           >
-            First Name
+            Tên
           </Checkbox>
         ),
       },
@@ -154,7 +166,7 @@ export default function Student() {
             checked={visibleColumns.class_student}
             onChange={() => toggleColumn("class_student")}
           >
-            Class
+            Lớp sinh viên
           </Checkbox>
         ),
       },
@@ -176,7 +188,18 @@ export default function Student() {
             checked={visibleColumns.phone}
             onChange={() => toggleColumn("phone")}
           >
-            Phone
+            Số điện thoại
+          </Checkbox>
+        ),
+      },
+      {
+        key: "is_deleted",
+        label: (
+          <Checkbox
+            checked={visibleColumns.is_deleted}
+            onChange={() => toggleColumn("is_deleted")}
+          >
+            Trạng thái
           </Checkbox>
         ),
       },
@@ -187,7 +210,7 @@ export default function Student() {
             checked={visibleColumns.created_at}
             onChange={() => toggleColumn("created_at")}
           >
-            Created At
+            Ngày tạo
           </Checkbox>
         ),
       },
@@ -198,7 +221,7 @@ export default function Student() {
             checked={visibleColumns.updated_at}
             onChange={() => toggleColumn("updated_at")}
           >
-            Updated At
+            Cập nhật gần nhất
           </Checkbox>
         ),
       },
@@ -206,12 +229,20 @@ export default function Student() {
   };
 
   const allColumns = [
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    //   visible: visibleColumns.id,
+    //   width: 70,
+    // },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      visible: visibleColumns.id,
+      title: "STT",
+      key: "stt",
       width: 70,
+      align: "center",
+      visible: visibleColumns.stt,
+      render: (_, __, index) => index + 1,
     },
     {
       title: "Mã sinh viên",
@@ -338,7 +369,7 @@ export default function Student() {
             </div>
             <div>
               <h1 className='text-3xl font-serif font-semibold text-gray-900'>
-                Students
+                Sinh viên
               </h1>
               <p className='text-sm text-gray-600 mt-1'>
                 Manage student information and records
