@@ -90,8 +90,8 @@ export default function SubjectDetail() {
               onValuesChange={(changedValues, allValues) => {
                 if (changedValues.credit !== undefined) {
                   form.setFieldsValue({
-                    // total_period: changedValues.credit * 15,
-                    total_period: changedValues.credit * 12,
+                    total_period: changedValues.credit * 15,
+                    // total_period: changedValues.credit * 12,
                   })
                 }
               }}>
