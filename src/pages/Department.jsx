@@ -356,7 +356,7 @@ export default function Department() {
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>Khoa</h1>
               <p className='text-sm text-gray-500'>
-                Manage department information and structure
+                Quản lý thông tin khoa
               </p>
             </div>
           </div>

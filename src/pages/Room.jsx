@@ -344,7 +344,7 @@ export default function Room() {
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>Phòng học</h1>
               <p className='text-sm text-gray-500'>
-                Manage classroom and facility information
+                Quản lý thông tin phòng học
               </p>
             </div>
           </div>

@@ -372,7 +372,7 @@ export default function Student() {
                 Sinh viên
               </h1>
               <p className='text-sm text-gray-600 mt-1'>
-                Manage student information and records
+                Quản lý thông tin sinh viên
               </p>
             </div>
           </div>

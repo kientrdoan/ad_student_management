@@ -237,7 +237,7 @@ export default function Course() {
         setIsModalVisible(false);
         form.resetFields();
       } else {
-        messageApi.error("Failed to save course!");
+        messageApi.error(res?.error ?.response?.data?.message || "Thất bại");
       }
     } catch (err) {
       console.log("Validate Failed:", err);
@@ -619,7 +619,7 @@ export default function Course() {
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>Lớp tín chỉ</h1>
               <p className='text-sm text-gray-500'>
-                Manage course schedules and assignments
+                Quản lý thông tin lớp tín chỉ
               </p>
             </div>
           </div>

@@ -337,7 +337,7 @@ export default function Teacher() {
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>Giáo viên</h1>
               <p className='text-sm text-gray-500'>
-                Manage teacher information and records
+                Quản lý thông tin giảng viên
               </p>
             </div>
           </div>

@@ -373,7 +373,7 @@ export default function Class() {
                 Lớp sinh viên
               </h1>
               <p className='text-sm text-gray-500'>
-                Manage class information and schedules
+                Quản lý thông tin lớp sinh viên
               </p>
             </div>
           </div>
