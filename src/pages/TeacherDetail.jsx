@@ -226,7 +226,7 @@ export default function TeacherDetail() {
                     name="title"
                     rules={[{ required: true, message: "Vui lòng nhập chức danh!" }]}
                   >
-                    <Input placeholder="VD: Giảng viên, Phó giáo sư" size="large" />
+                    <Input placeholder="VD: Giảng viên" size="large" />
                   </Form.Item>
                 </Col>
               </Row>
