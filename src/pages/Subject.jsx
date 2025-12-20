@@ -381,7 +381,7 @@ export default function Subject() {
 
           <Space size='middle'>
             <Input
-              placeholder='Search subjects...'
+              placeholder='Tìm kiếm...'
               prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}

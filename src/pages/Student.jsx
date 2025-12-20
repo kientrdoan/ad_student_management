@@ -402,7 +402,7 @@ export default function Student() {
 
           <Space size='middle'>
             <Input
-              placeholder='Search students...'
+              placeholder='Tìm kiếm...'
               prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}

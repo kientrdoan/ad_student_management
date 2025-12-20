@@ -375,7 +375,7 @@ export default function Department() {
 
           <Space size='middle'>
             <Input
-              placeholder='Search departments...'
+              placeholder='Tìm kiếm...'
               prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}

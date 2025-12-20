@@ -450,7 +450,7 @@ export default function Semester() {
 
           <Space size='middle'>
             <Input
-              placeholder='Search semesters...'
+              placeholder='Tìm kiếm...'
               prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}

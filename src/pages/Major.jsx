@@ -367,7 +367,7 @@ export default function Major() {
 
           <Space size='middle'>
             <Input
-              placeholder='Search majors...'
+              placeholder='Tìm kiếm...'
               prefix={<SearchOutlined className='text-gray-400' />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
