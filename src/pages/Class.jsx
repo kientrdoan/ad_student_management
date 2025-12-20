@@ -467,7 +467,7 @@ export default function Class() {
             name='major'
             rules={[{ required: true, message: "Vui lòng chọn ngành!" }]}
           >
-            <Select placeholder='Select major'>
+            <Select placeholder='Vui lòng chọn ngành'>
               {majors?.map((m) => (
                 <Select.Option key={m.id} value={m.id}>
                   {m.name}

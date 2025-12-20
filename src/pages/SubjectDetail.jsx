@@ -103,7 +103,7 @@ export default function SubjectDetail() {
                       name="code"
                       rules={[{ required: true, message: "Vui lòng nhập mã môn học!" }]}
                     >
-                      <Input placeholder="e.g. CS101" size="large" />
+                      <Input placeholder="e.g. LTW" size="large" />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
@@ -112,7 +112,7 @@ export default function SubjectDetail() {
                       name="name"
                       rules={[{ required: true, message: "Vui lòng nhập tên môn học!" }]}
                     >
-                      <Input placeholder="e.g. Introduction to Programming" size="large" />
+                      <Input placeholder="e.g. Lập trình web" size="large" />
                     </Form.Item>
                   </Col>
                 </Row>

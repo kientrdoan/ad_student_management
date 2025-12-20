@@ -695,7 +695,7 @@ export default function Course() {
               size='large'
               className='shadow-sm'
             >
-              Import data
+              Thêm bằng excel
             </Button>
           </div>
 
@@ -1094,7 +1094,7 @@ export default function Course() {
         okText='Xếp lịch'
         width={600}
       >
-        <p className='mb-2 font-semibold'>File danh sách lớp:</p>
+        <p className='mb-2 font-semibold'>File ràng buộc cứng:</p>
         <Upload
           accept='.xlsx,.xls'
           beforeUpload={() => false}
@@ -1126,7 +1126,7 @@ export default function Course() {
       </Modal>
 
       <Modal
-        title='Import Excel Courses'
+        title='Thêm khoá học'
         open={isImportModalVisible}
         onOk={handleImportOk}
         onCancel={() => setIsImportModalVisible(false)}
@@ -1147,8 +1147,7 @@ export default function Course() {
         </Upload>
 
         <p className='mt-2 text-gray-500 text-sm'>
-          Hỗ trợ: .xlsx | Format chứa các cột: semester, class, subject,
-          teacher, room, start_date...
+          Hỗ trợ: .xlsx
         </p>
       </Modal>
     </div>

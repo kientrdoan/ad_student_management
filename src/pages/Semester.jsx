@@ -520,7 +520,7 @@ export default function Semester() {
             name='semesters'
             rules={[{ required: true, message: "Vui lòng chọn học kỳ!" }]}
           >
-            <Select placeholder='Select semester'>
+            <Select placeholder='Chọn học kỳ'>
               <Select.Option value='Học kỳ 1'>Học kỳ 1</Select.Option>
               <Select.Option value='Học kỳ 2'>Học kỳ 2</Select.Option>
               <Select.Option value='Học kỳ 3'>Học kỳ 3</Select.Option>
