@@ -3,13 +3,14 @@
 import { teacherService } from "../../../service/TeacherService";
 import { GET_ALL_TEACHER, GET_ALL_TEACHER_BY_DEPARTMENT } from "../types/TeacherType";
 
-export const getAllTeacherAction = (statusFilter) => {
+export const getAllTeacherAction = (statusFilter, department_id = null) => {
   return async (dispatch) => {
     try {
       var payload = {}
       if(statusFilter !== "all"){
         payload = {
           is_deleted: statusFilter==="active"? 0 : 1,
+          department_id: department_id
         }
       }
       const result = await teacherService.getAllTeacher(payload);

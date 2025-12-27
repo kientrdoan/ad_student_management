@@ -28,10 +28,15 @@ import {
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { BiRecycle } from "react-icons/bi";
+import { getAllAction } from "../redux/actions/DepartmentsAction";
 
 export default function Teacher() {
   const dispatch = useDispatch();
   const teachers = useSelector((state) => state.TeacherReducer.teachers);
+  const departments = useSelector((state) => state.DepartmentReducer.departments);
+
+  const [selectDepartment, setSelectDepartment] = useState(undefined)
+
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
@@ -49,8 +54,9 @@ export default function Teacher() {
   });
 
   useEffect(() => {
-    dispatch(getAllTeacherAction(statusFilter));
-  }, [dispatch, statusFilter]);
+    dispatch(getAllTeacherAction(statusFilter, selectDepartment));
+    dispatch(getAllAction(statusFilter))
+  }, [dispatch, statusFilter, selectDepartment]);
 
   const handleDelete = async (id) => {
     const res = await dispatch(deleteTeacherAction(id));
@@ -373,6 +379,20 @@ export default function Teacher() {
               Thêm mới
             </Button>
           </Link>
+
+          <Select
+            allowClear={true}
+            value={selectDepartment ?? undefined}
+            onChange={(value) => {
+              setSelectDepartment(value);
+            }}
+            options={departments.map((s) => ({
+              value: s.id,
+              label: `${s.name}`,
+            }))}
+            placeholder='Chọn khoa'
+            className='w-full md:w-1/3'
+          />
 
           <Space size='middle'>
             <Input

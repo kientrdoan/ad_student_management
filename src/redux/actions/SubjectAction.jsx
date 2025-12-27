@@ -5,13 +5,14 @@ import { GET_ALL_SUBJECT, GET_ALL_SUBJECT_BY_MAJOR } from "../types/SubjectType"
 
 
 
-export const getAllSubjectAction = (statusFilter) => {
+export const getAllSubjectAction = (statusFilter, major_id = null) => {
   return async (dispatch) => {
     try {
       var payload = {};
       if (statusFilter !== "all") {
         payload = {
           is_deleted: statusFilter === "active" ? 0 : 1,
+          major_id: major_id,
         };
       }
       const result = await subjectService.getAllSubject(payload);

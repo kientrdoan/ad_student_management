@@ -36,6 +36,8 @@ export default function Subject() {
   const dispatch = useDispatch();
   const majors = useSelector((state) => state.MajorReducer.majors);
   const subjects = useSelector((state) => state.SubjectReducer.subjects);
+
+  const [selectMajor, setSelectMajor] = useState(undefined)
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [visibleColumns, setVisibleColumns] = useState({
@@ -54,10 +56,10 @@ export default function Subject() {
   useEffect(() => {
     const loadData = async () => {
       await dispatch(getAllMajorAction("active"));
-      await dispatch(getAllSubjectAction(statusFilter));
+      await dispatch(getAllSubjectAction(statusFilter, selectMajor));
     };
     loadData();
-  }, [dispatch, statusFilter]);
+  }, [dispatch, statusFilter, selectMajor]);
 
   const filteredData = subjects.filter((subject) => {
     const searchLower = searchText.toLowerCase();
@@ -360,9 +362,7 @@ export default function Subject() {
             </div>
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>Môn học</h1>
-              <p className='text-sm text-gray-500'>
-                Quản lý thông tin môn học
-              </p>
+              <p className='text-sm text-gray-500'>Quản lý thông tin môn học</p>
             </div>
           </div>
         </div>
@@ -378,6 +378,20 @@ export default function Subject() {
               Thêm mới
             </Button>
           </Link>
+
+          <Select
+            allowClear={true}
+            value={selectMajor ?? undefined}
+            onChange={(value) => {
+              setSelectMajor(value);
+            }}
+            options={majors.map((s) => ({
+              value: s.id,
+              label: `${s.name}`,
+            }))}
+            placeholder='Chọn ngành'
+            className='w-full md:w-1/3'
+          />
 
           <Space size='middle'>
             <Input
