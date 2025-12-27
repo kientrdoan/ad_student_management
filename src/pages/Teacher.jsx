@@ -40,6 +40,7 @@ export default function Teacher() {
     teacher_code: true,
     last_name: true,
     first_name: true,
+    department: true,
     email: true,
     phone: true,
     is_deleted: true,
@@ -147,6 +148,17 @@ export default function Teacher() {
         ),
       },
       {
+        key: "department",
+        label: (
+          <Checkbox
+            checked={visibleColumns.department}
+            onChange={() => toggleColumn("department")}
+          >
+            Tên
+          </Checkbox>
+        ),
+      },
+      {
         key: "email",
         label: (
           <Checkbox
@@ -239,6 +251,13 @@ export default function Teacher() {
       render: (_, r) => r.user?.first_name || "N/A",
       key: "first_name",
       visible: visibleColumns.first_name,
+      width: 150,
+    },
+    {
+      title: "Khoa",
+      render: (_, r) => r.department?.department_name || "N/A",
+      key: "department",
+      visible: visibleColumns.department,
       width: 150,
     },
     {

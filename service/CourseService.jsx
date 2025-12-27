@@ -12,6 +12,10 @@ export class CourseService extends BaseService {
   getAllCourseBySemester = (semester_id, payload) => {
     return this.get_token(`/admins/courses/${semester_id}`, payload);
   };
+    
+  getAllCourseByClass = (class_id, payload) => {
+    return this.get_token(`/admins/courses/class-st/${class_id}`, payload);
+  };
 
   getCourse = (id) => {
     return this.get_token(`/admins/course/${id}`);

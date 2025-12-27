@@ -121,6 +121,32 @@ export const getAllCourseBySemesterAction = (semester_id, statusFilter) => {
   };
 };
 
+
+export const getAllCourseByClassAction = (class_id, statusFilter) => {
+  return async (dispatch) => {
+    try {
+      var payload = {}
+      if(statusFilter !== "all"){
+        payload = {
+          is_deleted: statusFilter === "active"? 0: 1,
+        }
+      }
+      const result = await courseService.getAllCourseByClass(class_id, payload);
+      console.log("result", result.data);
+      if (result.status === 200) {
+        dispatch({
+          type: GET_ALL_COURSE,
+          courses: result.data.data,
+        });
+        return { success: true, data: result.data.data };
+      }
+    } catch (error) {
+      console.log("error", error);
+      return { success: false, error };
+    }
+  };
+};
+
 export const getCourseAction = (id) => {
   return async (dispatch) => {
     try {

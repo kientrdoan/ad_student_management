@@ -35,6 +35,7 @@ import {
   addCourseFromFileAction,
   deleteCourseAction,
   editCourseAction,
+  getAllCourseByClassAction,
   // getAllCourseAction,
   getAllCourseBySemesterAction,
   resetScheduleAction,
@@ -90,6 +91,7 @@ export default function Course() {
   const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const [semester, setSemester] = useState(null);
+  const [classSelect, setClassSelect] = useState(null);
 
   const courses = useSelector((state) => state.CourseReducer.courses);
   const semesters = useSelector((state) => state.SemesterReducer.semesters);
@@ -97,11 +99,9 @@ export default function Course() {
     (state) => state.SemesterReducer.current_semester
   );
   const classes = useSelector((state) => state.ClassReducer.classes);
-  // const teachers = useSelector((state) => state.TeacherReducer.teachers);
   const teacher_departments = useSelector(
     (state) => state.TeacherReducer.teacher_departments
   );
-  // const subjects = useSelector((state) => state.SubjectReducer.subjects);
   const subjects_majors = useSelector(
     (state) => state.SubjectReducer.subjects_majors
   );
@@ -156,6 +156,16 @@ export default function Course() {
     }
   }, [semester, dispatch, statusFilter]);
 
+  // Select danh sach lop theo lop sinh vien
+  useEffect(() => {
+    if (classSelect) {
+      console.log(classSelect)
+      dispatch(getAllCourseByClassAction(classSelect, statusFilter));
+    }else{
+      dispatch(getAllCourseBySemesterAction(semester, statusFilter));
+    }
+  }, [classSelect, dispatch, statusFilter, semester]);
+
   useEffect(() => {
     if (current_semester?.id && !semester) {
       setSemester(current_semester.id);
@@ -191,7 +201,6 @@ export default function Course() {
       dispatch(getTeacherByDepartmentAction(departmentId));
     }
 
-    // Set các field vào form, bao gồm subject (set id để Form quản lý)
     form.setFieldsValue({
       semester: record.semester?.id,
       class_st: record.class_st?.id,
@@ -205,7 +214,6 @@ export default function Course() {
       teacher: record.teacher?.id,
     });
 
-    // Lưu subject object để hiển thị fallback nếu options chưa có
     setSelectedSubject(record.subject);
   };
 
@@ -229,15 +237,13 @@ export default function Course() {
 
       if (res.success) {
         messageApi.success(
-          editingRecord
-            ? "Cập nhật thành công!"
-            : "Thêm thành công!"
+          editingRecord ? "Cập nhật thành công!" : "Thêm thành công!"
         );
         dispatch(getAllCourseBySemesterAction(semester, statusFilter));
         setIsModalVisible(false);
         form.resetFields();
       } else {
-        messageApi.error(res?.error ?.response?.data?.message || "Thất bại");
+        messageApi.error(res?.error?.response?.data?.message || "Thất bại");
       }
     } catch (err) {
       console.log("Validate Failed:", err);
@@ -250,7 +256,7 @@ export default function Course() {
     setSelectedSubject(null);
   };
 
-  const filteredData = courses.filter((course) => {
+  const filteredData = courses?.filter((course) => {
     const searchLower = searchText.toLowerCase();
     return (
       course.semester?.semesters?.toLowerCase().includes(searchLower) ||
@@ -626,29 +632,27 @@ export default function Course() {
         </div>
 
         <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
-          <Button
-            type='primary'
-            icon={<PlusOutlined />}
-            onClick={showAddModal}
-            size='large'
-            className='shadow-sm'
-          >
-            Thêm mới
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              onClick={showAddModal}
+              size='large'
+              className='shadow-sm'
+            >
+              Thêm mới
+            </Button>
 
-          <Select
-            value={semester ?? undefined}
-            onChange={(value) => {
-              console.log("🎯 Chọn semester:", value);
-              setSemester(value);
-            }}
-            options={semesters.map((s) => ({
-              value: s.id,
-              label: `${s.semesters} - Năm học ${s.year}`,
-            }))}
-            placeholder='Chọn học kỳ'
-            className='w-full md:w-1/3'
-          />
+            <Button
+              type='primary'
+              // icon={<PlusOutlined />}
+              onClick={() => setIsImportModalVisible(true)}
+              size='large'
+              className='shadow-sm'
+            >
+              Thêm bằng excel
+            </Button>
+          </div>
 
           <Space size='middle'>
             <Input
@@ -687,18 +691,36 @@ export default function Course() {
         </div>
 
         <div className='flex items-center justify-between mb-6 gap-4 flex-shrink-0'>
-          <div>
-            <Button
-              type='primary'
-              // icon={<PlusOutlined />}
-              onClick={() => setIsImportModalVisible(true)}
-              size='large'
-              className='shadow-sm'
-            >
-              Thêm bằng excel
-            </Button>
-          </div>
+          <div className="flex gap-2 flex-1">
+            <Select
+              value={semester ?? undefined}
+              onChange={(value) => {
+                console.log("🎯 Chọn semester:", value);
+                setSemester(value);
+              }}
+              options={semesters.map((s) => ({
+                value: s.id,
+                label: `${s.semesters} - Năm học ${s.year}`,
+              }))}
+              placeholder='Chọn học kỳ'
+              className='w-full md:w-1/3'
+            />
 
+            {/* Select theo lop sinh vien */}
+            <Select
+              allowClear={true}
+              value={classSelect ?? undefined}
+              onChange={(value) => {
+                setClassSelect(value);
+              }}
+              options={classes.map((s) => ({
+                value: s.id,
+                label: `${s.name}`,
+              }))}
+              placeholder='Chọn lớp sinh viên'
+              className='w-full md:w-1/3'
+            />
+          </div>
           <div className='flex items-center mb-6 gap-4 flex-shrink-0'>
             <Spin spinning={loadingSchedule}>
               <Button
@@ -1146,9 +1168,7 @@ export default function Course() {
           <Button icon={<UploadOutlined />}>Chọn file Excel</Button>
         </Upload>
 
-        <p className='mt-2 text-gray-500 text-sm'>
-          Hỗ trợ: .xlsx
-        </p>
+        <p className='mt-2 text-gray-500 text-sm'>Hỗ trợ: .xlsx</p>
       </Modal>
     </div>
   );
